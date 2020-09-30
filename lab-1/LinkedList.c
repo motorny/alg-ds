@@ -11,12 +11,12 @@ LIST* initList()
 
 void delList(LIST* head)
 {
-	LIST* a;
-	for (; head != NULL; )
+	LIST* currentDelLink;
+	while (head != NULL)
 	{
-		a = head;
+		currentDelLink = head;
 		head = head->next;
-		free(a);
+		free(currentDelLink);
 	}
 }
 
@@ -24,24 +24,24 @@ LIST* insertInList(LIST* head, int data)
 {
 	LIST* current = head
 		, * previous = NULL
-		, * temp;
+		, * linkToAdd;
 
-	temp = (LIST*)malloc(sizeof(LIST));
-	if (temp == NULL)
+	linkToAdd = (LIST*)malloc(sizeof(LIST));
+	if (linkToAdd == NULL)
 	{
 		printf_s("failed add item");
 		return NULL;
 	}
-	temp->data = data;
+	linkToAdd->data = data;
 
 	if (current == NULL)
 	{
-		head = temp;
+		head = linkToAdd;
 		head->next = NULL;
 		return head;
 	}
 
-	for (; current != NULL; )
+	while (current != NULL)
 	{
 		if (current->data == data)
 		{
@@ -51,19 +51,19 @@ LIST* insertInList(LIST* head, int data)
 		{
 			if (previous == NULL)
 			{
-				temp->next = current;
-				head = temp;
+				linkToAdd->next = current;
+				head = linkToAdd;
 				break;
 			}
 			if (current->next == NULL)
 			{
-				previous->next = temp;
-				temp->next = current;
+				previous->next = linkToAdd;
+				linkToAdd->next = current;
 			}
 			else
 			{
-				previous->next = temp;
-				temp->next = current;
+				previous->next = linkToAdd;
+				linkToAdd->next = current;
 			}
 			break;
 		}
@@ -71,8 +71,8 @@ LIST* insertInList(LIST* head, int data)
 		current = current->next;
 		if (current == NULL)
 		{
-			previous->next = temp;
-			temp->next = NULL;
+			previous->next = linkToAdd;
+			linkToAdd->next = NULL;
 		}
 	}
 
@@ -81,28 +81,28 @@ LIST* insertInList(LIST* head, int data)
 
 LIST* deleteItem(LIST* head, int data)
 {
-	LIST* a = head;
+	LIST* removedLink = head;
 	LIST* tmp = head;
-	if (a->data == data)
+	if (removedLink->data == data)
 	{
-		head = a->next;
-		free(a);
+		head = removedLink->next;
+		free(removedLink);
 	}
 	else
 	{
-		for (; a != NULL; )
+		while (removedLink != NULL)
 		{
-			if (a->data == data)
+			if (removedLink->data == data)
 			{
-				tmp->next = a->next;
-				free(a);
+				tmp->next = removedLink->next;
+				free(removedLink);
 				break;
 			}
-			tmp = a;
-			a = a->next;
+			tmp = removedLink;
+			removedLink = removedLink->next;
 		}
 
-		a = tmp;
+		removedLink = tmp;
 	}
 
 
@@ -111,59 +111,107 @@ LIST* deleteItem(LIST* head, int data)
 
 Bool searchItemInList(LIST* head, int data)
 {
-	LIST* a = head;
+	LIST* mainList = head;
 	Bool itFound = FALSE;
-	for (; a != NULL; )
+	while (mainList != NULL)
 	{
-		if (a->data == data)
+		if (mainList->data == data)
 		{
 			itFound = TRUE;
 			break;
 		}
-		a = a->next;
+		mainList = mainList->next;
 	}
 	return itFound;
 }
 
 LIST* intersection(LIST* head1, LIST* head2)
 {
-	LIST* a1 = head1, * a2;
-	LIST* temp = initList();
+	LIST* firstList = head1, * secondList;
+	LIST* intersectionList = initList();
 
-	for (; a1 != NULL; )
+	while (firstList != NULL)
 	{
-		a2 = head2;
-		for (; a2 != NULL; )
+		secondList = head2;
+		while (secondList != NULL)
 		{
-			if (a1->data == a2->data)
+			if (firstList->data == secondList->data)
 			{
-				temp = insertInList(temp, a1->data);
+				intersectionList = insertInList(intersectionList, firstList->data);
 				break;
 			}
-			a2 = a2->next;
+			secondList = secondList->next;
 		}
-		a1 = a1->next;
+		firstList = firstList->next;
 	}
 
-	return temp;
+	return intersectionList;
+}
+
+//helper function for union
+LIST* insertInEndOfList(LIST* head, int data)
+{
+	LIST* lastLink = head;
+	if (head == NULL)
+	{
+		lastLink = (LIST*)malloc(sizeof(LIST));
+		lastLink->data = data;
+		lastLink->next = NULL;
+		head = lastLink;
+	}
+	else
+	{
+		while (lastLink->next != NULL)
+		{
+			lastLink = lastLink->next;
+		}
+		lastLink->next = (LIST*)malloc(sizeof(LIST));
+		lastLink->next->data = data;
+		lastLink->next->next = NULL;
+	}
+
+	return head;
 }
 
 LIST* unionOfSets(LIST* head1, LIST* head2)
 {
-	LIST* a1 = head1, * a2 = head2;
-	LIST* temp = initList();
+	LIST* firstList = head1, * secondList = head2;
+	LIST* unionList = initList();
 
-	for (; a1 != NULL; )
+	while (firstList != NULL || secondList != NULL)
 	{
-		temp = insertInList(temp, a1->data);
-		a1 = a1->next;
+		if (firstList == NULL)
+		{
+			unionList = insertInEndOfList(unionList, secondList->data);
+			secondList = secondList->next;
+			continue;
+		}
+		if (secondList == NULL)
+		{
+			unionList = insertInEndOfList(unionList, firstList->data);
+			firstList = firstList->next;
+			continue;
+		}
+		if (firstList->data < secondList->data)
+		{
+			if (firstList != NULL)
+			{
+				unionList = insertInEndOfList(unionList, firstList->data);
+				firstList = firstList->next;
+				continue;
+			}
+		}
+		if (firstList->data == secondList->data)
+		{
+			unionList = insertInEndOfList(unionList, firstList->data);
+			firstList = firstList->next;
+			secondList = secondList->next;
+			continue;
+		}
+		unionList = insertInEndOfList(unionList, secondList->data);
+		secondList = secondList->next;
 	}
-	for (; a2 != NULL; )
-	{
-		temp = insertInList(temp, a2->data);
-		a2 = a2->next;
-	}
-	return temp;
+	return unionList;
 }
 
 void printList(LIST* head)

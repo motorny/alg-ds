@@ -1,0 +1,5 @@
+A:\lp\2\Test\Debug\Test.vcxproj.CopyComplete
+A:\lp\2\Test\Debug\Test.exe
+A:\lp\2\Test\Debug\Test.pdb
+A:\lp\2\Test\Debug\gtest.pdb
+A:\lp\2\Test\Debug\gtest_main.pdb

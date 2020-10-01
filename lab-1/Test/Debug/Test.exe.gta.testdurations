@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GtaTestDurations xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Executable>A:\lp\2\Test\Debug\Test.exe</Executable>
+  <TestDurations>
+    <TestDuration Test="TestCaseName.TestName" Duration="1" />
+    <TestDuration Test="CreateBucketMerge.CorrectData_ReturnTrue" Duration="1" />
+    <TestDuration Test="CreateBucketMerge.normalColumns_ReturnValidVal" Duration="1" />
+    <TestDuration Test="CreateBucketMerge.badlColumns_ReturnValidVal" Duration="1" />
+    <TestDuration Test="CreateBucketMerge.emptyList_ReturnValidVal" Duration="1" />
+    <TestDuration Test="CreateBucketMerge.normalColumns_ValidVal" Duration="1" />
+    <TestDuration Test="CreateBucketMerge.badlColumns_ValidVal" Duration="1" />
+    <TestDuration Test="CreateBucketMerge.emptyList_ValidVal" Duration="1" />
+    <TestDuration Test="Add2List.emptyList_ReturnTrue" Duration="1" />
+    <TestDuration Test="Add2List.notEmptyList_ReturnTrue" Duration="1" />
+  </TestDurations>
+</GtaTestDurations>

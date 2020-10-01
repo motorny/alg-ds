@@ -1,0 +1,2 @@
+A:\lp\2\A32\Debug\A32.exe
+A:\lp\2\A32\Debug\A32.pdb

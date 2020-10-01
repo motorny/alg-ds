@@ -1,5 +1,7 @@
 #include "pch.h"
+extern "C" {
 #include "..\skipList.h"
+}
 
 
 TEST(SkipListAdd, NullList_ReturnNull) {

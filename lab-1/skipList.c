@@ -1,10 +1,4 @@
-﻿// Gabdushev_A14_SkipList.cpp : Определяет функции для статической библиотеки.
-//
-
-#include "pch.h"
-#include "framework.h"
-
-#include <stdlib.h>
+﻿#include <stdlib.h>
 #include "skipList.h"
 
 skipList* skipList_Get(int maxLevelCount) {
@@ -78,7 +72,10 @@ skipList_Item* skipList_Add(skipList* sL, void* value, int key, int forceLevelOr
   if (insertingItem == NULL) {
     return NULL;
   }
-  *insertingItem = { value , key , itemLevelCount , NULL};
+  insertingItem->value = value;
+  insertingItem->key = key;
+  insertingItem->levelCount = itemLevelCount;
+  insertingItem->nextItem_array = NULL;
   insertingItem->nextItem_array = (skipList_Item**)calloc(itemLevelCount, sizeof(skipList_Item*));
   if (insertingItem->nextItem_array == NULL) {
     free(insertingItem);

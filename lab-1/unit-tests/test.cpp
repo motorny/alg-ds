@@ -1,76 +1,317 @@
 #include "pch.h"
 #include "..\skipList.h"
 
-TEST(SkipListFree, ZeroItems_NoMemLeaks) {
-  _CrtMemState s1, s2, s3;
 
+TEST(SkipListAdd, NullList_ReturnNull) {
   skipList* list;
+  skipList_Item* item;
 
-  _CrtMemCheckpoint(&s1);
+  int keys[]   = { 1 };
+  int levels[] = { 1 };
+  int values[] = { 1 };
 
-  list = skipList_Get();
-  skipList_Free(list);
+  list = NULL;
+  item = skipList_Add(list, &(values[0]), keys[0], levels[0]);
 
-  _CrtMemCheckpoint(&s2);
-
-  EXPECT_FALSE(_CrtMemDifference(&s3, &s1, &s2) && (_CrtMemDumpStatistics(&s3), true));
+  EXPECT_TRUE(item == NULL);
 }
 
-TEST(SkipListFree, OneItems_NoMemLeaks) {
-  _CrtMemState s1, s2, s3;
-
+TEST(SkipListAdd, InvalidLevel_ReturnNull) {
   skipList* list;
-  void* value = NULL;
-  int key = 0;
-  char level = 1;
+  skipList_Item* item;
 
-  _CrtMemCheckpoint(&s1);
+  int keys[]   = { 1 };
+  int levels[] = {-1 };
+  int values[] = { 1 };
 
-  list = skipList_Get();
-  skipList_Add(list, value, key, level);
+  list = skipList_Get(2);
+  item = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+
+  EXPECT_TRUE(item == NULL);
+
   skipList_Free(list);
-
-  _CrtMemCheckpoint(&s2);
-
-  EXPECT_FALSE(_CrtMemDifference(&s3, &s1, &s2) && (_CrtMemDumpStatistics(&s3), true));
 }
 
-TEST(SkipListAdd, TwoItemsSecondSmaller_NoMemLeaks) {
-  _CrtMemState s1, s2, s3;
-
+TEST(SkipListAdd, OneItem_ReturnValidVal) {
   skipList* list;
-  void* value = NULL;
-  int key1 = 1, key2 = 0;
-  char level1 = 1, level2 = 2;
+  skipList_Item* item0;
 
-  _CrtMemCheckpoint(&s1);
+  int keys[] = { 1 };
+  int levels[] = { 1 };
+  int values[] = { 1 };
 
-  list = skipList_Get();
-  skipList_Add(list, value, key1, level1);
-  skipList_Add(list, value, key2, level2);
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+
+  EXPECT_TRUE(item0 != NULL);
+  EXPECT_TRUE(item0->key == keys[0]);
+  EXPECT_TRUE(item0->levelCount == levels[0]);
+  EXPECT_TRUE(item0->value == values + 0);
+
   skipList_Free(list);
-
-  _CrtMemCheckpoint(&s2);
-
-  EXPECT_FALSE(_CrtMemDifference(&s3, &s1, &s2) && (_CrtMemDumpStatistics(&s3), true));
 }
 
-TEST(SkipListAdd, TwoItemsSecondBigger_NoMemLeaks) {
-  _CrtMemState s1, s2, s3;
-
+TEST(SkipListAdd, OneItemLevel1_CorrectPointers) {
   skipList* list;
-  void* value = NULL;
-  int key1 = 1, key2 = 2;
-  char level1 = 1, level2 = 2;
+  skipList_Item* item0;
 
-  _CrtMemCheckpoint(&s1);
+  int keys[] = { 1 };
+  int levels[] = { 1 };
+  int values[] = { 1 };
 
-  list = skipList_Get();
-  skipList_Add(list, value, key1, level1);
-  skipList_Add(list, value, key2, level2);
+  //item :     0      
+  //lvl_1: --------> NULL
+  //lvl_0: -> [ ] -> NULL
+  //key  :    <1>
+  //value:    {1}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == item0);
+  EXPECT_TRUE(list->statrItem.nextItem_array[1] == NULL);
+  EXPECT_TRUE(item0->nextItem_array[0] == NULL);
+
   skipList_Free(list);
+}
 
-  _CrtMemCheckpoint(&s2);
+TEST(SkipListAdd, OneItemLevel2_CorrectPointers) {
+  skipList* list;
+  skipList_Item* item0;
 
-  EXPECT_FALSE(_CrtMemDifference(&s3, &s1, &s2) && (_CrtMemDumpStatistics(&s3), true));
+  int keys[] = { 1 };
+  int levels[] = { 2 };
+  int values[] = { 1 };
+
+  //item :     0      
+  //lvl_1: -> [ ] -> NULL
+  //lvl_0: -> [ ] -> NULL
+  //key  :    <1>
+  //value:    {1}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == item0);
+  EXPECT_TRUE(list->statrItem.nextItem_array[1] == item0);
+  EXPECT_TRUE(item0->nextItem_array[0] == NULL);
+  EXPECT_TRUE(item0->nextItem_array[1] == NULL);
+
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys11_ReturnValidVal) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[] = { 1, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <1>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(item0->key == keys[0] && item0->levelCount == levels[0] && item0->value == values + 0);
+  EXPECT_TRUE(item1->key == keys[1] && item1->levelCount == levels[1] && item1->value == values + 1);
+
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys12_ReturnValidVal) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[] = { 1, 2 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     0      1
+  //lvl_1: --------> [ ] -> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {1}    {2}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(item0->key == keys[0] && item0->levelCount == levels[0] && item0->value == values + 0);
+  EXPECT_TRUE(item1->key == keys[1] && item1->levelCount == levels[1] && item1->value == values + 1);
+
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys21_ReturnValidVal) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[] = { 2, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(item0->key == keys[0] && item0->levelCount == levels[0] && item0->value == values + 0);
+  EXPECT_TRUE(item1->key == keys[1] && item1->levelCount == levels[1] && item1->value == values + 1);
+
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys11_Sorted) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[] = { 1, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <1>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(item1 == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item0 == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys12_Sorted) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[]   = { 1, 2 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     0      1
+  //lvl_1: --------> [ ] -> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {1}    {2}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(item0 == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item1 == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys21_Sorted) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[]   = { 2, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(item1 == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item0 == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+  
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys11_CorrectPointers) {
+  skipList* list;
+  skipList_Item* startItem, * item0, * item1;
+  int keys[] = { 1, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <1>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  startItem = &(list->statrItem);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(startItem->nextItem_array[0] == item1);
+  EXPECT_TRUE(startItem->nextItem_array[1] == item1);
+  EXPECT_TRUE(item1->nextItem_array[0] == item0);
+  EXPECT_TRUE(item1->nextItem_array[1] == NULL);
+  EXPECT_TRUE(item0->nextItem_array[0] == NULL);
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys12_CorrectPointers) {
+  skipList* list;
+  skipList_Item* startItem, * item0, * item1;
+  int keys[]   = { 1, 2 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     0      1
+  //lvl_1: --------> [ ] -> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {1}    {2}
+
+  list = skipList_Get(2);
+  startItem = &(list->statrItem);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(startItem->nextItem_array[0] == item0);
+  EXPECT_TRUE(startItem->nextItem_array[1] == item1);
+  EXPECT_TRUE(item0->nextItem_array[0] == item1);
+  EXPECT_TRUE(item1->nextItem_array[0] == NULL);
+  EXPECT_TRUE(item1->nextItem_array[1] == NULL);
+  skipList_Free(list);
+}
+
+TEST(SkipListAdd, TwoItemsKeys21_CorrectPointers) {
+  skipList* list;
+  skipList_Item* startItem, * item0, * item1;
+  int keys[]   = { 2, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  startItem = &(list->statrItem);
+  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+
+  EXPECT_TRUE(startItem->nextItem_array[0] == item1);
+  EXPECT_TRUE(startItem->nextItem_array[1] == item1);
+  EXPECT_TRUE(item1->nextItem_array[0] == item0);
+  EXPECT_TRUE(item1->nextItem_array[1] == NULL);
+  EXPECT_TRUE(item0->nextItem_array[0] == NULL);
+  skipList_Free(list);
 }

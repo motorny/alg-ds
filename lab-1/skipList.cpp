@@ -7,15 +7,15 @@
 #include <stdlib.h>
 #include "skipList.h"
 
-skipList* skipList_Get(void) {
+skipList* skipList_Get(int maxLevelCount) {
   skipList* sL;
 
   sL = (skipList*)malloc(sizeof(skipList));
   if (sL == NULL) {
     return NULL;
   }
-
-  sL->statrItem.nextItem_array = (skipList_Item**)calloc(SKIP_LIST_MAX_LEVEL_COUNT, sizeof(skipList_Item*));
+  sL->maxLevelCount = maxLevelCount;
+  sL->statrItem.nextItem_array = (skipList_Item**)calloc(maxLevelCount, sizeof(skipList_Item*));
   if (sL->statrItem.nextItem_array == NULL) {
     free(sL);
     return NULL;
@@ -28,7 +28,7 @@ int skipList_Free(skipList* sL) {
   skipList_Item* item, * nextItem;
 
   //Проверка входных данных
-  if (sL == NULL || sL->statrItem.nextItem_array == NULL) {
+  if (sL == NULL || sL->statrItem.nextItem_array == NULL || sL->maxLevelCount < 1) {
     return SKIP_LIST_ERROR;
   }
 
@@ -44,88 +44,84 @@ int skipList_Free(skipList* sL) {
   return SKIP_LIST_OK;
 }
 
-static char skipList_GetRandLevelCount(void) {
-  char n = 1;
-  while (n < SKIP_LIST_MAX_LEVEL_COUNT && rand()%2 == 1) {
+static int skipList_GetRandLevelCount(int maxLevelCount) {
+  int n = 1;
+  while (n < maxLevelCount && rand()%2 == 1) {
     n++;
   }
   return n;
 }
 
-int skipList_Add(skipList* sL, void* value, int key, char forceLevelOrZero) {
-  char i, itemLevelCount;
+skipList_Item* skipList_Add(skipList* sL, void* value, int key, int forceLevelOrZero) {
+  int i, itemLevelCount, maxLevelCount;
   skipList_Item* item, * nextItem, * insertingItem;
 
-  //В этот массив записываются последние элементы каждого уровня перед искомомым элементом
-  skipList_Item** endSearchItem_array;
-
   //Проверка входных данных
-  if (sL == NULL || sL->statrItem.nextItem_array == NULL || 
-      forceLevelOrZero < 0 || forceLevelOrZero > SKIP_LIST_MAX_LEVEL_COUNT) {
-    return SKIP_LIST_ERROR;
+  if (sL == NULL || sL->statrItem.nextItem_array == NULL || sL->maxLevelCount < 1) {
+    return NULL;
+  }
+  maxLevelCount = sL->maxLevelCount;
+  if (forceLevelOrZero < 0 || forceLevelOrZero > maxLevelCount) {
+    return NULL;
   }
 
   //Уровень вставляемого элемента может задаваться вероятностно (при 0) или конкретно (если корректное число)
   if (forceLevelOrZero == 0) {
-    itemLevelCount = skipList_GetRandLevelCount();
+    itemLevelCount = skipList_GetRandLevelCount(maxLevelCount);
   }
   else {
     itemLevelCount = forceLevelOrZero;
   }
 
   //Инициализация
-  endSearchItem_array = (skipList_Item**)calloc(SKIP_LIST_MAX_LEVEL_COUNT, sizeof(skipList_Item*));
-  if (endSearchItem_array == NULL) {
-    return SKIP_LIST_ERROR;
-  }
   insertingItem = (skipList_Item*)malloc(sizeof(skipList_Item));
   if (insertingItem == NULL) {
-    free(endSearchItem_array);
-    return SKIP_LIST_ERROR;
+    return NULL;
   }
   *insertingItem = { value , key , itemLevelCount , NULL};
   insertingItem->nextItem_array = (skipList_Item**)calloc(itemLevelCount, sizeof(skipList_Item*));
   if (insertingItem->nextItem_array == NULL) {
-    free(endSearchItem_array);
     free(insertingItem);
-    return SKIP_LIST_ERROR;
+    return NULL;
   }
 
   //Поиск
   item = &(sL->statrItem);
-  for (i = SKIP_LIST_MAX_LEVEL_COUNT - 1; i >= 0; i--) {
+  for (i = maxLevelCount - 1; i >= itemLevelCount; i--) {
     nextItem = item->nextItem_array[i];
     while (nextItem != NULL && nextItem->key < key) {
       item = nextItem;
       nextItem = nextItem->nextItem_array[i];
     }
-    endSearchItem_array[i] = item;
   }
 
-  //Вставка
-  for (i = 0; i < itemLevelCount; i++) {
-    item = endSearchItem_array[i];
+  //Поиск и вставка
+  for (i = itemLevelCount - 1; i >= 0; i--) {
     nextItem = item->nextItem_array[i];
+    while (nextItem != NULL && nextItem->key < key) {
+      item = nextItem;
+      nextItem = nextItem->nextItem_array[i];
+    }
     item->nextItem_array[i] = insertingItem;
     insertingItem->nextItem_array[i] = nextItem;
   }
-  
-  free(endSearchItem_array);
-  return SKIP_LIST_OK;
+
+  return insertingItem;
 }
 
 skipList_Item* skipList_Find(skipList* sL, int key)
 {
-  char i;
+  int i, maxLevelCount;
   skipList_Item* item, * nextItem = NULL;
 
   //Проверка входных данных
-  if (sL == NULL || sL->statrItem.nextItem_array == NULL) {
+  if (sL == NULL || sL->statrItem.nextItem_array == NULL || sL->maxLevelCount < 1) {
     return NULL;
   }
 
+  maxLevelCount = sL->maxLevelCount;
   item = &(sL->statrItem);
-  for (i = SKIP_LIST_MAX_LEVEL_COUNT - 1; i >= 0; i--) {
+  for (i = maxLevelCount - 1; i >= 0; i--) {
     nextItem = item->nextItem_array[i];
     while (nextItem != NULL && nextItem->key < key) {
       item = nextItem;
@@ -142,27 +138,28 @@ skipList_Item* skipList_Find(skipList* sL, int key)
 }
 
 int skipList_DeleteItem(skipList* sL, skipList_Item* deletingItem) {
-  char i, itemLevelCount;
+  int i, itemLevelCount, maxLevelCount;
   skipList_Item* item, * nextItem = NULL;
 
   //В этот массив записываются последние элементы каждого уровня перед искомомым элементом
   skipList_Item** endSearchItem_array;
 
   //Проверка входных данных
-  if (sL == NULL || sL->statrItem.nextItem_array == NULL || deletingItem == NULL) {
+  if (sL == NULL || sL->statrItem.nextItem_array == NULL || sL->maxLevelCount < 1 || deletingItem == NULL) {
     return SKIP_LIST_ERROR;
   }
   
   //Инициализация
+  maxLevelCount = sL->maxLevelCount;
   itemLevelCount = deletingItem->levelCount;
-  endSearchItem_array = (skipList_Item**)calloc(SKIP_LIST_MAX_LEVEL_COUNT, sizeof(skipList_Item*));
+  endSearchItem_array = (skipList_Item**)calloc(maxLevelCount, sizeof(skipList_Item*));
   if (endSearchItem_array == NULL) {
     return SKIP_LIST_ERROR;
   }
 
   //Поиск
   item = &(sL->statrItem);
-  for (i = SKIP_LIST_MAX_LEVEL_COUNT - 1; i >= 0; i--) {
+  for (i = maxLevelCount - 1; i >= 0; i--) {
     nextItem = item->nextItem_array[i];
     while (nextItem != NULL && nextItem != deletingItem) {
       item = nextItem;
@@ -190,26 +187,27 @@ int skipList_DeleteItem(skipList* sL, skipList_Item* deletingItem) {
 }
 
 int skipList_DeleteByKey(skipList* sL, int key) {
-  char i, itemLevelCount;
+  int i, itemLevelCount, maxLevelCount;
   skipList_Item* item, * nextItem = NULL, * deletingItem;
 
   //В этот массив записываются последние элементы каждого уровня перед искомомым элементом
   skipList_Item** endSearchItem_array;
 
   //Проверка входных данных
-  if (sL == NULL || sL->statrItem.nextItem_array == NULL) {
+  if (sL == NULL || sL->statrItem.nextItem_array == NULL || sL->maxLevelCount < 1) {
     return SKIP_LIST_ERROR;
   }
 
   //Инициализация
-  endSearchItem_array = (skipList_Item**)calloc(SKIP_LIST_MAX_LEVEL_COUNT, sizeof(skipList_Item*));
+  maxLevelCount = sL->maxLevelCount;
+  endSearchItem_array = (skipList_Item**)calloc(maxLevelCount, sizeof(skipList_Item*));
   if (endSearchItem_array == NULL) {
     return SKIP_LIST_ERROR;
   }
 
   //Поиск
   item = &(sL->statrItem);
-  for (i = SKIP_LIST_MAX_LEVEL_COUNT - 1; i >= 0; i--) {
+  for (i = maxLevelCount - 1; i >= 0; i--) {
     nextItem = item->nextItem_array[i];
     while (nextItem != NULL && nextItem->key < key) {
       item = nextItem;

@@ -3,8 +3,149 @@ extern "C" {
 #include "..\skipList.h"
 }
 
+skipList* GetSkiplistMockKeys11(void) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[] = { 1, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
 
-TEST(SkipListAdd, NullList_ReturnNull) {
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <1>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  item0 = (skipList_Item*)malloc(sizeof(skipList_Item));
+  item1 = (skipList_Item*)malloc(sizeof(skipList_Item));
+  if (item0 == NULL || item1 == NULL) {
+    return NULL;
+  }
+  item0->value = malloc(sizeof(int));
+  item1->value = malloc(sizeof(int));
+  if (item0->value == NULL || item1->value == NULL) {
+    return NULL;
+  }
+  item0->key = keys[0];
+  item0->levelCount = levels[0];
+  *(int*)(item0->value) = values[0];
+
+  item1->key = keys[1];
+  item1->levelCount = levels[1];
+  *(int*)(item1->value) = values[1];
+
+  item0->nextItem_array = (skipList_Item**)calloc(item0->levelCount, sizeof(skipList_Item*));
+  item1->nextItem_array = (skipList_Item**)calloc(item1->levelCount, sizeof(skipList_Item*));
+  if (item0->nextItem_array == NULL || item1->nextItem_array == NULL) {
+    return NULL;
+  }
+  list->statrItem.nextItem_array[0] = item1;
+  list->statrItem.nextItem_array[1] = item1;
+  item1->nextItem_array[0] = item0;
+  
+  return list;
+}
+
+skipList* GetSkiplistMockKeys12(void) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[] = { 1, 2 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     0      1
+  //lvl_1: --------> [ ] -> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {1}    {2}
+
+  list = skipList_Get(2);
+  item0 = (skipList_Item*)malloc(sizeof(skipList_Item));
+  item1 = (skipList_Item*)malloc(sizeof(skipList_Item));
+  if (item0 == NULL || item1 == NULL) {
+    return NULL;
+  }
+  item0->value = malloc(sizeof(int));
+  item1->value = malloc(sizeof(int));
+  if (item0->value == NULL || item1->value == NULL) {
+    return NULL;
+  }
+  item0->key = keys[0];
+  item0->levelCount = levels[0];
+  *(int*)(item0->value) = values[0];
+
+  item1->key = keys[1];
+  item1->levelCount = levels[1];
+  *(int*)(item1->value) = values[1];
+
+  item0->nextItem_array = (skipList_Item**)calloc(item0->levelCount, sizeof(skipList_Item*));
+  item1->nextItem_array = (skipList_Item**)calloc(item1->levelCount, sizeof(skipList_Item*));
+  if (item0->nextItem_array == NULL || item1->nextItem_array == NULL) {
+    return NULL;
+  }
+  list->statrItem.nextItem_array[0] = item0;
+  list->statrItem.nextItem_array[1] = item1;
+  item0->nextItem_array[0] = item1;
+  
+  return list;
+}
+
+skipList* GetSkiplistMockKeys21(void) {
+  skipList* list;
+  skipList_Item* item0, * item1;
+  int keys[] = { 2, 1 };
+  int levels[] = { 1, 2 };
+  int values[] = { 1, 2 };
+
+  //item :     1      0
+  //lvl_1: -> [ ] --------> NULL
+  //lvl_0: -> [ ] -> [ ] -> NULL
+  //key  :    <1>    <2>
+  //value:    {2}    {1}
+
+  list = skipList_Get(2);
+  item0 = (skipList_Item*)malloc(sizeof(skipList_Item));
+  item1 = (skipList_Item*)malloc(sizeof(skipList_Item));
+  if (item0 == NULL || item1 == NULL) {
+    return NULL;
+  }
+  item0->value = malloc(sizeof(int));
+  item1->value = malloc(sizeof(int));
+  if (item0->value == NULL || item1->value == NULL) {
+    return NULL;
+  }
+  item0->key = keys[0];
+  item0->levelCount = levels[0];
+  *(int*)(item0->value) = values[0];
+
+  item1->key = keys[1];
+  item1->levelCount = levels[1];
+  *(int*)(item1->value) = values[1];
+
+  item0->nextItem_array = (skipList_Item**)calloc(item0->levelCount, sizeof(skipList_Item*));
+  item1->nextItem_array = (skipList_Item**)calloc(item1->levelCount, sizeof(skipList_Item*));
+  if (item0->nextItem_array == NULL || item1->nextItem_array == NULL) {
+    return NULL;
+  }
+  list->statrItem.nextItem_array[0] = item1;
+  list->statrItem.nextItem_array[1] = item1;
+  item1->nextItem_array[0] = item0;
+
+  return list;
+}
+
+void FreeSkiplistMock(skipList* list) {
+  skipList_Item* item;
+  item = list->statrItem.nextItem_array[0];
+  while (item != NULL) {
+    free(item->value);
+    item = item->nextItem_array[0];
+  }
+  skipList_Free(list);
+}
+
+TEST(skipList_Add, NullList_ReturnNull) {
   skipList* list;
   skipList_Item* item;
 
@@ -18,7 +159,7 @@ TEST(SkipListAdd, NullList_ReturnNull) {
   EXPECT_TRUE(item == NULL);
 }
 
-TEST(SkipListAdd, InvalidLevel_ReturnNull) {
+TEST(skipList_Add, InvalidLevel_ReturnNull) {
   skipList* list;
   skipList_Item* item;
 
@@ -34,7 +175,7 @@ TEST(SkipListAdd, InvalidLevel_ReturnNull) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, OneItem_ReturnValidVal) {
+TEST(skipList_Add, OneItem_ReturnValidVal) {
   skipList* list;
   skipList_Item* item0;
 
@@ -53,7 +194,7 @@ TEST(SkipListAdd, OneItem_ReturnValidVal) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, OneItemLevel1_CorrectPointers) {
+TEST(skipList_Add, OneItemLevel1_CorrectPointers) {
   skipList* list;
   skipList_Item* item0;
 
@@ -77,7 +218,7 @@ TEST(SkipListAdd, OneItemLevel1_CorrectPointers) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, OneItemLevel2_CorrectPointers) {
+TEST(skipList_Add, OneItemLevel2_CorrectPointers) {
   skipList* list;
   skipList_Item* item0;
 
@@ -102,7 +243,7 @@ TEST(SkipListAdd, OneItemLevel2_CorrectPointers) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys11_ReturnValidVal) {
+TEST(skipList_Add, TwoItemsKeys11_ReturnValidVal) {
   skipList* list;
   skipList_Item* item0, * item1;
   int keys[] = { 1, 1 };
@@ -125,7 +266,7 @@ TEST(SkipListAdd, TwoItemsKeys11_ReturnValidVal) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys12_ReturnValidVal) {
+TEST(skipList_Add, TwoItemsKeys12_ReturnValidVal) {
   skipList* list;
   skipList_Item* item0, * item1;
   int keys[] = { 1, 2 };
@@ -148,7 +289,7 @@ TEST(SkipListAdd, TwoItemsKeys12_ReturnValidVal) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys21_ReturnValidVal) {
+TEST(skipList_Add, TwoItemsKeys21_ReturnValidVal) {
   skipList* list;
   skipList_Item* item0, * item1;
   int keys[] = { 2, 1 };
@@ -171,7 +312,7 @@ TEST(SkipListAdd, TwoItemsKeys21_ReturnValidVal) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys11_Sorted) {
+TEST(skipList_Add, TwoItemsKeys11_Sorted) {
   skipList* list;
   skipList_Item* item0, * item1;
   int keys[] = { 1, 1 };
@@ -194,7 +335,7 @@ TEST(SkipListAdd, TwoItemsKeys11_Sorted) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys12_Sorted) {
+TEST(skipList_Add, TwoItemsKeys12_Sorted) {
   skipList* list;
   skipList_Item* item0, * item1;
   int keys[]   = { 1, 2 };
@@ -217,7 +358,7 @@ TEST(SkipListAdd, TwoItemsKeys12_Sorted) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys21_Sorted) {
+TEST(skipList_Add, TwoItemsKeys21_Sorted) {
   skipList* list;
   skipList_Item* item0, * item1;
   int keys[]   = { 2, 1 };
@@ -240,7 +381,7 @@ TEST(SkipListAdd, TwoItemsKeys21_Sorted) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys11_CorrectPointers) {
+TEST(skipList_Add, TwoItemsKeys11_CorrectPointers) {
   skipList* list;
   skipList_Item* startItem, * item0, * item1;
   int keys[] = { 1, 1 };
@@ -266,7 +407,7 @@ TEST(SkipListAdd, TwoItemsKeys11_CorrectPointers) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys12_CorrectPointers) {
+TEST(skipList_Add, TwoItemsKeys12_CorrectPointers) {
   skipList* list;
   skipList_Item* startItem, * item0, * item1;
   int keys[]   = { 1, 2 };
@@ -292,7 +433,7 @@ TEST(SkipListAdd, TwoItemsKeys12_CorrectPointers) {
   skipList_Free(list);
 }
 
-TEST(SkipListAdd, TwoItemsKeys21_CorrectPointers) {
+TEST(skipList_Add, TwoItemsKeys21_CorrectPointers) {
   skipList* list;
   skipList_Item* startItem, * item0, * item1;
   int keys[]   = { 2, 1 };

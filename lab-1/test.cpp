@@ -5,7 +5,7 @@ extern "C"
 }
 
 
-TEST(pushFront_EmptyList_true) {
+TEST(pushFront_EmptyList_returnTrue) {
   list_t *l = createList();
 
   pushFront(l, "Element0");
@@ -14,7 +14,7 @@ TEST(pushFront_EmptyList_true) {
   deleteList(&l);
 }
 
-TEST(pushFront_1ElementList_true) {
+TEST(pushFront_1ElementList_returnTrue) {
   list_t *l = createList();
   pushFront(l, "Element0");
 
@@ -25,7 +25,7 @@ TEST(pushFront_1ElementList_true) {
   deleteList(&l);
 }
 
-TEST(pushFront_2ElementList_true) {
+TEST(pushFront_2ElementList_returnTrue) {
   list_t *l = createList();
   pushFront(l, "Element0");
   pushFront(l, "Element1");
@@ -37,7 +37,7 @@ TEST(pushFront_2ElementList_true) {
   deleteList(&l);
 }
 
-TEST(pushBack_EmptyList_true) {
+TEST(pushBack_EmptyList_returnTrue) {
   list_t* l = createList();
 
   pushBack(l, "Element0");
@@ -46,7 +46,7 @@ TEST(pushBack_EmptyList_true) {
   deleteList(&l);
 }
 
-TEST(pushBack_1ElementList_true) {
+TEST(pushBack_1ElementList_returnTrue) {
   list_t* l = createList();
   pushBack(l, "Element0");
 
@@ -57,7 +57,7 @@ TEST(pushBack_1ElementList_true) {
   deleteList(&l);
 }
 
-TEST(pushBack_2ElementList_true) {
+TEST(pushBack_2ElementList_returnTrue) {
   list_t* l = createList();
   pushBack(l, "Element0");
   pushBack(l, "Element1");
@@ -69,13 +69,13 @@ TEST(pushBack_2ElementList_true) {
   deleteList(&l);
 }
 
-TEST(popFront_EmptyList_returnFalse) {
+TEST(popFront_EmptyList_returnError) {
   list_t *l = createList();
   ASSERT_DEATH(popFront(l), "");
   deleteList(&l);
 }
 
-TEST(popFront_1ElementList_true) {
+TEST(popFront_1ElementList_returnElement) {
   list_t *l = createList();
   data_t tmp = {0};
 
@@ -86,7 +86,7 @@ TEST(popFront_1ElementList_true) {
   deleteList(&l);
 }
 
-TEST(popFront_2ElementList_true) {
+TEST(popFront_2orMoreElementList_returnElement) {
   list_t* l = createList();
   data_t tmp = { 0 };
 
@@ -98,17 +98,9 @@ TEST(popFront_2ElementList_true) {
   ASSERT_EQ(strcmp(l->head->value.value, "Element1"), 0);
   ASSERT_EQ(l->head, l->tail);
   deleteList(&l);
-} // стоит ли писать больше??
-
-/*TEST(insertBeforeElement_EmptyList_returnError) {
-  list_t* l = createList();
-  node_t* elem = NULL;
-  ASSERT_DEATH(insertBeforeElement(l, elem, "Element"), "");
-  deleteList(&l);
 }
-*/
 
-TEST(insertBeforeElement_1ElementList_true) {
+TEST(insertBeforeElement_1ElementList_returnTrue) {
   list_t *l = createList();
   pushBack(l, "Element");
   node_t* elem = l->head;
@@ -118,7 +110,7 @@ TEST(insertBeforeElement_1ElementList_true) {
   deleteList(&l);
 }
 
-TEST(insertBeforeElement_2ElementList_true) {
+TEST(insertBeforeElement_2ElementList_returnTrue) {
   list_t* l = createList();
   pushBack(l, "Element");
   pushBack(l, "Element1");
@@ -129,7 +121,7 @@ TEST(insertBeforeElement_2ElementList_true) {
   deleteList(&l);
 }
 
-TEST(insertBeforeElement_3orMoreElementList_true) {
+TEST(insertBeforeElement_3orMoreElementList_returnTrue) {
   list_t* l = createList();
   pushBack(l, "Element0");
   pushBack(l, "Element1");

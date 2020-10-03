@@ -33,11 +33,12 @@ int main(void) {
   tableMerge = fopen("tableMerge.csv", "w");
   assert(tableMerge != NULL);
 
-  if (Table2List(table1, buckets1, N) == 0 || Table2List(table2, buckets2, N) == 0) {
-    fprintf(tableMerge, "To many columns\n");
+  if (Table2List(table1, buckets1, N) == ERROR_MORE_COLUMNS_THEN_EXPECTED
+     || Table2List(table2, buckets2, N) == ERROR_MORE_COLUMNS_THEN_EXPECTED) {
+    fprintf(tableMerge, "Too many columns\n");
     return 0;
   }
-  if (CreateBucketMerge(buckets1, buckets2, bucketsMerge, N) == 0) {
+  if (CreateBucketMerge(buckets1, buckets2, bucketsMerge, N) == ERROR_WITH_COLUMNS) {
     fprintf(tableMerge, "Tables need to have same columns\n");
     return 0;
   }

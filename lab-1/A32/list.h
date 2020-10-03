@@ -3,6 +3,10 @@
 
 #pragma once
 
+#define ERROR_MORE_COLUMNS_THEN_EXPECTED - 2
+#define ERROR_WITH_COLUMNS - 1
+#define OK 1
+
 //define list and its functions 
 typedef struct List {
   char* data;

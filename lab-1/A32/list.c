@@ -13,7 +13,9 @@ static void InitBucket(List_t** head) {
 }
 
 List_t* Add2List(List_t* head, char* word) {
+
   List_t* cur = head;
+
   if (head == NULL) {//initialization
     InitBucket(&head);
     head->data = word;
@@ -29,11 +31,14 @@ List_t* Add2List(List_t* head, char* word) {
       cur->next->next = NULL;
     }
   }
+
   return head;
 }
 
 static void DestroyNode(List_t* buckets[], int column) {
+
   List_t* cur;
+
   cur = buckets[column];
   buckets[column] = buckets[column]->next;
   free(cur->data);
@@ -48,14 +53,14 @@ static int FindColumns(List_t* buckets1[], List_t* buckets2[], int* L, int* R, i
       if (strcmp(buckets1[column1]->data, buckets2[column2]->data) == 0) {//if names of the columns are the same 
         *L = column1;
         *R = column2;
-        return 1;
+        return OK;
       }
       else
         column2++;
     }
     column1++;
   }
-  return 0;
+  return ERROR_WITH_COLUMNS;
 }
 
 static List_t* Copy2List(List_t* buckets, List_t* bucketsMerge) {
@@ -71,7 +76,7 @@ int Table2List(FILE* table, List_t* buckets[], int n) {//transform exel file to 
   char str;
   while ((str = (char)fgetc(table)) != (EOF)) {
     if (column >= n)
-      return 0;
+      return ERROR_MORE_COLUMNS_THEN_EXPECTED;
     switch (str) {
       case ';'://if next column
         if(word)
@@ -96,7 +101,7 @@ int Table2List(FILE* table, List_t* buckets[], int n) {//transform exel file to 
     }
   }
   free(word);
-  return 1;
+  return OK;
 }
 
 int CreateBucketMerge(List_t* buckets1[], List_t* buckets2[], List_t* bucketsMerge[], int n) {
@@ -104,8 +109,8 @@ int CreateBucketMerge(List_t* buckets1[], List_t* buckets2[], List_t* bucketsMer
   List_t* cur;
   int leftColumn, rightColumn;
 
-  if (FindColumns(buckets1, buckets2, &leftColumn, &rightColumn, n) == 0)
-    return 0;
+  if (FindColumns(buckets1, buckets2, &leftColumn, &rightColumn, n) == ERROR_WITH_COLUMNS)
+    return ERROR_WITH_COLUMNS;
 
   //for start  add to bucketMerge names of columns exept the same
   int columnTables = 0, columnMerge = 0;
@@ -152,7 +157,7 @@ int CreateBucketMerge(List_t* buckets1[], List_t* buckets2[], List_t* bucketsMer
       free(cur->data);
     free(cur);
   }
-  return 1;
+  return OK;
 }
 
 void List2Table(List_t* buckets[], FILE* table, int n) {

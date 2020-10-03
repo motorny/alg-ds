@@ -142,7 +142,7 @@ TEST(CreateBucketMerge, CorrectData_ReturnTrue) {//check if Add2List can initial
  FreeTestData(bucketsMerge, 3);
 }
 
-#define INVALID_COLUMNS_ERROR_CODE 0
+#define INVALID_COLUMNS_ERROR_CODE -1
 #define CORRECT_COLUMNS_CODE 1
 
 TEST(CreateBucketMerge, normalColumns_ValidVal) {

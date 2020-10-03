@@ -1,2 +1,4 @@
 A:\lp\2\A32\Debug\A32.exe
 A:\lp\2\A32\Debug\A32.pdb
+C:\Users\Иван\Documents\GitHub\alg-ds\lab-1\A32\Debug\A32.exe
+C:\Users\Иван\Documents\GitHub\alg-ds\lab-1\A32\Debug\A32.pdb

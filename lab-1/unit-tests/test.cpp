@@ -684,3 +684,250 @@ TEST(skipList_Find, TwoItemsKeys20SecondValidKey_ReturnValidVal) {
   EXPECT_TRUE(item == list->statrItem.nextItem_array[0]->nextItem_array[0]);
   FreeSkiplistMock(list);
 }
+
+
+TEST(skipList_DeleteByKey, NullList_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = NULL;
+  returnCode = skipList_DeleteByKey(list, 1);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+}
+
+TEST(skipList_DeleteByKey, ZeroItem_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = skipList_Get(2);
+  returnCode = skipList_DeleteByKey(list, 0);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, OneItemLevel1TooBigKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockLevel_1();
+  returnCode = skipList_DeleteByKey(list, 2);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, OneItemLevel1TooSmallKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockLevel_1();
+  returnCode = skipList_DeleteByKey(list, 0);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, OneItemLevel1ValidKey_ReturnValidVal) {
+  skipList* list;
+  int returnCode;
+  _CrtMemState memSt1, memSt2, memDiff;
+  _CrtMemCheckpoint(&memSt1);
+
+  list = GetSkiplistMockLevel_1();
+  returnCode = skipList_DeleteByKey(list, 1);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == NULL && list->statrItem.nextItem_array[1] == NULL);
+
+  FreeSkiplistMock(list);
+
+  _CrtMemCheckpoint(&memSt2);
+  _CrtMemDumpAllObjectsSince(&memSt1);
+  EXPECT_FALSE(_CrtMemDifference(&memDiff, &memSt1, &memSt2));
+  
+}
+
+TEST(skipList_DeleteByKey, OneItemLevel2TooBigKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockLevel_2();
+  returnCode = skipList_DeleteByKey(list, 3);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, OneItemLevel2TooSmallKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockLevel_2();
+  returnCode = skipList_DeleteByKey(list, 0);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, OneItemLevel2ValidKey_ReturnValidVal) {
+  skipList* list;
+  int returnCode;
+  _CrtMemState memSt1, memSt2, memDiff;
+  _CrtMemCheckpoint(&memSt1);
+
+  list = GetSkiplistMockLevel_2();
+  returnCode = skipList_DeleteByKey(list, 2);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == NULL && list->statrItem.nextItem_array[1] == NULL);
+
+  FreeSkiplistMock(list);
+
+  _CrtMemCheckpoint(&memSt2);
+  _CrtMemDumpAllObjectsSince(&memSt1);
+  EXPECT_FALSE(_CrtMemDifference(&memDiff, &memSt1, &memSt2));
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys11TooBigKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockKeys_11();
+  returnCode = skipList_DeleteByKey(list, 2);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys11TooSmallKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockKeys_11();
+  returnCode = skipList_DeleteByKey(list, 0);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys11ValidKey_ReturnValidVal) {
+  skipList* list;
+  int returnCode;
+  skipList_Item* leftItem;
+  _CrtMemState memSt1, memSt2, memDiff;
+  _CrtMemCheckpoint(&memSt1);
+
+  list = GetSkiplistMockKeys_11();
+  leftItem = list->statrItem.nextItem_array[0]->nextItem_array[0];
+  returnCode = skipList_DeleteByKey(list, 1);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == NULL);
+
+  FreeSkiplistMock(list);
+
+  _CrtMemCheckpoint(&memSt2);
+  _CrtMemDumpAllObjectsSince(&memSt1);
+  EXPECT_FALSE(_CrtMemDifference(&memDiff, &memSt1, &memSt2));
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys02MidKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockKeys_02();
+  returnCode = skipList_DeleteByKey(list, 1);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys02FirstValidKey_ReturnValidVal) {
+  skipList* list;
+  int returnCode;
+  skipList_Item* leftItem;
+  _CrtMemState memSt1, memSt2, memDiff;
+  _CrtMemCheckpoint(&memSt1);
+
+  list = GetSkiplistMockKeys_02();
+  leftItem = list->statrItem.nextItem_array[0]->nextItem_array[0];
+  returnCode = skipList_DeleteByKey(list, 0);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == leftItem);
+
+  FreeSkiplistMock(list);
+
+  _CrtMemCheckpoint(&memSt2);
+  _CrtMemDumpAllObjectsSince(&memSt1);
+  EXPECT_FALSE(_CrtMemDifference(&memDiff, &memSt1, &memSt2));
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys02SecondValidKey_ReturnValidVal) {
+  skipList* list;
+  int returnCode;
+  skipList_Item* leftItem;
+  _CrtMemState memSt1, memSt2, memDiff;
+  _CrtMemCheckpoint(&memSt1);
+
+  list = GetSkiplistMockKeys_02();
+  leftItem = list->statrItem.nextItem_array[0];
+  returnCode = skipList_DeleteByKey(list, 2);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == NULL && leftItem->nextItem_array[0] == NULL);
+
+  FreeSkiplistMock(list);
+
+  _CrtMemCheckpoint(&memSt2);
+  _CrtMemDumpAllObjectsSince(&memSt1);
+  EXPECT_FALSE(_CrtMemDifference(&memDiff, &memSt1, &memSt2));
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys20MidKey_ReturnError) {
+  skipList* list;
+  int returnCode;
+
+  list = GetSkiplistMockKeys_20();
+  returnCode = skipList_DeleteByKey(list, 1);
+
+  EXPECT_TRUE(returnCode == SKIP_LIST_ERROR);
+  FreeSkiplistMock(list);
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys20FirstValidKey_ReturnValidVal) {
+  skipList* list;
+  int returnCode;
+  skipList_Item* leftItem;
+  _CrtMemState memSt1, memSt2, memDiff;
+  _CrtMemCheckpoint(&memSt1);
+
+  list = GetSkiplistMockKeys_20();
+  leftItem = list->statrItem.nextItem_array[0]->nextItem_array[0];
+  returnCode = skipList_DeleteByKey(list, 0);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == NULL && leftItem->nextItem_array[0] == NULL);
+
+  FreeSkiplistMock(list);
+
+  _CrtMemCheckpoint(&memSt2);
+  _CrtMemDumpAllObjectsSince(&memSt1);
+  EXPECT_FALSE(_CrtMemDifference(&memDiff, &memSt1, &memSt2));
+}
+
+TEST(skipList_DeleteByKey, TwoItemsKeys20SecondValidKey_ReturnValidVal) {
+  skipList* list;
+  int returnCode;
+  skipList_Item* leftItem;
+  _CrtMemState memSt1, memSt2, memDiff;
+  _CrtMemCheckpoint(&memSt1);
+
+  list = GetSkiplistMockKeys_20();
+  leftItem = list->statrItem.nextItem_array[0];
+  returnCode = skipList_DeleteByKey(list, 2);
+
+  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == leftItem && leftItem->nextItem_array[0] == NULL && leftItem->nextItem_array[1] == NULL);
+
+  FreeSkiplistMock(list);
+
+  _CrtMemCheckpoint(&memSt2);
+  _CrtMemDumpAllObjectsSince(&memSt1);
+  EXPECT_FALSE(_CrtMemDifference(&memDiff, &memSt1, &memSt2));
+}

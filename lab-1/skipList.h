@@ -22,3 +22,5 @@ int skipList_Free(skipList* sL);
 skipList_Item* skipList_Add(skipList* sL, void* value, int key, int forceLevelOrZero);
 
 skipList_Item* skipList_Find(skipList* sL, int key);
+
+int skipList_DeleteByKey(skipList* sL, int key);

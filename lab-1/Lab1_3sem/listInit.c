@@ -35,8 +35,8 @@ enum SAME_E FindPosForMan(myList** start, SNP snp, myList** pMan, myList** nMan,
 	*pMan = NULL;
 	char word[isize];
 	char word2compare[isize];
-	int pointer = 0;
-	
+	int cmpR = STRSAME;
+
 	switch (snp_pos) {
 	case SURNAME:
 		strcpy(word2compare, snp.surname);
@@ -63,16 +63,14 @@ enum SAME_E FindPosForMan(myList** start, SNP snp, myList** pMan, myList** nMan,
 			break;
 		}
 
-		for (pointer = 0; pointer < isize && pointer < strlen(word2compare) && pointer < strlen(word); pointer++) {
-			if (word2compare[pointer] != word[pointer])
-				break;
-		}
+		
+		cmpR = strcmp(word2compare, word);
 
-		if (word2compare[pointer] < word[pointer]) {
+		if (cmpR == STR2B) {
 			*nMan = OfList;
 			break;
 		}
-		else if (word2compare[pointer] > word[pointer]) {
+		else if (cmpR == STR1B) {
 			if (OfList->next == NULL) {
 				*nMan = OfList->next;
 				*pMan = OfList;
@@ -86,8 +84,8 @@ enum SAME_E FindPosForMan(myList** start, SNP snp, myList** pMan, myList** nMan,
 				return SAME;
 			}
 			else {
-				return NSAME;
 				*nMan = OfList;
+				return NSAME;
 			}
 		}
 
@@ -153,3 +151,4 @@ myList* Add2List(myList** start, SNP snp) {
 
 	return nMan;
 }
+

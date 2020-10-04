@@ -1,5 +1,8 @@
 #pragma once
 #define isize 20
+#define STRSAME 0
+#define STR1B 1
+#define STR2B -1
 
 typedef struct myList{
   struct myList* next;

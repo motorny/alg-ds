@@ -11,22 +11,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="skipList.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="list.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="skipList.c">
+    <ClCompile Include="listCompare.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="list.c">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md" />
   </ItemGroup>
 </Project>

@@ -11,7 +11,7 @@ typedef struct skipList_Item {
 } skipList_Item;
 
 typedef struct skipList {
-  skipList_Item statrItem;
+  skipList_Item startItem;
   int maxLevelCount;
 } skipList;
 
@@ -19,6 +19,10 @@ skipList* skipList_Get(int maxLevelCount);
 
 int skipList_Free(skipList* sL);
 
-skipList_Item* skipList_Add(skipList* sL, void* value, int key, int forceLevelOrZero);
+skipList_Item* _skipList_Add(skipList* sL, void* value, int key, int forceLevelOrZero);
+
+skipList_Item* skipList_Add(skipList* sL, void* value, int key);
 
 skipList_Item* skipList_Find(skipList* sL, int key);
+
+int skipList_DeleteByKey(skipList* sL, int key);

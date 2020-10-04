@@ -3,6 +3,11 @@
 #include <assert.h>
 #define N 4 //количество элементов в массиве, служащем основной очереди 
 
+#define NO_ERRORS 0
+#define NOT_ENOUGH_MEMORY 1
+#define ARRAY_IS_FULL 2
+#define QUEUE_IS_FREE 3
+
 /*#define __CRTDBG_MAP_ALLOC
 #include <crtdbg.h>
 #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -25,12 +30,18 @@ typedef struct{
 	element_t* tail;
 }queue_list_t;
 
-void CreateList(queue_list_t* queue) {
+void CreateList(queue_list_t* queue, int *error) {
 
 	queue->head = malloc(sizeof(element_t));
-	queue->head->next = NULL;
-	queue->tail = queue->head;
-	queue->size = 0;
+	if (queue->head == NULL) {
+		*error = NOT_ENOUGH_MEMORY;
+	}
+	else {
+		queue->head->next = NULL;
+		queue->tail = queue->head;
+		queue->size = 0;
+		*error = NO_ERRORS;
+	}
 
 }
 
@@ -45,25 +56,25 @@ int IsFilledList(queue_list_t* queue) {
 
 void AddToList(queue_list_t* queue, int data, int *error) {
 
-	element_t* temp;
+	element_t* newElement;
 
 	if (IsFilledList(queue)) {
-		temp = malloc(sizeof(element_t));
+		newElement = malloc(sizeof(element_t));
 
-		if (temp == NULL) {
-			*error = 1; //в случае нехватки памяти
+		if (newElement == NULL) {
+			*error = NOT_ENOUGH_MEMORY;
 		}
 		else {
-			*error = 0;
-			temp->data = data;
-			temp->next = NULL;
+			*error = NO_ERRORS;
+			newElement->data = data;
+			newElement->next = NULL;
 
-			queue->tail->next = temp;
-			queue->tail = temp;
+			queue->tail->next = newElement;
+			queue->tail = newElement;
 		}
 	}
 	else {
-		*error = 0;
+		*error = NO_ERRORS;
 		queue->head->data = data;
 		queue->head->next = NULL;
 		queue->tail = queue->head;
@@ -82,11 +93,11 @@ int DeleteFromList(queue_list_t* queue, int *error) {
 		queue->head = first;
 		queue->size--;
 
-		*error = 0;
+		*error = NO_ERRORS;
 		return element;
 	}
 	else {
-		*error = 1;
+		*error = QUEUE_IS_FREE;
 		return 0;
 	}
 
@@ -126,12 +137,12 @@ int IsFilledArray(queue_array_t* queue) {
 
 void AddToArray(queue_array_t* queue, int element, int* error) {
 	if ((queue->tail + 1) % N == queue->head) {
-		*error = 1; //если массив переполнен
+		*error = ARRAY_IS_FULL; 
 	}
 	else {
 		queue->data[queue->tail] = element;
 		queue->tail = (queue->tail + 1) % N;
-		*error = 0;
+		*error = NO_ERRORS;
 	}
 }
 
@@ -141,11 +152,11 @@ int DeleteFromArray(queue_array_t* queue, int* error) {
 	if (IsFilledArray(queue)) {
 		element = queue->data[queue->head];
 		queue->head = (queue->head + 1) % N;
-		*error = 0;
+		*error = NO_ERRORS;
 		return element;
 	}
 	else {
-		*error = 1; //если массив пустой
+		*error = QUEUE_IS_FREE;
 		return 0;
 	}
 }
@@ -177,11 +188,14 @@ void DeleteAllArray_ArrayIsFree_returnValidVal(void) {
 
 void DeleteAllArray_ArrayIsFilled_returnValidVal(void) {
 	queue_array_t queue;
-	int error;
 	CreateArray(&queue);
 
-	AddToArray(&queue, 1, &error);
-	AddToArray(&queue, 2, &error);
+	queue.data[queue.tail] = 1;
+	queue.tail = (queue.tail + 1) % N;
+
+	queue.data[queue.tail] = 2;
+	queue.tail = (queue.tail + 1) % N;
+
 	DeleteAllArray(&queue);
 
 	assert(queue.head == queue.tail);
@@ -208,7 +222,7 @@ void AddToArray_ArrayIsFree_returnValidVal() {
 	assert(queue.tail - tail == 1);
 }
 
-void AddToArray_ArrayIsFull_returnValidVal() {
+void AddToArray_ArrayIsFull_returnError() {
 	queue_array_t queue;
 	int error, i, tail;
 	CreateArray(&queue);
@@ -239,7 +253,8 @@ void DeleteFromArray_ArrayIsFiiled_returnValidVal() {
 	int error, element;
 	CreateArray(&queue);
 
-	AddToArray(&queue, 6, &error);
+	queue.data[queue.tail] = 6;
+	queue.tail = (queue.tail + 1) % N;
 	element = DeleteFromArray(&queue, &error);
 
 	assert(error == 0);
@@ -292,7 +307,7 @@ void AddToList_ListIsFree_returnValidVal(void) {
 	queue_list_t queue;
 	int error;
 
-	CreateList(&queue);
+	CreateList(&queue, &error);
 	AddToList(&queue, 5, &error);
 
 	assert(queue.head->data == 5);
@@ -301,8 +316,9 @@ void AddToList_ListIsFree_returnValidVal(void) {
 
 void CreateList_ListIsFree_returnValidVal(void) {
 	queue_list_t queue;
+	int error;
 
-	CreateList(&queue);
+	CreateList(&queue, &error);
 
 	assert(queue.size == 0);
 	assert(queue.head == queue.tail);
@@ -310,8 +326,9 @@ void CreateList_ListIsFree_returnValidVal(void) {
 
 void DeleteAllList_ListIsFree_returnValidVal(void) {
 	queue_list_t queue;
+	int error;
 
-	CreateList(&queue);
+	CreateList(&queue, &error);
 
 	DeleteAllList(&queue);
 
@@ -323,8 +340,12 @@ void DeleteAllList_ListIsFilled_returnValidVal(void) {
 	queue_list_t queue;
 	int error;
 
-	CreateList(&queue);
-	AddToList(&queue, 5, &error);
+	CreateList(&queue, &error);
+
+	queue.head->data = 6;
+	queue.head->next = NULL;
+	queue.tail = queue.head;
+
 	DeleteAllList(&queue);
 
 	assert(queue.size == 0);
@@ -334,7 +355,7 @@ void DeleteAllList_ListIsFilled_returnValidVal(void) {
 void DeleteFromList_ListIsFree_returnValidVal(void) {
 	queue_list_t queue;
 	int element, error;
-	CreateList(&queue);
+	CreateList(&queue, &error);
 
 	element = DeleteFromList(&queue, &error);
 
@@ -347,10 +368,17 @@ void DeleteFromList_ListIsFree_returnValidVal(void) {
 void DeleteFromList_ListIsFilled_returnValidVal(void) {
 	queue_list_t queue;
 	int element, error;
-	CreateList(&queue);
+	element_t* newElement;
+	CreateList(&queue, &error);
 
-	AddToList(&queue, 6, &error);
-	AddToList(&queue, 4, &error);
+	queue.head->data = 6;
+	queue.head->next = NULL;
+	queue.tail = queue.head;
+
+	newElement->data = 4;
+	newElement->next = NULL;
+	queue.tail->next = newElement;
+	queue.tail = newElement;
 
 	element = DeleteFromList(&queue, &error);
 
@@ -362,8 +390,8 @@ void DeleteFromList_ListIsFilled_returnValidVal(void) {
 
 void IsFilledList_ListIsFree_return0(void) {
 	queue_list_t queue;
-	int state;
-	CreateList(&queue);
+	int state, error;
+	CreateList(&queue, &error);
 
 	state = IsFilledList(&queue);
 
@@ -373,7 +401,7 @@ void IsFilledList_ListIsFree_return0(void) {
 void IsFilledList_ListIsFilled_return1(void) {
 	queue_list_t queue;
 	int state, error;
-	CreateList(&queue);
+	CreateList(&queue, &error);
 
 	AddToList(&queue, 1, &error);
 	state = IsFilledList(&queue);
@@ -384,8 +412,8 @@ void IsFilledList_ListIsFilled_return1(void) {
 
 void SizeOfList_ListIsFree_return0(void) {
 	queue_list_t queue;
-	int size;
-	CreateList(&queue);
+	int size, error;
+	CreateList(&queue, &error);
 
 	size = SizeOfList(&queue);
 
@@ -395,7 +423,7 @@ void SizeOfList_ListIsFree_return0(void) {
 void SizeOfList_ListIsFilled_return2(void) {
 	queue_list_t queue;
 	int size, error;
-	CreateList(&queue);
+	CreateList(&queue, &error);
 
 	AddToList(&queue, 1, &error);
 	AddToList(&queue, 2, &error);

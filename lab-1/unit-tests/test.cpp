@@ -28,7 +28,7 @@ skipList* GetSkiplistMockLevel_1(void) {
   if (item0->nextItem_array == NULL) {
     return NULL;
   }
-  list->statrItem.nextItem_array[0] = item0;
+  list->startItem.nextItem_array[0] = item0;
 
   return list;
 }
@@ -58,8 +58,8 @@ skipList* GetSkiplistMockLevel_2(void) {
   if (item0->nextItem_array == NULL) {
     return NULL;
   }
-  list->statrItem.nextItem_array[0] = item0;
-  list->statrItem.nextItem_array[1] = item0;
+  list->startItem.nextItem_array[0] = item0;
+  list->startItem.nextItem_array[1] = item0;
 
   return list;
 }
@@ -96,8 +96,8 @@ skipList* GetSkiplistMockKeys_11(void) {
   if (item0->nextItem_array == NULL || item1->nextItem_array == NULL) {
     return NULL;
   }
-  list->statrItem.nextItem_array[0] = item1;
-  list->statrItem.nextItem_array[1] = item1;
+  list->startItem.nextItem_array[0] = item1;
+  list->startItem.nextItem_array[1] = item1;
   item1->nextItem_array[0] = item0;
   
   return list;
@@ -135,8 +135,8 @@ skipList* GetSkiplistMockKeys_02(void) {
   if (item0->nextItem_array == NULL || item1->nextItem_array == NULL) {
     return NULL;
   }
-  list->statrItem.nextItem_array[0] = item0;
-  list->statrItem.nextItem_array[1] = item1;
+  list->startItem.nextItem_array[0] = item0;
+  list->startItem.nextItem_array[1] = item1;
   item0->nextItem_array[0] = item1;
   
   return list;
@@ -174,8 +174,8 @@ skipList* GetSkiplistMockKeys_20(void) {
   if (item0->nextItem_array == NULL || item1->nextItem_array == NULL) {
     return NULL;
   }
-  list->statrItem.nextItem_array[0] = item1;
-  list->statrItem.nextItem_array[1] = item1;
+  list->startItem.nextItem_array[0] = item1;
+  list->startItem.nextItem_array[1] = item1;
   item1->nextItem_array[0] = item0;
 
   return list;
@@ -194,7 +194,7 @@ TEST(skipList_Add, NullList_ReturnNull) {
   int values[] = { 1 };
 
   list = NULL;
-  item = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
 
   EXPECT_TRUE(item == NULL);
 }
@@ -208,7 +208,7 @@ TEST(skipList_Add, InvalidLevel_ReturnNull) {
   int values[] = { 1 };
 
   list = skipList_Get(2);
-  item = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
 
   EXPECT_TRUE(item == NULL);
 
@@ -224,7 +224,7 @@ TEST(skipList_Add, OneItem_ReturnValidVal) {
   int values[] = { 1 };
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
 
   EXPECT_TRUE(item0 != NULL);
   EXPECT_TRUE(item0->key == keys[0]);
@@ -249,16 +249,16 @@ TEST(skipList_Add, OneItemLevel1_CorrectPointers) {
   //value:    {1}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == item0);
-  EXPECT_TRUE(list->statrItem.nextItem_array[1] == NULL);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == item0);
+  EXPECT_TRUE(list->startItem.nextItem_array[1] == NULL);
   EXPECT_TRUE(item0->nextItem_array[0] == NULL);
 
   skipList_Free(list);
 }
 
-TEST(skipList_Add, OneItemLevel2_CorrectPointers) {
+TEST(_skipList_Add, OneItemLevel2_CorrectPointers) {
   skipList* list;
   skipList_Item* item0;
 
@@ -273,10 +273,10 @@ TEST(skipList_Add, OneItemLevel2_CorrectPointers) {
   //value:    {1}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == item0);
-  EXPECT_TRUE(list->statrItem.nextItem_array[1] == item0);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == item0);
+  EXPECT_TRUE(list->startItem.nextItem_array[1] == item0);
   EXPECT_TRUE(item0->nextItem_array[0] == NULL);
   EXPECT_TRUE(item0->nextItem_array[1] == NULL);
 
@@ -297,8 +297,8 @@ TEST(skipList_Add, TwoItemsKeys11_ReturnValidVal) {
   //value:    {2}    {1}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
   EXPECT_TRUE(item0->key == keys[0] && item0->levelCount == levels[0] && item0->value == values + 0);
   EXPECT_TRUE(item1->key == keys[1] && item1->levelCount == levels[1] && item1->value == values + 1);
@@ -320,8 +320,8 @@ TEST(skipList_Add, TwoItemsKeys12_ReturnValidVal) {
   //value:    {1}    {2}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
   EXPECT_TRUE(item0->key == keys[0] && item0->levelCount == levels[0] && item0->value == values + 0);
   EXPECT_TRUE(item1->key == keys[1] && item1->levelCount == levels[1] && item1->value == values + 1);
@@ -343,8 +343,8 @@ TEST(skipList_Add, TwoItemsKeys21_ReturnValidVal) {
   //value:    {2}    {1}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
   EXPECT_TRUE(item0->key == keys[0] && item0->levelCount == levels[0] && item0->value == values + 0);
   EXPECT_TRUE(item1->key == keys[1] && item1->levelCount == levels[1] && item1->value == values + 1);
@@ -366,11 +366,11 @@ TEST(skipList_Add, TwoItemsKeys11_Sorted) {
   //value:    {2}    {1}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
-  EXPECT_TRUE(item1 == list->statrItem.nextItem_array[0]);
-  EXPECT_TRUE(item0 == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+  EXPECT_TRUE(item1 == list->startItem.nextItem_array[0]);
+  EXPECT_TRUE(item0 == list->startItem.nextItem_array[0]->nextItem_array[0]);
 
   skipList_Free(list);
 }
@@ -389,11 +389,11 @@ TEST(skipList_Add, TwoItemsKeys12_Sorted) {
   //value:    {1}    {2}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
-  EXPECT_TRUE(item0 == list->statrItem.nextItem_array[0]);
-  EXPECT_TRUE(item1 == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+  EXPECT_TRUE(item0 == list->startItem.nextItem_array[0]);
+  EXPECT_TRUE(item1 == list->startItem.nextItem_array[0]->nextItem_array[0]);
 
   skipList_Free(list);
 }
@@ -412,11 +412,11 @@ TEST(skipList_Add, TwoItemsKeys21_Sorted) {
   //value:    {2}    {1}
 
   list = skipList_Get(2);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
-  EXPECT_TRUE(item1 == list->statrItem.nextItem_array[0]);
-  EXPECT_TRUE(item0 == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+  EXPECT_TRUE(item1 == list->startItem.nextItem_array[0]);
+  EXPECT_TRUE(item0 == list->startItem.nextItem_array[0]->nextItem_array[0]);
   
   skipList_Free(list);
 }
@@ -435,9 +435,9 @@ TEST(skipList_Add, TwoItemsKeys11_CorrectPointers) {
   //value:    {2}    {1}
 
   list = skipList_Get(2);
-  startItem = &(list->statrItem);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  startItem = &(list->startItem);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
   EXPECT_TRUE(startItem->nextItem_array[0] == item1);
   EXPECT_TRUE(startItem->nextItem_array[1] == item1);
@@ -461,9 +461,9 @@ TEST(skipList_Add, TwoItemsKeys12_CorrectPointers) {
   //value:    {1}    {2}
 
   list = skipList_Get(2);
-  startItem = &(list->statrItem);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  startItem = &(list->startItem);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
   EXPECT_TRUE(startItem->nextItem_array[0] == item0);
   EXPECT_TRUE(startItem->nextItem_array[1] == item1);
@@ -487,9 +487,9 @@ TEST(skipList_Add, TwoItemsKeys21_CorrectPointers) {
   //value:    {2}    {1}
 
   list = skipList_Get(2);
-  startItem = &(list->statrItem);
-  item0 = skipList_Add(list, &(values[0]), keys[0], levels[0]);
-  item1 = skipList_Add(list, &(values[1]), keys[1], levels[1]);
+  startItem = &(list->startItem);
+  item0 = _skipList_Add(list, &(values[0]), keys[0], levels[0]);
+  item1 = _skipList_Add(list, &(values[1]), keys[1], levels[1]);
 
   EXPECT_TRUE(startItem->nextItem_array[0] == item1);
   EXPECT_TRUE(startItem->nextItem_array[1] == item1);
@@ -549,7 +549,7 @@ TEST(skipList_Find, OneItemLevel1ValidKey_ReturnValidVal) {
   list = GetSkiplistMockLevel_1();
   item = skipList_Find(list, 1);
 
-  EXPECT_TRUE(item == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item == list->startItem.nextItem_array[0]);
   FreeSkiplistMock(list);
 }
 
@@ -582,7 +582,7 @@ TEST(skipList_Find, OneItemLevel2ValidKey_ReturnValidVal) {
   list = GetSkiplistMockLevel_2();
   item = skipList_Find(list, 2);
 
-  EXPECT_TRUE(item == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item == list->startItem.nextItem_array[0]);
   FreeSkiplistMock(list);
 }
 
@@ -615,7 +615,7 @@ TEST(skipList_Find, TwoItemsKeys11ValidKey_ReturnValidVal) {
   list = GetSkiplistMockKeys_11();
   item = skipList_Find(list, 1);
 
-  EXPECT_TRUE(item == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item == list->startItem.nextItem_array[0]);
   FreeSkiplistMock(list);
 }
 
@@ -637,7 +637,7 @@ TEST(skipList_Find, TwoItemsKeys02FirstValidKey_ReturnValidVal) {
   list = GetSkiplistMockKeys_02();
   item = skipList_Find(list, 0);
 
-  EXPECT_TRUE(item == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item == list->startItem.nextItem_array[0]);
   FreeSkiplistMock(list);
 }
 
@@ -648,7 +648,7 @@ TEST(skipList_Find, TwoItemsKeys02SecondValidKey_ReturnValidVal) {
   list = GetSkiplistMockKeys_02();
   item = skipList_Find(list, 2);
 
-  EXPECT_TRUE(item == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+  EXPECT_TRUE(item == list->startItem.nextItem_array[0]->nextItem_array[0]);
   FreeSkiplistMock(list);
 }
 
@@ -670,7 +670,7 @@ TEST(skipList_Find, TwoItemsKeys20FirstValidKey_ReturnValidVal) {
   list = GetSkiplistMockKeys_20();
   item = skipList_Find(list, 0);
 
-  EXPECT_TRUE(item == list->statrItem.nextItem_array[0]);
+  EXPECT_TRUE(item == list->startItem.nextItem_array[0]);
   FreeSkiplistMock(list);
 }
 
@@ -681,7 +681,7 @@ TEST(skipList_Find, TwoItemsKeys20SecondValidKey_ReturnValidVal) {
   list = GetSkiplistMockKeys_20();
   item = skipList_Find(list, 2);
 
-  EXPECT_TRUE(item == list->statrItem.nextItem_array[0]->nextItem_array[0]);
+  EXPECT_TRUE(item == list->startItem.nextItem_array[0]->nextItem_array[0]);
   FreeSkiplistMock(list);
 }
 
@@ -738,7 +738,7 @@ TEST(skipList_DeleteByKey, OneItemLevel1ValidKey_ReturnValidVal) {
   list = GetSkiplistMockLevel_1();
   returnCode = skipList_DeleteByKey(list, 1);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == NULL && list->statrItem.nextItem_array[1] == NULL);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == NULL && list->startItem.nextItem_array[1] == NULL);
 
   FreeSkiplistMock(list);
 
@@ -779,7 +779,7 @@ TEST(skipList_DeleteByKey, OneItemLevel2ValidKey_ReturnValidVal) {
   list = GetSkiplistMockLevel_2();
   returnCode = skipList_DeleteByKey(list, 2);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == NULL && list->statrItem.nextItem_array[1] == NULL);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == NULL && list->startItem.nextItem_array[1] == NULL);
 
   FreeSkiplistMock(list);
 
@@ -818,10 +818,10 @@ TEST(skipList_DeleteByKey, TwoItemsKeys11ValidKey_ReturnValidVal) {
   _CrtMemCheckpoint(&memSt1);
 
   list = GetSkiplistMockKeys_11();
-  leftItem = list->statrItem.nextItem_array[0]->nextItem_array[0];
+  leftItem = list->startItem.nextItem_array[0]->nextItem_array[0];
   returnCode = skipList_DeleteByKey(list, 1);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == NULL);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == leftItem && list->startItem.nextItem_array[1] == NULL);
 
   FreeSkiplistMock(list);
 
@@ -849,10 +849,10 @@ TEST(skipList_DeleteByKey, TwoItemsKeys02FirstValidKey_ReturnValidVal) {
   _CrtMemCheckpoint(&memSt1);
 
   list = GetSkiplistMockKeys_02();
-  leftItem = list->statrItem.nextItem_array[0]->nextItem_array[0];
+  leftItem = list->startItem.nextItem_array[0]->nextItem_array[0];
   returnCode = skipList_DeleteByKey(list, 0);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == leftItem);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == leftItem && list->startItem.nextItem_array[1] == leftItem);
 
   FreeSkiplistMock(list);
 
@@ -869,10 +869,10 @@ TEST(skipList_DeleteByKey, TwoItemsKeys02SecondValidKey_ReturnValidVal) {
   _CrtMemCheckpoint(&memSt1);
 
   list = GetSkiplistMockKeys_02();
-  leftItem = list->statrItem.nextItem_array[0];
+  leftItem = list->startItem.nextItem_array[0];
   returnCode = skipList_DeleteByKey(list, 2);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == NULL && leftItem->nextItem_array[0] == NULL);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == leftItem && list->startItem.nextItem_array[1] == NULL && leftItem->nextItem_array[0] == NULL);
 
   FreeSkiplistMock(list);
 
@@ -900,10 +900,10 @@ TEST(skipList_DeleteByKey, TwoItemsKeys20FirstValidKey_ReturnValidVal) {
   _CrtMemCheckpoint(&memSt1);
 
   list = GetSkiplistMockKeys_20();
-  leftItem = list->statrItem.nextItem_array[0]->nextItem_array[0];
+  leftItem = list->startItem.nextItem_array[0]->nextItem_array[0];
   returnCode = skipList_DeleteByKey(list, 0);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == NULL && leftItem->nextItem_array[0] == NULL);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == leftItem && list->startItem.nextItem_array[1] == NULL && leftItem->nextItem_array[0] == NULL);
 
   FreeSkiplistMock(list);
 
@@ -920,10 +920,10 @@ TEST(skipList_DeleteByKey, TwoItemsKeys20SecondValidKey_ReturnValidVal) {
   _CrtMemCheckpoint(&memSt1);
 
   list = GetSkiplistMockKeys_20();
-  leftItem = list->statrItem.nextItem_array[0];
+  leftItem = list->startItem.nextItem_array[0];
   returnCode = skipList_DeleteByKey(list, 2);
 
-  EXPECT_TRUE(list->statrItem.nextItem_array[0] == leftItem && list->statrItem.nextItem_array[1] == leftItem && leftItem->nextItem_array[0] == NULL && leftItem->nextItem_array[1] == NULL);
+  EXPECT_TRUE(list->startItem.nextItem_array[0] == leftItem && list->startItem.nextItem_array[1] == leftItem && leftItem->nextItem_array[0] == NULL && leftItem->nextItem_array[1] == NULL);
 
   FreeSkiplistMock(list);
 

@@ -25,6 +25,6 @@ void pushFront(list_t* list, char* value);
 data_t popFront(list_t* list);
 void pushBack(list_t* list, char* value);
 void insertBeforeElement(list_t* list, node_t* elm, char* value);
-list_t* insertionSort(list_t** List);
+int insertionSort(list_t** List);
 
 #endif // !DLL_H_

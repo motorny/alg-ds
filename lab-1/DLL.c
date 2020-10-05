@@ -43,7 +43,7 @@ data_t popFront(list_t* list) {
   node_t* prev;
   data_t tmp = {0};
   if (list->head == NULL)
-    return;
+    return tmp;
   prev = list->head;
   list->head = list->head->next;
   if (list->head)
@@ -56,10 +56,10 @@ data_t popFront(list_t* list) {
 }
 
 void pushBack(list_t* list, char* value) {
-  node_t* tmp = (node_t*)malloc(sizeof(node_t));
+  node_t* newEl = (node_t*)malloc(sizeof(node_t));
   node_t* tmp1 = NULL;
   
-  if (tmp == NULL) {
+  if (newEl == NULL) {
     exit(3);
   }
   if (list->head == NULL) {
@@ -68,12 +68,12 @@ void pushBack(list_t* list, char* value) {
   else {
     tmp1 = list->tail;
     
-    tmp->prev = tmp1;
-    tmp->next = NULL;
-    strcpy(tmp->value.value, value);
+    newEl->prev = tmp1;
+    newEl->next = NULL;
+    strcpy(newEl->value.value, value);
 
-    tmp1->next = tmp;
-    list->tail = tmp;
+    tmp1->next = newEl;
+    list->tail = newEl;
   }
 }
 
@@ -87,6 +87,9 @@ void insertBeforeElement(list_t* list, node_t* elm, char *value) {
     return;
   }
   ins = (node_t*)malloc(sizeof(node_t));
+  if (ins == NULL) {
+    return;
+  }
   strcpy(ins->value.value, value);
   ins->prev = elm->prev;
   ins->next = elm;
@@ -96,9 +99,9 @@ void insertBeforeElement(list_t* list, node_t* elm, char *value) {
   ins->prev->next = ins;
 }
 
-list_t* insertionSort(list_t** List) {
+int insertionSort(list_t** List) {
   if ((*List)->head == NULL) {
-    return NULL;
+    return 0;
   }
   list_t* out = createList();
   node_t* sorted = NULL;
@@ -125,5 +128,5 @@ list_t* insertionSort(list_t** List) {
   }
   free(*List);
   *List = out;
-  return List;
+  return 1;
 }

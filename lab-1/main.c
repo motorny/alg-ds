@@ -7,7 +7,7 @@
 #include <crtdbg.h> 
 #endif
 
-double* CompareStack(void) { // sry for copy & paste))
+double* CompareStack(void) { // sry for copy & paste
 	int i = 0, N = 1000;
 	double* time = (double*)malloc(4*sizeof(double)), buf;
 	stackList_t* head;

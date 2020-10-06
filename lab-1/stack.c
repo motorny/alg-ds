@@ -1,21 +1,27 @@
 #include "stack.h"
 #include <stdlib.h>
+#define ERROR_STACK NULL
+#define ERROR_REALLOC 0
+#define ERROR_EMPTY_STACK 0
+
+
 
 int CheckNullStack(stack_t* stack) {
     return stack == NULL;
 }
 
+
 stack_t* CreateStack(int size) {
     stack_t* stack = (stack_t*)malloc(sizeof(stack_t));
     if (CheckNullStack(stack)) {
-        return NULL;
+        return ERROR_STACK;
     }
     stack->data_size = size;
     stack->last = 0;
     stack->data = (type_t*)malloc(sizeof(type_t) * stack->data_size);
     if (stack->data == NULL) {
         free(stack);
-        return NULL;
+        return ERROR_STACK;
     }
     return stack;
 }
@@ -30,7 +36,7 @@ int ReallocAndCheckNull(stack_t *stack) {
         stack->data_size++;
         buffer = (type_t*)realloc(stack->data, stack->data_size * sizeof(type_t));
         if (buffer == NULL) {
-            return 0;
+            return ERROR_REALLOC;
         }
         stack->data = buffer;
         return 1;
@@ -52,7 +58,7 @@ type_t Pop(stack_t* stack) {
         a = stack->data[stack->last];
         return a;
     }
-    return a;
+    return ERROR_EMPTY_STACK;
 }
 
 void RemoveStack(stack_t* stack) {
@@ -79,7 +85,7 @@ type_t PopList(stackList_t** head) {
     type_t value;
     stackList_t* out;
     if (CheckNullHead(*head))
-        return 0;
+        return ERROR_REALLOC;
     value = (*head)->value;
     out = (*head);
     (*head) = (*head)->next;
@@ -88,7 +94,7 @@ type_t PopList(stackList_t** head) {
 }
 
 type_t PeekList(stackList_t *head) {
-    return CheckNullHead(head) ? 0 : head->value;
+    return CheckNullHead(head) ? ERROR_EMPTY_STACK : head->value;
 }
 
 type_t IsEmptyList(stackList_t* head) {

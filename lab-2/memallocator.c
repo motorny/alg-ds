@@ -29,6 +29,9 @@ static struct {
   int totalSize;       // total block size
 } s_memInfo;
 
+#define MEM_SUCCESS 1
+#define MEM_FAIL 0
+
 // Init memory system with memory block pMemory.
 int meminit(void *pMemory, int size) {
   descriptor_t descr;
@@ -60,7 +63,7 @@ int meminit(void *pMemory, int size) {
 }
 
 // You can implement memory leak checks here
-void memdone(void) {
+void memdone() {
   // in the end list must have 2 nodes, that contains all memory block
   int size = s_memInfo.startList->blockSize + s_memInfo.startList->next->blockSize + 2 * BLOCK_INFO_SIZE;
 

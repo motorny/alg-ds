@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef __MEMALLOCATOR_H__E71A34CB
 #define __MEMALLOCATOR_H__E71A34CB
 
@@ -7,14 +5,11 @@
 extern "C" {
 #endif
 
-#define MEM_SUCCESS 1
-#define MEM_FAIL 0
-
 // Init memory system with memory block pMemory.
 int meminit(void *pMemory, int size);
 
 // You can implement memory leak checks here
-void memdone(void);
+void memdone();
 
 // Allocate memory block of size 'size'.
 // Returns pointer to memory block is success, 0 otherwise
@@ -32,7 +27,8 @@ void memfree(void *p);
 // memfree(p);
 // memdone();
 // free(ptr);
-int memgetminimumsize(void);
+int memgetminimumsize();
+
 
 // Returns size in bytes of additional information per allocation
 // use case:
@@ -46,7 +42,7 @@ int memgetminimumsize(void);
 // memfree(p1);
 // memdone();
 // free(ptr);
-int memgetblocksize(void);
+int memgetblocksize();
 
 
 #ifdef __cplusplus

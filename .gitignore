@@ -1,0 +1,14 @@
+.vscode
+lab-2
+lab-1/working_list/.vs
+lab-1/working_list/Debug
+lab-1/working_list/working_list.sln
+lab-1/working_list/working_list/Debug
+lab-1/working_list/working_list/working_list.vcxproj
+lab-1/working_list/working_list/working_list.vcxproj.filters
+lab-1/working_list/working_list/working_list.vcxproj.user
+lab-1/working_list/tst1/Debug
+lab-1/working_list/tst1/tst1.vcxproj
+lab-1/working_list/tst1/tst1.vcxproj.user
+lab-1/working_list/tst1/packages.config
+lab-1/working_list/packages

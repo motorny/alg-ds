@@ -20,6 +20,7 @@ struct ListPosition {
     struct Node *curPtr;
     struct Node *prevPtr;
 };
+unsigned long long ptr_xor(struct Node *ptr1, struct Node *ptr2);
 struct ListPosition find(struct List list, const char *key);
 void show(struct List list);
 //extern "C" {

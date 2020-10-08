@@ -53,7 +53,7 @@ void delete_position(struct List *list, struct ListPosition pos) {
         assert(list->firstElement == curPtr);
         list->firstElement = nextPtr;
     }
-    printf("free %lld ", (unsigned long long) curPtr);
+//    printf("free %lld ", (unsigned long long) curPtr);
     free(curPtr);
 
 }
@@ -76,26 +76,16 @@ void show(struct List list) {
     printf("\n");
 }
 
-
-// push_back -> (5, NULL)
-// push_front -> (NULL, 1)
-/// 1 -- 2 -- 3 -- 4 -- 5
-// prevPtr - 0
-// nextPtr - 1
-/// <0>--1 -- 2 <-- 2.5 --> 3 -- 4 -- 5
-// curPtr - 2.5
-//ptr== pointer
-// prevPtr->linksXor == 1 ^ 3 ^ 2.5
 void add(struct List *list, struct Node *prevPtr, struct Node *nextPtr, const char *value) {
     struct Node *curPtr = (struct Node *) malloc(sizeof(struct Node));
 //    printf("%lld ", (unsigned long long) curPtr);
     curPtr->element = value;
     curPtr->linksXor = ptr_xor(prevPtr, nextPtr);
     if (prevPtr != NULL) {
-        prevPtr->linksXor ^= (unsigned long long) curPtr ^ (unsigned long long) nextPtr;
+        prevPtr->linksXor ^= ptr_xor(curPtr,nextPtr);
     }
     if (nextPtr != NULL) {
-        nextPtr->linksXor ^= (unsigned long long) curPtr ^ (unsigned long long) prevPtr;
+        nextPtr->linksXor ^= ptr_xor(curPtr,prevPtr);
     }
     if (prevPtr == NULL) {
         list->firstElement = curPtr;
@@ -115,36 +105,16 @@ int main_2() {
     show(mylist);
     printf("\n");
     struct ListPosition front, back;
-
-//    int x[10]; // stack
-//    int * y = malloc(sizeof(int) * 10) ;// heap  new
-//
-//    vector<int> vec;
-//    char * z = "first"; // string literal
-//    z[0] = 'd'
-//    front = find(mylist, "first");
-//    printf("")
     front.prevPtr = NULL;
-    front.curPtr = (struct Node *) mylist.firstElement->linksXor;
+    front.curPtr = mylist.firstElement;
+    delete_position(&mylist,front);
+    show(mylist);
     front = find(mylist, "caba");
     printf("\n");
-//    printf("%lld", front.curPtr);
-//    printf("\n");
-//    printf("%lld", front.prevPtr);
     show(mylist);
     delete_key(&mylist, "caba");
-//    delete_position(&mylist,front);
     delete_key(&mylist, "aba");
-    printf(" \n%s  \n", "______________________");
-    add(&mylist, NULL, mylist.firstElement, "3");
-    show(mylist);
-    add(&mylist, NULL, mylist.firstElement, "4");
-    show(mylist);
-    add(&mylist, NULL, mylist.firstElement, "5");
-    show(mylist);
-    puts("");
-    add(&mylist, NULL, mylist.firstElement, "6");
-    printf("Before last show!!/n");
+    printf("%s  \n", "______________________");
     show(mylist);
     return 0;
 }

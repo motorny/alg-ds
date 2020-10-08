@@ -23,6 +23,7 @@ struct ListPosition {
 
 extern "C" {
     struct ListPosition find(struct List list, const char *key);
+unsigned long long ptr_xor(struct Node *ptr1, struct Node *ptr2);
 void show(struct List list);
 void delete_position(struct List *list, struct ListPosition pos);
 void delete_key(struct List *list, const char *key);

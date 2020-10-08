@@ -1,7 +1,9 @@
-#include "pch.h"
+//#include "pch.h"
 #include <stdlib.h>
 //#include "vld.h"
 #include <stdio.h>
+const int capacityChange = 10;
+#define STACK_IS_EMPTY -1
 typedef struct ArrayStack {
 	int* data;
 	int capacity;
@@ -10,26 +12,26 @@ typedef struct ArrayStack {
 
 ArrayStack_t* createArrayStack() {
 	ArrayStack_t* t = (ArrayStack_t*)malloc(sizeof(ArrayStack_t));
-	t->capacity = 10;
+	t->capacity = capacityChange;
 	t->size = 0;
-	t->data = (int*)malloc(sizeof(int) * 10);
+	t->data = (int*)malloc(sizeof(int) * capacityChange);
 	return t;
 }
 void pushArray(int d, ArrayStack_t* stack) {
 	stack->data[stack->size++] = d;
 	if (stack->capacity == stack->size)
 	{
-		int* newData = (int*)malloc(sizeof(int) * (stack->capacity + 10));
+		int* newData = (int*)malloc(sizeof(int) * (stack->capacity + capacityChange));
 		for (int i = 0; i != stack->size; ++i)
 			newData[i] = stack->data[i];
-		stack->capacity += 10;
+		stack->capacity += capacityChange;
 		free(stack->data);
 		stack->data = newData;
 	}
 }
 int popArray(ArrayStack_t* stack)
 {
-	return stack->data[(stack->size--) - 1];
+	return stack->data[(stack->size--)-1];
 }
 void destroyArray(ArrayStack_t* stack)
 {
@@ -67,7 +69,7 @@ int pop(LinkedListStack_t** stack)
 		*stack = prev;
 		return t;
 	}
-	else return -1;
+	else return STACK_IS_EMPTY;
 }
 void destroy(LinkedListStack_t** stack) {
 	LinkedListStack_t* prev = NULL;
@@ -78,69 +80,71 @@ void destroy(LinkedListStack_t** stack) {
 	}
 	free(*stack);
 }
-TEST(testArrayStack, createAndDestroyEmptyArrayStack) {
+TEST(testArrayStack, createEmptyArrayStack) {
 	ArrayStack_t* t = createArrayStack();
-	EXPECT_TRUE(t->capacity == 10);
-	EXPECT_TRUE(t->size == 0);
+	EXPECT_TRUE(t->capacity == capacityChange);
+	EXPECT_TRUE(t->size==0);
 	EXPECT_TRUE(t->data != NULL);
-	destroyArray(t);
+	free(t->data);
+	free(t);
 }
 TEST(testArrayStack, pushOnetoArrayStack) {
 	ArrayStack_t* t = createArrayStack();
-	pushArray(1, t);
-	EXPECT_TRUE(t->capacity == 10);
+	pushArray(1,t);
+	EXPECT_TRUE(t->capacity == capacityChange);
 	EXPECT_TRUE(t->size == 1);
 	EXPECT_TRUE(t->data[0] == 1);
 	destroyArray(t);
 }
 TEST(testArrayStack, pushMoreThenTenIntstoArrayStack) {
 	ArrayStack_t* t = createArrayStack();
-	for (int i = 0; i != 11; ++i)
-		pushArray(i, t);
+	for(int i=0;i!=11;++i)
+	pushArray(i, t);
 	EXPECT_TRUE(t->capacity == 20);
 	EXPECT_TRUE(t->size == 11);
 	for (int i = 0; i != 11; ++i)
-		EXPECT_TRUE(t->data[i] == i);
+	EXPECT_TRUE(t->data[i] == i);
 	destroyArray(t);
 }
 TEST(testArrayStack, popOnetoArrayStack) {
 	ArrayStack_t* t = createArrayStack();
-	pushArray(1, t);
+	t->data[t->size++] = 1;
 	EXPECT_TRUE(popArray(t) == 1);
-	EXPECT_TRUE(t->capacity == 10);
-	EXPECT_TRUE(t->size == 0);
+	EXPECT_TRUE(t->capacity == capacityChange);
+	EXPECT_TRUE(t->size == 0);	
 	destroyArray(t);
 }
-TEST(testArrayStack, pushAndPopMoreThenTentoArrayStack) {
+TEST(testArrayStack, pushMoreThenTentoArrayStack) {
 	ArrayStack_t* t = createArrayStack();
 	for (int i = 0; i != 11; ++i)
-		pushArray(i, t);
-	for (int i = 0; i != 11; ++i)
-		EXPECT_TRUE(popArray(t) == 10 - i);
+	pushArray(i, t);
 	EXPECT_TRUE(t->capacity == 20);
-	EXPECT_TRUE(t->size == 0);
+	EXPECT_TRUE(t->size == 11);
 	destroyArray(t);
 }
 
 
 TEST(testLinkedListStack, createAndDestroyEmptyLinkedListStack) {
-	LinkedListStack_t* t = createLinkedListStack();
-	EXPECT_TRUE(t->next == NULL);
-	EXPECT_TRUE(t->data == 0);
-	destroy(&t);
-}
+	LinkedListStack_t* t= createLinkedListStack();
+	EXPECT_TRUE(t->next==NULL);
+	EXPECT_TRUE(t->data== 0);
+	free(t);
+}													 
 TEST(testLinkedListStack, pushOneToLinkedListStack) {
 	LinkedListStack_t* t = createLinkedListStack();
 	push(1, &t);
-	EXPECT_TRUE(t->next->next == NULL);
-	EXPECT_TRUE(t->data == 1);
+	EXPECT_TRUE(t->next->next== NULL);
+	EXPECT_TRUE(t->data== 1);
 	destroy(&t);
 }
 TEST(testLinkedListStack, popOneToLinkedListStack) {
 	LinkedListStack_t* t = createLinkedListStack();
-	push(1, &t);
-	EXPECT_TRUE(pop(&t) == 1);
-	EXPECT_TRUE(t->next == NULL);
+	LinkedListStack_t* newStackElement = createLinkedListStack();
+	newStackElement->data = 1;
+	newStackElement->next =t;
+	t = newStackElement;	  
+	EXPECT_TRUE(pop(&t)== 1);
+	EXPECT_TRUE(t->next== NULL);
 	destroy(&t);
 }
 TEST(testLinkedListStack, pushAndPopSomeIntsToLinkedListStack) {
@@ -154,15 +158,9 @@ TEST(testLinkedListStack, pushAndPopSomeIntsToLinkedListStack) {
 	destroy(&t);
 }
 int main(int argc, char** argv) {
-	InitGoogleTest(&argc, argv);
+	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 
 }
-// К минусам реализации стека через связный список можно отнести большую, по сравнении с реализации через
-//массив, вероятность фрагментации памяти(так как на каждый элемент память выделяеться отдельно), необходимость
-//хранить дополнительные данные, количество которых зависит от количества элементов в стеке. Однако, при
-// реализации через массив при превышении некоторого количества элементов приходится создавать новый массив 
-// большего объема и копировать все элементы, уже находящиеся в стеке, что является потенциально длительной 
-// операцией, и соответсвенно большим минусом. 
 
 

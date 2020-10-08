@@ -19,7 +19,7 @@ typedef struct {
 
 LIST* InitList(void);
 void ReadFile(FILE* f, LIST* list);
-int AddToList(LIST* list, int dd, int mm, int yy, int temp);
+void AddToList(LIST* list, int dd, int mm, int yy, int temp);
 void Print(LIST* list);
 int Search(LIST* list, int temp);
 void FreeList(LIST* list);

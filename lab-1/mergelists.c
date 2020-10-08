@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "mergelists.h"
 
@@ -21,40 +22,34 @@ static char _upperIntoLower(char ch) {
 
 // Reads the sring character by character until meeting '\n' or EOF
 static char* _readLine(FILE* fp, int* err) {
-  char sym;
-  char* p = (char*)malloc(sizeof(char)), * q = p;
-  int i = 0;
+  int mul = 100, extra = 1;
+  char* p = (char*)malloc(sizeof(char) * (mul + 1)), * q = p, * cur = p;
 
   if (*err != 0)
     return NULL;
 
-  sym = fgetc(fp);
-
   if (p != NULL) {
-    while (sym != '\n' && (int)sym != EOF) {
-      if (q != NULL && _isLetter(sym) == 1) {
+    if (fgets(p, mul + 1, fp) == NULL) {
+      p[0] = 0;
+      return p;
+    }
+
+    while (p[strlen(p) - 1] != '\n' && !feof(fp)) {
+      q = (char*)realloc(p, sizeof(char) * (mul * (++extra) + 1));
+      if (q != NULL) {
         p = q;
-        *(p + i) = sym;
+        cur = p + mul * (extra - 1);
+        fgets(cur, mul + 1, fp);
       }
       else {
         (*err)++;
         break;
       }
-      q = (char*)realloc(p, sizeof(char) * (1 + (++i)));
-      sym = fgetc(fp);
     }
-
-    // Fills the last character of a string: EOF (if there was no other characters) or 0 (for other cases)
-    if (q != NULL && *err == 0) {
-      p = q;
-      if (i == 0 && (int)sym == EOF)
-        *(p + i) = EOF;
-      else
-        *(p + i) = 0;
-    }
-    else
-      (*err)++;
+    if (p[strlen(p) - 1] == '\n')
+      p[strlen(p) - 1] = 0;
   }
+
   else
     (*err)++;
 
@@ -106,7 +101,7 @@ void DestroyList(list_t* p) {
 }
 
 // Returns a pointer to a subnode before current word
-subList_t* FindPlaceForWord(char* newWord, list_t* p) {
+subList_t* FindPlaceForWord(char* newWord, list_t* p, int* err) {
   subList_t* prev = p->words, * cur = prev->next;
   char letterCur, letterNew;
   int i, flagPlaceFound = 0;
@@ -115,6 +110,10 @@ subList_t* FindPlaceForWord(char* newWord, list_t* p) {
   // Order is figured out by compairing ASCII codes of two letters
   while (cur != NULL) {
     for (i = 1; newWord[i] != 0; i++) {
+      if (_isLetter(cur->word[i]) == 0 || _isLetter(newWord[i]) == 0) {
+        (*err)++;
+        return NULL;
+      }
       letterCur = _upperIntoLower(cur->word[i]);
       letterNew = _upperIntoLower(newWord[i]);
       if (letterCur == 0 || letterCur < letterNew)
@@ -137,11 +136,14 @@ subList_t* FindPlaceForWord(char* newWord, list_t* p) {
 subList_t* AddWord(char* newWord, list_t* p, int* err) {
   subList_t* subp, * prev;
 
+  if (*err != 0)
+    return NULL;
+
   subp = (subList_t*)malloc(sizeof(subList_t));
 
   if (subp != NULL) {
     subp->word = newWord;
-    prev = FindPlaceForWord(newWord, p);
+    prev = FindPlaceForWord(newWord, p, err);
     subp->next = prev->next;
     prev->next = subp;
   }
@@ -179,8 +181,13 @@ list_t* AddLetter(char newLetter, list_t* p, int* err) {
 // If node for current word exists: returns its pointer, flagMatchFound == 1
 // If node for current word doesn't exist: returns pointer for a node, which the current letter must follow after, flagMatchFound == 0
 // Returns NULL in case of unknown mistake
-list_t* FindLetterMatch(list_t* list, char letter, int* flagMatchFound) {
+list_t* FindLetterMatch(list_t* list, char letter, int* flagMatchFound, int*err) {
   list_t* prev = list, * cur = list->next;
+
+  if (_isLetter(letter) == 0) {
+    (*err)++;
+    return NULL;
+  }
 
   // Cycle searches, if the letter of current word already exist in a list
   while (cur != NULL) {
@@ -218,7 +225,7 @@ static list_t* _fillFromFile(char* filename, int* err) {
         free(word);
         continue;
       }
-      cur = FindLetterMatch(list, _upperIntoLower(word[0]), &flagMatchFound);
+      cur = FindLetterMatch(list, _upperIntoLower(word[0]), &flagMatchFound, err);
       if (flagMatchFound == 0)
         cur = AddLetter(_upperIntoLower(word[0]), cur, err);
       AddWord(word, cur, err);
@@ -257,7 +264,7 @@ list_t* MergeLists(list_t* list1, list_t* list2, int* err) {
       free(cur2->words);
       while (subCur != NULL) {
         subNext = subCur->next;
-        sub1Prev = FindPlaceForWord(subCur->word, cur1);
+        sub1Prev = FindPlaceForWord(subCur->word, cur1, err);
         subCur->next = sub1Prev->next;
         sub1Prev->next = subCur;
         subCur = subNext;

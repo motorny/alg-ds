@@ -21,13 +21,13 @@ list_t* CreateList(int* err);
 
 void DestroyList(list_t* p);
 
-subList_t* FindPlaceForWord(char* newWord, list_t* p);
+subList_t* FindPlaceForWord(char* newWord, list_t* p, int* err);
 
 subList_t* AddWord(char* newWord, list_t* p, int* err);
 
 list_t* AddLetter(char newLetter, list_t* p, int* err);
 
-list_t* FindLetterMatch(list_t* list, char letter, int* flagMatchFound);
+list_t* FindLetterMatch(list_t* list, char letter, int* flagMatchFound, int* err);
 
 list_t* MergeLists(list_t* list1, list_t* list2, int* err);
 

@@ -23,6 +23,7 @@ TEST(TestFindPlaceForWord, AbIntoSublistOfAaAndAc_ReturnAaPtr) {
   list_t* list;
   subList_t *aa, *ac;
   subList_t* res;
+  int err = 0;
 
   list = (list_t*)malloc(sizeof(list_t));
   list->words = (subList_t*)malloc(sizeof(subList_t));
@@ -35,7 +36,7 @@ TEST(TestFindPlaceForWord, AbIntoSublistOfAaAndAc_ReturnAaPtr) {
   ac->next = NULL;
   ac->word = "ac";
 
-  res = FindPlaceForWord("ab", list);
+  res = FindPlaceForWord("ab", list, &err);
   ASSERT_EQ(aa, res);
 
   free(aa);
@@ -48,6 +49,7 @@ TEST(TestFindPlaceForWord, AbIntoSublistOfAa_ReturnAaPtr) {
   list_t* list;
   subList_t *aa;
   subList_t* res;
+  int err = 0;
 
   list = (list_t*)malloc(sizeof(list_t));
   list->words = (subList_t*)malloc(sizeof(subList_t));
@@ -57,7 +59,7 @@ TEST(TestFindPlaceForWord, AbIntoSublistOfAa_ReturnAaPtr) {
   aa->word = "aa";
   aa->next = NULL;
 
-  res = FindPlaceForWord("ab", list);
+  res = FindPlaceForWord("ab", list, &err);
   ASSERT_EQ(aa, res);
 
   free(aa);
@@ -68,13 +70,14 @@ TEST(TestFindPlaceForWord, AbIntoSublistOfAa_ReturnAaPtr) {
 TEST(TestFindPlaceForWord, AbIntoEmptySublist_ReturnDummyPtr) {
   list_t* list;
   subList_t* res;
+  int err = 0;
 
   list = (list_t*)malloc(sizeof(list_t));
   list->words = (subList_t*)malloc(sizeof(subList_t));
 
   list->words->next = NULL;
 
-  res = FindPlaceForWord("ab", list);
+  res = FindPlaceForWord("ab", list, &err);
   ASSERT_EQ(list->words, res);
 
   free(list->words);
@@ -123,6 +126,7 @@ TEST(TestFindLetterMatch, BIntoListOfA_ReturnAPtr_FlagZero) {
   list_t *list, *a;
   list_t* res;
   int flag = 0;
+  int err = 0;
 
   list = (list_t*)malloc(sizeof(list_t));
   a = (list_t*)malloc(sizeof(list_t));
@@ -131,7 +135,7 @@ TEST(TestFindLetterMatch, BIntoListOfA_ReturnAPtr_FlagZero) {
   a->next = NULL;
   a->letter = 'a';
 
-  res = FindLetterMatch(list, 'b', &flag);
+  res = FindLetterMatch(list, 'b', &flag, &err);
   ASSERT_EQ(a, res);
   ASSERT_EQ(0, flag);
 
@@ -143,6 +147,7 @@ TEST(TestFindLetterMatch, BIntoListOfB_ReturnBPtr_FlagUnit) {
   list_t* list, *b;
   list_t* res;
   int flag = 0;
+  int err = 0;
 
   list = (list_t*)malloc(sizeof(list_t));
   b = (list_t*)malloc(sizeof(list_t));
@@ -151,7 +156,7 @@ TEST(TestFindLetterMatch, BIntoListOfB_ReturnBPtr_FlagUnit) {
   b->next = NULL;
   b->letter = 'b';
 
-  res = FindLetterMatch(list, 'b', &flag);
+  res = FindLetterMatch(list, 'b', &flag, &err);
   ASSERT_EQ(b, res);
   ASSERT_EQ(1, flag);
 
@@ -163,11 +168,12 @@ TEST(TestFindLetterMatch, BIntoEmptyList_ReturnDummyPtr_FlagZero) {
   list_t* list;
   list_t* res;
   int flag = 0;
+  int err = 0;
 
   list = (list_t*)malloc(sizeof(list_t));
   list->next = NULL;
 
-  res = FindLetterMatch(list, 'b', &flag);
+  res = FindLetterMatch(list, 'b', &flag, &err);
   ASSERT_EQ(list, res);
   ASSERT_EQ(0, flag);
 

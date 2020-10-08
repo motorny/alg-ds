@@ -1,6 +1,23 @@
 #include "pch.h"
 #include "C:\Users\79523\source\repos\ALG1\ALG1\listfuncs.c"
 
+LIST* InitTestList() {
+	LIST* list = (LIST*)malloc(sizeof(LIST));
+	list->first = (NODE*)malloc(sizeof(NODE));
+	list->first->day = 1;
+	list->first->month = 1;
+	list->first->year = 2020;
+	list->first->temperature = -12;
+	list->first->next = (NODE*)malloc(sizeof(NODE));
+	list->first->next->day = 2;
+	list->first->next->month = 1;
+	list->first->next->year = 2020;
+	list->first->next->temperature = -10;
+	list->first->next->next = NULL;
+
+	return list;
+}
+
 TEST(InitList, InitListValid) {
 	LIST* list = InitList();
 	ASSERT_TRUE(list != NULL);
@@ -35,21 +52,20 @@ TEST(AddToList, SortAddedElements) {
 	FreeList(list);
 }
 
-TEST(Search, NumberOfFoundedElements) {
-	LIST* list = InitList();
-	AddToList(list, 1, 10, 2020, -10);
-	AddToList(list, 2, 10, 2020, -8);
-	AddToList(list, 3, 10, 2020, -8);
+TEST(Search, ElementFound) {
+	LIST* list = InitTestList();
+	int out;
+	out = Search(list, -12);
+	EXPECT_EQ(out, 1);
 
-	int out1, out2, out3;
+	FreeList(list);
+}
 
-	out1 = Search(list, -12);
-	out2 = Search(list, -10);
-	out3 = Search(list, -8);
-
-	EXPECT_EQ(out1, 0);
-	EXPECT_EQ(out2, 1);
-	EXPECT_EQ(out3, 2);
+TEST(Search, ElementNotFound) {
+	LIST* list = InitTestList();
+	int out;
+	out = Search(list, -11);
+	EXPECT_EQ(out, 0);
 
 	FreeList(list);
 }

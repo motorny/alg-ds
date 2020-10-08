@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "C:\\Users\Lenovo\source\repos\lib_2020\lib_2020.c"
+#include "lib_2020.c"
 
 LIST_T* InitSplittedListFirstHalf() {
 	LIST_T * List, *go, *tmp;

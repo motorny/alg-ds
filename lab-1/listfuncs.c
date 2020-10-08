@@ -64,7 +64,7 @@ void AddToList(LIST* list, int dd, int mm, int yy, int temp) {
 	
 	next_node = current_node->next;
 
-	while (current2 != NULL) {
+	while (next_node != NULL) {
 		if (add->temperature < next_node->temperature)
 			break;
 		if (add->temperature == next_node->temperature) {

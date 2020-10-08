@@ -16,8 +16,8 @@ void ReadFile(FILE* f, LIST* list) {
 
 void AddToList(LIST* list, int dd, int mm, int yy, int temp) {
 	NODE* add = (NODE*)malloc(sizeof(NODE));
-	NODE* current1 = list->first;
-	NODE* current2;
+	NODE* current_node = list->first;
+	NODE* next_node;
 
 	if (add == NULL) {
 		puts("Addition error");
@@ -62,30 +62,30 @@ void AddToList(LIST* list, int dd, int mm, int yy, int temp) {
 		}
 	}
 	
-	current2 = current1->next;
+	next_node = current_node->next;
 
 	while (current2 != NULL) {
-		if (add->temperature < current2->temperature)
+		if (add->temperature < next_node->temperature)
 			break;
-		if (add->temperature == current2->temperature) {
-			if (add->year < current2->year)
+		if (add->temperature == next_node->temperature) {
+			if (add->year < next_node->year)
 				break;
-			if (add->year == current2->year) {
-				if (add->month < current2->month)
+			if (add->year == next_node->year) {
+				if (add->month < next_node->month)
 					break;
-				if (add->month == current2->month) {
-					if (add->day < current2->day)
+				if (add->month == next_node->month) {
+					if (add->day < next_node->day)
 						break;
-					if (add->day == current2->day)
+					if (add->day == next_node->day)
 						return;
 				}
 			}
 		}
-		current1 = current2;
-		current2 = current2->next;
+		current_node = next_node;
+		next_node = next_node->next;
 	}
-	add->next = current2;
-	current1->next = add;
+	add->next = next_node;
+	current_node->next = add;
 	return;
 }
 

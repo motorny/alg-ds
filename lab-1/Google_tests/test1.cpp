@@ -79,6 +79,7 @@ TEST (MyFirstTestSuite, deletePositin_firstElement_returnValidVal) {
     ASSERT_EQ(testList.firstElement, secondElement) << "delete by position first element failed";
     show(testList);
 }
+
 TEST (MyFirstTestSuite, deletePositin_secondElement_returnValidVal) {
     List testList;
     Node *firstElement = (Node *) malloc(sizeof(Node));
@@ -122,6 +123,7 @@ TEST (MyFirstTestSuite, find_onlyElement_returnValidVal) {
                                 << "find only element failed";
     free(testElement);
 }
+
 TEST (MyFirstTestSuite, find_firstElement_returnValidVal) {
     List testList;
     Node *firstElement = (Node *) malloc(sizeof(Node));
@@ -139,6 +141,7 @@ TEST (MyFirstTestSuite, find_firstElement_returnValidVal) {
     free(firstElement);
     free(secondElement);
 }
+
 TEST (MyFirstTestSuite, find_secondElement_returnValidVal) {
     List testList;
     Node *firstElement = (Node *) malloc(sizeof(Node));

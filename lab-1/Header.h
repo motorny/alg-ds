@@ -6,7 +6,13 @@
 #include <crtdbg.h>
 #define _CRTDBG_MAP_ALLOC
 #define SIZE 40
-#pragma warning (disable:4996)
+#define GOING_ON_A 0
+#define GOING_ON_B 1
+
+//we read (char) digits and transform it to (int) number, so we need 
+//transform (char) digit to int, multiply it by ten and add next digit
+#define MULTIPLIER 10  
+#pragma warning (disable:4996) //for fopen 
 
 //id-sorting
 typedef struct {

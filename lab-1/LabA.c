@@ -40,7 +40,7 @@ table_t* BuildTable(FILE* filename) {
   while ((arr = FileReading(filename)) != NULL) {
 
     //putting data to strings
-    for (j = 0; j < 40; ++j)
+    for (j = 0; j < SIZE; ++j)
       elem->line->name[j] = arr[j];
 
     IsRead = 1; //at least 1 string was read
@@ -48,7 +48,7 @@ table_t* BuildTable(FILE* filename) {
     elem->line->id = 0;
     //pushing number
     while (elem->line->name[i] >= '0' && elem->line->name[i] <= '9') {
-      elem->line->id = elem->line->id * 10 + (int)(elem->line->name[i] - '0');
+      elem->line->id = elem->line->id * MULTIPLIER + (int)(elem->line->name[i] - '0');
       i++;
     }
     for (k = 0; k < 30; ++k) {
@@ -94,38 +94,36 @@ table_t* MergeTable(table_t* A, table_t* B) {
   
   table_t* NewTable = (table_t*)malloc(sizeof(table_t));
   elem_t* help = NULL, *prevA = NULL, *prevB = NULL;
-  int k=0; //bool, shows by which list we are moving on
+
+  int leadingList= GOING_ON_A; //bool, shows by which list we are moving on
   
 
   NewTable->head = (A->head->line->id <= B->head->line->id ? A->head : B->head);
   help = NewTable->head;
 
   if (NewTable->head == A->head)
-    k = 0; //head on A, so going on A
+    leadingList = GOING_ON_A; //head on A, so going on A
   else
-    k = 1; //going on B
+    leadingList = GOING_ON_B; //going on B
 
   prevA = A->head;
   prevB = B->head;
 
   while (A->head != NULL && B->head != NULL) {
 
-    // k=0 - going on A
-    // k=1 - going on B
-
     //A less than B
     if (A->head->line->id <= B->head->line->id) {
       
-      if (k == 0) {
+      if (leadingList == GOING_ON_A) {
         prevA = A->head;
         A->head = A->head->next;
       }
 
-      else if(k==1) {
+      else if(leadingList == GOING_ON_B) {
         prevB->next = A->head;
         prevA = A->head;
         A->head = A->head->next;
-        k = 0;
+        leadingList = GOING_ON_A;
       }
 
     }
@@ -133,16 +131,16 @@ table_t* MergeTable(table_t* A, table_t* B) {
     //A bigger than B
     else {
 
-      if (k==1) {
+      if (leadingList == GOING_ON_B) {
         prevB = B->head;
         B->head = B->head->next;
       }
 
-      else if (k == 0) {
+      else if (leadingList == GOING_ON_A) {
         prevA->next = B->head;
         prevB = B->head;
         B->head = B->head->next;
-        k = 1;
+        leadingList = GOING_ON_B;
       }
 
 

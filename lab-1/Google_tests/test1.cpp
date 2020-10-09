@@ -1,6 +1,4 @@
-//
-// Created by alex4 on 03.10.2020.
-//
+
 #include "gtest/gtest.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +19,6 @@ TEST (MyFirstTestSuite, ptrXor_AB_returnValidVal) {
 TEST (MyFirstTestSuite, add_addOnly_returnValidVal) {
     List testList;
     testList.firstElement = NULL;
-//    char * word = "second"
     add(&testList, NULL, NULL, "second");
     ASSERT_TRUE(strcmp(testList.firstElement->element, "second") == 0) << "addOnly is failed";
     free(testList.firstElement);
@@ -31,11 +28,9 @@ TEST (MyFirstTestSuite, add_addOnly_returnValidVal) {
 TEST (MyFirstTestSuite, add_addFront_returnValidVal) {
     List testList;
     testList.firstElement = NULL;
-//    char * word = "second"
     add(&testList, NULL, NULL, "second");
     add(&testList, NULL, testList.firstElement, "first");
     ASSERT_TRUE(strcmp(testList.firstElement->element, "first") == 0) << "addFront is failed";
-//    free(&testList.firstElement->linksXor);
     free(testList.firstElement);
 }
 

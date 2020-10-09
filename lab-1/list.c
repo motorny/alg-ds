@@ -53,7 +53,6 @@ void delete_position(struct List *list, struct ListPosition pos) {
         assert(list->firstElement == curPtr);
         list->firstElement = nextPtr;
     }
-//    printf("free %lld ", (unsigned long long) curPtr);
     free(curPtr);
 
 }
@@ -61,12 +60,8 @@ void delete_position(struct List *list, struct ListPosition pos) {
 
 void show(struct List list) {
 
-
-//    printf(" %s ", "(unsigned long long) curPtr");
     struct Node *prevPtr = NULL;
     struct Node *curPtr = list.firstElement;//current
-
-//    printf(" %lld ", (unsigned long long) curPtr);
     while (curPtr != NULL) {
         printf(" (%s) ", curPtr->element);
         struct Node *nextPtr = (struct Node *) (curPtr->linksXor ^ (unsigned long long) prevPtr);
@@ -78,14 +73,13 @@ void show(struct List list) {
 
 void add(struct List *list, struct Node *prevPtr, struct Node *nextPtr, const char *value) {
     struct Node *curPtr = (struct Node *) malloc(sizeof(struct Node));
-//    printf("%lld ", (unsigned long long) curPtr);
     curPtr->element = value;
     curPtr->linksXor = ptr_xor(prevPtr, nextPtr);
     if (prevPtr != NULL) {
-        prevPtr->linksXor ^= ptr_xor(curPtr,nextPtr);
+        prevPtr->linksXor ^= ptr_xor(curPtr, nextPtr);
     }
     if (nextPtr != NULL) {
-        nextPtr->linksXor ^= ptr_xor(curPtr,prevPtr);
+        nextPtr->linksXor ^= ptr_xor(curPtr, prevPtr);
     }
     if (prevPtr == NULL) {
         list->firstElement = curPtr;
@@ -94,28 +88,4 @@ void add(struct List *list, struct Node *prevPtr, struct Node *nextPtr, const ch
 }
 
 
-int main_2() {
-
-    char a[3][10] = {"first", "aba", "caba"};
-//    printf("%s",a[1]);
-    struct List mylist;
-    mylist.firstElement = NULL;
-    for (int i = 0; i < 3; i++)
-        add(&mylist, NULL, mylist.firstElement, a[i]);
-    show(mylist);
-    printf("\n");
-    struct ListPosition front, back;
-    front.prevPtr = NULL;
-    front.curPtr = mylist.firstElement;
-    delete_position(&mylist,front);
-    show(mylist);
-    front = find(mylist, "caba");
-    printf("\n");
-    show(mylist);
-    delete_key(&mylist, "caba");
-    delete_key(&mylist, "aba");
-    printf("%s  \n", "______________________");
-    show(mylist);
-    return 0;
-}
 

@@ -1,6 +1,4 @@
-//
-// Created by alex4 on 03.10.2020.
-//
+
 
 #ifndef LABA1_LIST_H
 #define LABA1_LIST_H
@@ -8,7 +6,6 @@ int main_2();
 //////
 struct Node {
     const char *element;
-//    int element;
     unsigned long long linksXor;
 };
 

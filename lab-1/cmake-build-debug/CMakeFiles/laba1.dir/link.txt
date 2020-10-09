@@ -1,1 +1,0 @@
-/usr/bin/cc -g   CMakeFiles/laba1.dir/main.c.o CMakeFiles/laba1.dir/list.c.o  -o laba1 

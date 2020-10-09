@@ -45,7 +45,7 @@ SkipList* CreateSkipList() {
     }
     sl->level = 0;
     sl->header = Create(MAX_LEVEL, 0, 0);
-    sl->tail = Create(0, 0x7fffffff, 0);
+    sl->tail = Create(0,  MAX_KEY, 0);
     for (int i = 0; i <= MAX_LEVEL; i++) {
         sl->header->forward[i] = sl->tail;
     }
@@ -65,7 +65,7 @@ int Insert(SkipList* sl, int key, int value) {
     }
     q = p->forward[0];
     if (q->key == key) {
-        return 0;
+        return  NOT_DONE;
     }
 
     k = RandomLevel();
@@ -82,7 +82,7 @@ int Insert(SkipList* sl, int key, int value) {
         update[i]->forward[i] = q;
     }
     
-    return 1;
+    return  DONE;
 }
 
 int Delete(SkipList* sl, int key) {
@@ -109,10 +109,10 @@ int Delete(SkipList* sl, int key) {
                 sl->level--;
             }
         }
-        return 1;
+        return  DONE;
     }
     else {
-        return 0;
+        return  NOT_DONE;
     }
 }
 

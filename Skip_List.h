@@ -4,6 +4,9 @@
 
 
 #define MAX_LEVEL 16
+#define MAX_KEY 5000
+#define NOT_DONE 0 //insert - element exists , delete - element doesn`t exist
+#define DONE 1
 
 typedef struct Node {
     int key;

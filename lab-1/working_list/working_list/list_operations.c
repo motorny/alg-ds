@@ -49,9 +49,9 @@ tnode* ConvertInputToNode(char* tmp) { //Converts request from <"surname" "name"
     }
     name[k] = '\0';
     i++;
-    while ((q = tmp[i]) != '\0') {  //reads untill the end of the stroke, removes \n and adds \0
-        if (j >= MAX_LE) {                //doesnt work anymore with \n, dk why, doesnt see \0 either
-            printf("overflow  ;");             // fixed, works fine with \0, but only from calloced buffer
+    while ((q = tmp[i]) != '\0') {  
+        if (j >= MAX_LE) {                
+            printf("overflow  ;");             
             return NULL;
         }
         scndname[j] = q;
@@ -59,8 +59,11 @@ tnode* ConvertInputToNode(char* tmp) { //Converts request from <"surname" "name"
         j++;
     }
 
-    if (j > 0) {
+    if (scndname[j-1] == '\n' && j>0) {
         scndname[j - 1] = '\0';         //puts /0 instead of /n for Compare() to work properly 
+    }                                   //needed for reading from file
+    else {
+        scndname[j] = '\0';                 //this branch goes if string has no \n
     }
     
     tnode* result = (tnode*)malloc(sizeof(tnode));
@@ -141,3 +144,42 @@ int AddToList(tnode** top, tnode* person) {  // adds element to end of list
         last->next = person;
     }
 }
+
+int PrintFilteredList(tnode** top, tnode* input) { // applies entered filters "info" to list and prints it
+    int match_counter = 0;
+    tnode* tmp = (*top);
+    while (tmp != NULL) {                    // does nothing if initial list is empty, as intended
+        if (Compare(tmp, input) == MATCH) {
+            printf("%s\n", tmp->surname);
+            match_counter++;
+        }
+        tmp = tmp->next;
+    }
+    return match_counter;
+}
+
+void PrintInitialList(tnode** top) { // prints the list read from the file
+    tnode* tmp = (*top);            // prints only surnames
+    if ((*top) == NULL) {
+        printf("empty list");
+        return;
+    }
+    while (tmp != NULL) {
+        printf("%s\n", tmp->surname);
+        tmp = tmp->next;
+    }
+    printf("list successfully printed\n");
+}
+
+
+void FreeList(tnode** top) {        // kills the list after the programm is done
+    tnode* tmp = (*top);
+    if (tmp == NULL) return;
+    while ((*top) != NULL) {
+        tmp = (*top);
+        (*top) = (*top)->next;
+        free(tmp);
+    }
+    free(*top);
+}
+

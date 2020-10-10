@@ -13,31 +13,31 @@ int main()
     }
 
     tnode* person = NULL;
-    char* txt = (char*)calloc(3 * MAX_LE, sizeof(char));
+    char* buffer = (char*)calloc(3 * MAX_LE, sizeof(char));
 
     while (!feof(fp)) {
-        fgets(txt, 3 * MAX_LE, fp);
-        person = ConvertInputToNode(txt);
+        fgets(buffer, 3 * MAX_LE, fp);
+        person = ConvertInputToNode(buffer);
         AddToList(&top, person);
     }
-  
+
     PrintInitialList(&top);
 
     printf("Enter the request in format <<surname>> <<name>> <<second name>> : ");
-    
-    fgets(txt, 3 * MAX_LE, stdin);
-    tnode* input = ConvertInputToNode(txt);
+
+    fgets(buffer, 3 * MAX_LE, stdin);
+    tnode* input = ConvertInputToNode(buffer);
     int count = PrintFilteredList(&top, input);
-    if (!count) {
+    if (count == 0) {
         printf("no matches found in list");
     }
     free(input);
-    free(txt);
+    free(buffer);
     FreeList(&top);
-    
+
     fclose(fp);
     return 0;
-     
+
 }
 
 

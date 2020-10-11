@@ -1,5 +1,5 @@
 ﻿#include "gtest/gtest.h"
-#include "../Lib List/ListBirthDay.c"
+#include "../ListBirthDay.c"
 #include <string.h>
 #include <stdlib.h>
 

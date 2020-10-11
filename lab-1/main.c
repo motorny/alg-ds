@@ -15,6 +15,7 @@ ListDays *ReadFile(char *file_name) {
 	int i, n, numb;
 	struct tm time_tm;
 	time_t time;
+
 	FILE *f = fopen(file_name, "r");
 	fpos_t  fpos1, fpos2; // Позиция в файле
 	ListDays *days = NULL;
@@ -175,7 +176,7 @@ show:
 int main(void) {
 	setlocale(LC_ALL, "RUS");
 
-	g_days = ReadFile("file2.txt");
+	g_days = ReadFile("file.txt");
 	if ( g_days == NULL )
 		return 1;
 

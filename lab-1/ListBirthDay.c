@@ -1,7 +1,6 @@
-﻿#include "ListBirthDay.h"
-#include <stdlib.h>
+﻿#include <stdlib.h>
 #include <malloc.h>
-
+#include "ListBirthDay.h"
 
 // Добавляет дату с фио в список
 int AddDayToList(ListDays **q, time_t time, char *fio)

@@ -1,6 +1,6 @@
-﻿#pragma once
-#ifndef LISTBIRTHDAY_H_
-#define LISTBIRTHDAY_H_
+﻿#ifndef LISTBIRTHDAY_H_INCLUDED__
+#define LISTBIRTHDAY_H_INCLUDED__
+#pragma once
 
 #include <time.h>
 
@@ -32,4 +32,4 @@ ListDays *FindDay(time_t time, ListDays *q);
 // Уничтожает список
 void DestroyList(ListDays **q);
 
-#endif // ! LISTBIRTHDAY_H_
+#endif // ! LISTBIRTHDAY_H_INCLUDED__

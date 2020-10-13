@@ -941,7 +941,7 @@ gradle-app.setting
 ##### CMake
 CMakeLists.txt.user
 CMakeCache.txt
-CMakeLists1.txt
+CMakeLists.txt
 CMakeFiles
 CMakeScripts
 Testing

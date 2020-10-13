@@ -1,0 +1,16 @@
+aircraft
+aist
+change
+crowd
+cube
+error
+flower
+garden
+man
+tree
+war
+wife
+wind
+winter
+xan
+zoo

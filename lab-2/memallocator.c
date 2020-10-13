@@ -46,7 +46,7 @@ void* memalloc(int size) {
   if (list == NULL || size <= 0) // no free memory or memory didn't initializate
     return NULL;
    
-  bestFitSize = 2000000000;
+  bestFitSize = 1000000;
   while (p != NULL) {
     if (p->size >= size + memgetblocksize() && p->size < bestFitSize) {
       bestFitSize = p->size;
@@ -54,7 +54,7 @@ void* memalloc(int size) {
     }
     p = p->next;
   }
-  if (bestFitSize == 2000000000)
+  if (bestFitSize == 1000000)
     return NULL;
 
   // change list of free memory;
@@ -104,59 +104,38 @@ void* memalloc(int size) {
 }
 
 void memfree(void* p) {
-  descriptor_t* nextDes;
-  descriptor_t* prevDes;
-  descriptor_t* curDes;
-  int* curEnd;
-  int* nextEnd;
-  int* prevEnd;
-
-  if (p < (void*)start || p > (void*)(start + allmem))
+  int freemem;
+  descriptor_t* tmp;
+  char isInList = 0; // when we join free blocks into one, it doesn't need to be added to the list
+  //assert(p != NULL);
+  if (p == NULL)
     return;
+  p = (char*)p - sizeof(descriptor_t);
 
-  curDes = (descriptor_t*)((char*)p - sizeof(descriptor_t));
-  curEnd = (int*)((char*)curDes + curDes->size - sizeof(int));
-
-  // join with previous block
-  prevEnd = (int*)((char*)curDes - sizeof(int));
-  if (prevEnd > (int*)start && *prevEnd < 0) { // possible to join
-    prevDes = (descriptor_t*)((char*)curDes + *prevEnd);
-    prevDes->size += curDes->size;
-    *curEnd = -prevDes->size; //block is free
-    curDes = prevDes;
-  }
-  else { // impossibe to join
-    *curEnd = -*curEnd; // block become free
-    //add to the start of list
-    if (list != NULL) { //list is not empty
-      curDes->next = list;
-      curDes->prev = NULL;
-      list->prev = curDes;
-      list = curDes;
-    }
-    else {
-      list = curDes;
-      list->prev = NULL;
-      list->next = NULL;
-    }
+  // join free blocks if possible
+  freemem = ((descriptor_t*)p)->size;
+  while ((char*)p > start && *((int*)p - 1) < 0) {
+    freemem -= *((int*)p - 1);
+    p = (char*)p + *((int*)p - 1);
+    isInList = 1; // block have already been in the list 
   }
 
-  // join with next block
-  nextDes = (descriptor_t*)((char*)curDes + curDes->size);
-  if (nextDes < (descriptor_t*)(start + allmem)) { // next descriptor exist;
-    nextEnd = (int*)((char*)nextDes + nextDes->size - sizeof(int));
-    if (*nextEnd < 0) { // possible to join
-      curDes->size += nextDes->size;
-      *nextEnd = -curDes->size; //block is free
-      //renove from list
-      if (nextDes->next != NULL)
-        (nextDes->next)->prev = nextDes->prev;
-      if (nextDes->prev != NULL)
-        (nextDes->prev)->next = nextDes->next;
-      else 
-        list = nextDes->next;
-    }
-  }
+  // change size
+  ((descriptor_t*)p)->size = freemem;
+
+  //write -size to the end of block
+  *(int*)((char*)p + freemem - sizeof(int)) = -freemem;
+  
+  // add to start of the list(if need)
+  if (isInList)
+    return;
+  ((descriptor_t*)p)->next = list;
+  ((descriptor_t*)p)->prev = NULL;
+  if (list != NULL)
+    list->prev = (descriptor_t*)p;
+  tmp = (descriptor_t*)p;
+  p = (void*)list;
+  list = tmp;
 }
 
 void memdone() {
@@ -166,7 +145,7 @@ void memdone() {
     freemem += p->size;
     p = p->next;
   }
- // assert(freemem == allmem);
+  //assert(freemem == allmem);
 
   list = NULL;
   start = NULL;

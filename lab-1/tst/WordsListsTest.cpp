@@ -3,7 +3,6 @@
 //
 #include "gtest/gtest.h"
 #include "WordsList.h"
-#include "iostream"
 
 
 TEST(getCountOfLettersTest, 1) {

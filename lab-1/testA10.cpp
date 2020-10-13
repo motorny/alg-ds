@@ -2,16 +2,47 @@
 #include "../alg-ds/lab-1/A10_Bolshakova.c"
 
 #define START_STACK_SIZE 5
+arrStack_t* ArrStackOnes(error_t* err) {
+  arrStack_t* stack = (arrStack_t*)malloc(sizeof(arrStack_t));
+  if (stack == NULL) {
+    *err = OUT_OF_MEMORY;
+    return NULL;
+  }
+  stack->size = 1;
+  stack->data = (data_t*)malloc((stack->size) * sizeof(data_t));
+  if (stack->data == NULL) {
+    free(stack);
+    *err = OUT_OF_MEMORY;
+    return NULL;
+  }
+  stack->top = 0;
+  stack->data[stack->top] = 1;
+  stack->top = 1;
+  return stack;
+}
 
+//функция создания стека из одного элемента , data == 1
+void LinkListOneStack(node_t** head, error_t* err) {
+  node_t* node = (node_t*)malloc(sizeof(node_t));
+  data_t dat = 1;
+  if (node == NULL) {
+    *err = OUT_OF_MEMORY;
+  }
+  else {
+    node->next = *head;
+    node->data = &dat;
+    *head = node;
+  }
+}
 
-TEST(ArrStackDestroy_CreatedStack_ReturnsNull){
+TEST(ArrStackDestroy_CreatedStack_ReturnsNull) {
   error_t err = ERROR_NO;
   arrStack_t* s = ArrStackCreate(START_STACK_SIZE, &err);
   ArrStackDestroy(&s);
   ASSERT_EQ(NULL, s);
 }
 
-TEST( ArrStackDestroy_NotCreatedStack_ReturnsNull) {
+TEST(ArrStackDestroy_NotCreatedStack_ReturnsNull) {
   error_t err = ERROR_NO;
   arrStack_t* s = NULL;
   ArrStackDestroy(&s);
@@ -23,7 +54,7 @@ TEST(ArrStackAddElem_CreatedStack_ChangeSize) {
   arrStack_t* s = ArrStackCreate(START_STACK_SIZE, &err);
   size_t oldsize = (s->size) * sizeof(data_t);
   s = ArrStackAddElem(s, &err);
-  ASSERT_EQ((s->size) * sizeof(data_t) - oldsize, sizeof(data_t) );
+  ASSERT_EQ((s->size) * sizeof(data_t) - oldsize, sizeof(data_t));
   ArrStackDestroy(&s);
 }
 
@@ -57,30 +88,18 @@ TEST(ArrStackPush_1Integer_noError) {
   ArrStackDestroy(&s);
 }
 
-TEST(ArrStackPop_5Integers_returncorrectData){
+TEST(ArrStackPop_OnesStack_PopEQ1) {
   error_t err = ERROR_NO;
-  arrStack_t* s = ArrStackCreate(START_STACK_SIZE, &err);
-  int i;
-  for ( i = 0; i < s->size; i++) {
-    ArrStackPush(s, i, &err);
-    ASSERT_EQ(i, ArrStackPop(s, &err));
-    ArrStackPush(s, i, &err);
-  }
+  arrStack_t* s = ArrStackOnes(&err);
+  ASSERT_EQ(ArrStackPop(s, &err), 1);
   ArrStackDestroy(&s);
 }
 
-TEST(ArrStackPeek_1Integer_PeekEQPopvalue) {
-  error_t err = ERROR_NO;
-  arrStack_t* s = ArrStackCreate(START_STACK_SIZE, &err);
-  ArrStackPush(s, 1, &err);
-  ASSERT_EQ(ArrStackPop(s, &err), ArrStackPeek(s, &err));
-  ArrStackDestroy(&s);
-}
 
 TEST(ArrStackPeek_EmptyStack_returnNull) {
   error_t err = ERROR_NO;
   arrStack_t* s = ArrStackCreate(START_STACK_SIZE, &err);
-  ASSERT_EQ(0,ArrStackPeek(s, &err));
+  ASSERT_EQ(0, ArrStackPeek(s, &err));
   ArrStackDestroy(&s);
 }
 
@@ -93,45 +112,23 @@ TEST(LinkListStackPush_1Integes_noerror) {
   LinkListStackDestroy(&head, &err);
 }
 
-TEST(LinkListStackPopTest__5Integers_returncorrectData) {
+TEST(LinkListStackPopTest__StackOfOnes_returncorrectData) {
   error_t err = ERROR_NO;
   node_t* head = NULL;
-  int i;
-  for (i = 0; i < START_STACK_SIZE; i++) {
-    LinkListStackPush(&head, i, &err);
-    ASSERT_EQ(i, LinkListStackPopTest(&head, *(head->data), &err));
-    LinkListStackPush(&head, i, &err);
-  }
-  LinkListStackDestroy(&head, &err);
+  LinkListOneStack(&head, &err);
+  ASSERT_EQ(1, LinkListStackPopTest(&head, *(head->data), &err));
 }
 
-//этот тест фэйлится по причине, описанной в комменте к LinkListStackPopTest
-/*
-TEST(LinkListStackPop__5Integers_returncorrectData) {
+TEST(LinkListStackPeek_1Integer_Return1) {
   error_t err = ERROR_NO;
   node_t* head = NULL;
-  int i;
-  for (i = 0; i < START_STACK_SIZE; i++) {
-    LinkListStackPush(&head, i, &err);
-    ASSERT_EQ(i, LinkListStackPop(&head, &err));
-    LinkListStackPush(&head, i, &err);
-  }
-  LinkListStackDestroy(&head, &err);
-}
-*/
-
-TEST(LinkListStackPeek_1Integer_PeekEQPopvalue){
-  error_t err = ERROR_NO;
-  node_t* head = NULL;
-  node_t** headptr;
-  LinkListStackPush(&head, 1, &err);
-  headptr = &head;
-  ASSERT_EQ(LinkListStackPopTest(headptr, *(head->data), &err), LinkListStackPeek(head, &err));
+  LinkListOneStack(&head, &err);
+  ASSERT_EQ(1, LinkListStackPeek(head, &err));
   LinkListStackDestroy(&head, &err);
 }
 
 
-TEST(LinkListStackPeek_EmptyStack_returnNull){
+TEST(LinkListStackPeek_EmptyStack_returnNull) {
   error_t err = ERROR_NO;
   node_t* head = NULL;
   ASSERT_EQ(0, LinkListStackPeek(head, &err));

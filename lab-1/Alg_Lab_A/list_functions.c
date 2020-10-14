@@ -80,7 +80,12 @@ void Add2List(list_p** list, char word[]) {
 		*list = nWord;
 }
 
-void PrintList(list_p* list, FILE* file3) {
+void PrintList(list_p* list, FILE* file3, error_t* error) {
+	if (file3 == NULL) {
+		*error = error_with_file;
+		return;
+	}
+
 	while (list != NULL) {
 		fprintf(file3, "%s\n", list->word);
 		list = list->next;
@@ -99,6 +104,7 @@ void UnionList(list_p* list2, list_p* list1) {
 
 void UnionAndPrintList(list_p* list1, list_p* list2, FILE* file3, error_t* error) {
 	int comp = EQUAL_STR;
+	error_t print_error = no_error;
 	comp = strcmp(list1->word, list2->word);
 
 	if (file3 == NULL) {
@@ -108,10 +114,15 @@ void UnionAndPrintList(list_p* list1, list_p* list2, FILE* file3, error_t* error
 
 	if (comp == STR1BIG) {
 		UnionList(list1, list2);
-		PrintList(list2, file3);
+		PrintList(list2, file3, &print_error);
 	}
 	else {
 		UnionList(list2, list1);
-		PrintList(list1, file3);
+		PrintList(list1, file3, &print_error);
+	}
+
+	if (print_error == error_with_file) {
+		*error = error_with_file;
+		return;
 	}
 }

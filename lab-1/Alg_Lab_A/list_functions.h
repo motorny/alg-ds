@@ -12,6 +12,11 @@ typedef struct list_p {
 	char word[stsize];
 }list_p;
 
+typedef enum {
+	no_error,
+	error_with_file
+} error_t;
+
 void EnterWord (list_p* list, char* word);
 list_p* InitList (char* word);
 void DeleteList (list_p* list);
@@ -20,4 +25,4 @@ list_p* AddWord (list_p* nWord, list_p* pWord, char* word);
 void Add2List (list_p** list, char word[]);
 void PrintList (list_p* list, FILE* file3);
 void UnionList (list_p* list2, list_p* list1);
-void UnionAndPrintList (list_p* list1, list_p* list2, FILE* file3);
+void UnionAndPrintList (list_p* list1, list_p* list2, FILE* file3, error_t* error);

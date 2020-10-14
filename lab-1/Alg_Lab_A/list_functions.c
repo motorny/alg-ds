@@ -11,10 +11,11 @@ void EnterWord(list_p* list, char* word) {
 
 list_p* InitList(char* word) {
 	list_p* fWord = (list_p*)malloc(sizeof(list_p));
+	if (fWord == NULL)
+		return NULL;
 
 	EnterWord(fWord, word);
 	fWord->next = NULL;
-
 	return fWord;
 }
 
@@ -96,9 +97,14 @@ void UnionList(list_p* list2, list_p* list1) {
 	}
 }
 
-void UnionAndPrintList(list_p* list1, list_p* list2, FILE* file3) {
+void UnionAndPrintList(list_p* list1, list_p* list2, FILE* file3, error_t* error) {
 	int comp = EQUAL_STR;
 	comp = strcmp(list1->word, list2->word);
+
+	if (file3 == NULL) {
+		*error = error_with_file;
+		return;
+	}
 
 	if (comp == STR1BIG) {
 		UnionList(list1, list2);

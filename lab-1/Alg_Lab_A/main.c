@@ -14,6 +14,7 @@ int main(int argc, char* argv[]) {
 	FILE* file3 = NULL;
 	//FILE* file4 = NULL;
 	//FILE* file5 = NULL;
+	error_t error = no_error;
 	char word[20];
 
 	file1 = fopen("input1.txt", "r");
@@ -54,6 +55,12 @@ int main(int argc, char* argv[]) {
 	fclose(file2);
 
 	file3 = fopen("output.txt", "w");
+
+	if (file3 == NULL) {
+		printf("The file error");
+		return 2;
+	}
+
 	list3 = list1;
 
 	/*
@@ -65,7 +72,11 @@ int main(int argc, char* argv[]) {
 	fclose(file5);
 	*/
 
-	UnionAndPrintList(list3, list2, file3);
+	UnionAndPrintList(list3, list2, file3, &error);
+	if (error == error_with_file) {
+		printf("The file error");
+		return 2;
+	}
 	fclose(file3);
 
 	DeleteList(list2);

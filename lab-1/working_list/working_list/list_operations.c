@@ -134,15 +134,17 @@ int AddToList(tnode** top, tnode* person) {  // adds element to end of list
         printf("tried to add empty element;");
         return EMPTY_ELEMENT;
     }
-    if ((*top) == NULL) {   // if list's empty and person is first
+    //if ((*top) == NULL) {   // if list's empty and person is first
         person->next = (*top);
         (*top) = person;
+        
+        /*
     }
     else {
         tnode* last = GetPtrLast((*top));
         person->next = NULL;
         last->next = person;
-    }
+    }*/
 }
 
 int PrintFilteredList(tnode** top, tnode* input) { // applies entered filters "info" to list and prints it

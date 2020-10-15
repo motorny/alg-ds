@@ -1,5 +1,4 @@
 #include "WordsList.h"
-#include "iostream"
 
 int ruChar(char *word) {
     return tolowerRu(tolower(word[1])) <= 143 ?
@@ -80,15 +79,15 @@ void add2List(char *word, WordsListNode *&listHead, unsigned int len) {
 
 void cout(WordsListNode *&currNode, bool all) {
     unsigned int len = currNode->countOfLetters;
-    std::cout << std::endl;
+    printf("\n");
     while (currNode != nullptr && (len == currNode->countOfLetters || all)) {
-        std::cout << currNode->word << std::endl;
+        printf("%s \n",  currNode->word );
         currNode=currNode->nextPtr;
     }
 }
 
 void printWordsLenN(WordsListNode *&listHead, int n){
-    std::cout << "\nСлова длинной " << n;
+    printf("\nСлова длинной %d ", n);
     WordsListNode *currNode = listHead;
     while (currNode != nullptr && currNode->countOfLetters < n) {
         currNode = currNode->nextPtr;
@@ -97,11 +96,11 @@ void printWordsLenN(WordsListNode *&listHead, int n){
         cout(currNode, false);
         return;
     }
-    std::cout << "\nНет слов длинной " << n;
+    printf("\nНет слов длинной %d ", n);
 }
 
 void printWordsMoreNLen(WordsListNode *&listHead, int n) {
-    std::cout << "\nСлова длинной большей " << n;
+    printf("\nСлова длинной большей %d ", n);
     WordsListNode *currNode = listHead;
     while (currNode != nullptr && currNode->countOfLetters < n) {
         currNode = currNode->nextPtr;
@@ -110,5 +109,5 @@ void printWordsMoreNLen(WordsListNode *&listHead, int n) {
         cout(currNode, true);
         return;
     }
-    std::cout << "\nНет слова длинной большей чем " << n;
+    printf("\nНет слова длинной большей чем  %d ", n);
 }

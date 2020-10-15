@@ -1,14 +1,13 @@
-#include <iostream>
 #include <cstdio>
 #include <cstring>
 
 #include "WordsList.h"
 
-#define moreThanN 10
-#define lenN 6
+#define moreThanN 7
 
 int main() {
     WordsListNode *listHead = nullptr;
+    int lenN;
     FILE *file;
     const char *fName =  "/home/ikuzin/study/algo_and_struct/alg-ds/lab-1/src/words.txt";
     file = fopen(fName, "r");
@@ -27,12 +26,13 @@ int main() {
             }
             fclose(file);
             printWordsMoreNLen(listHead, moreThanN);
-            std::cout<<std::endl;
+            printf("\n Давайте узнаем сколько слов с длинной...: ");
+            scanf("%d", &lenN);
             printWordsLenN(listHead, lenN);
             return 0;
         }
-        std::cout << "Ошибка работы с файлом! - ошибка чтения из файла" << std::endl;
+        printf("\nОшибка работы с файлом! - ошибка чтения из файла");
     }
-    std::cout << "Ошибка работы с файлом! - файл не найден" << std::endl;
+    printf("\nОшибка работы с файлом! - файл не найден");
     return 1;
 }

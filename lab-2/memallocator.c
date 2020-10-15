@@ -74,8 +74,10 @@ void memdone() {
 
   // evaluate size
   size = s_memInfo.startList->blockSize + s_memInfo.startList->next->blockSize + 2 * BLOCK_INFO_SIZE;
+#ifdef PRINT_LEAKS
   if (size != s_memInfo.totalSize)
     fprintf(stderr, "Memory leaks");
+#endif /* PRINT_LEAKS */
   // make manager uninitialized
   memset(s_memInfo.memBlock, 0, s_memInfo.totalSize);
   memset(&s_memInfo, 0, sizeof(s_memInfo));

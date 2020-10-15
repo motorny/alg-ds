@@ -36,8 +36,8 @@ static struct {
 int meminit(void *pMemory, int size) {
   descriptor_t descr;
 
-  // check size
-  if (size < memgetminimumsize())
+  // check size and pointer
+  if (size < memgetminimumsize() || pMemory == NULL)
     return MEM_FAIL;
   // fill global variable
   s_memInfo.beforeLastAlloc =
@@ -57,6 +57,7 @@ int meminit(void *pMemory, int size) {
   descr.blockSize = size - 2 * BLOCK_INFO_SIZE;
   descr.next = (descriptor_t*)pMemory;
   memcpy((char*)pMemory + BLOCK_INFO_SIZE, &descr, sizeof(descr));
+  memset((char*)pMemory + BLOCK_INFO_SIZE + sizeof(descr), 0, size - 2 * BLOCK_INFO_SIZE);
   *(int*)((char*)pMemory + size - sizeof(int)) = descr.blockSize;
 
   return MEM_SUCCESS;
@@ -65,69 +66,82 @@ int meminit(void *pMemory, int size) {
 // You can implement memory leak checks here
 void memdone() {
   // in the end list must have 2 nodes, that contains all memory block
-  int size = s_memInfo.startList->blockSize + s_memInfo.startList->next->blockSize + 2 * BLOCK_INFO_SIZE;
+  int size;
 
+  // check is manager initizlised
+  if (s_memInfo.memBlock == NULL)
+    return;
+
+  // evaluate size
+  size = s_memInfo.startList->blockSize + s_memInfo.startList->next->blockSize + 2 * BLOCK_INFO_SIZE;
   if (size != s_memInfo.totalSize)
     fprintf(stderr, "Memory leaks");
+  // make manager uninitialized
+  memset(s_memInfo.memBlock, 0, s_memInfo.totalSize);
+  memset(&s_memInfo, 0, sizeof(s_memInfo));
 }
 
 // Allocate memory block of size 'size'.
 // Returns pointer to memory block is success, 0 otherwise
 void* memalloc(int size) {
-  descriptor_t
-    *beforeNewAlloc = s_memInfo.beforeLastAlloc,
-    *newAlloc = beforeNewAlloc->next;
+  descriptor_t *beforeNewAlloc, *newAlloc;
+
+  // check memory manager
+  if (s_memInfo.memBlock == NULL)
+    return NULL;
+  // check size
+  if (size <= 0)
+    return NULL;
+
+  beforeNewAlloc = s_memInfo.beforeLastAlloc;
+  newAlloc = beforeNewAlloc->next;
 
   // search suitable block
   while (newAlloc->blockSize < size) {
-    if (beforeNewAlloc == s_memInfo.beforeLastAlloc)
-      return NULL;
     beforeNewAlloc = newAlloc;
     newAlloc = newAlloc->next;
+    // root if not find
+    if (beforeNewAlloc == s_memInfo.beforeLastAlloc)
+      return NULL;
   }
+  s_memInfo.beforeLastAlloc = beforeNewAlloc;
 
-  // root to split block
+  // root if block splits
   if (newAlloc->blockSize > size + BLOCK_INFO_SIZE) {
-    // evaluate place of new block
-    descriptor_t *newBlock = (descriptor_t*)((char*)(newAlloc) + size + BLOCK_INFO_SIZE);
+    descriptor_t *splitedBlock = (descriptor_t*)((char*)newAlloc + size + BLOCK_INFO_SIZE);
 
-    // replace with old block
-    if (newAlloc == s_memInfo.startList) {
-      s_memInfo.startList = newBlock;
-      s_memInfo.endList->next = newBlock;
-    }
-    if (newAlloc == s_memInfo.endList)
-      s_memInfo.endList = newBlock;
+    // set global values
+    if (s_memInfo.startList == newAlloc)
+      s_memInfo.startList = splitedBlock;
+    if (s_memInfo.endList == newAlloc)
+      s_memInfo.endList = splitedBlock;
 
-    // fill new block
-    newBlock->blockSize = newAlloc->blockSize - size - BLOCK_INFO_SIZE;
-    newBlock->next = newAlloc->next;
-    *(int*)((char*)newBlock + newBlock->blockSize + sizeof(descriptor_t)) = newBlock->blockSize;
-    if (newAlloc == s_memInfo.endList)
-      s_memInfo.endList = newBlock;
+    // fill splited block
+    beforeNewAlloc->next = splitedBlock;
+    splitedBlock->blockSize = newAlloc->blockSize - BLOCK_INFO_SIZE - size;
+    splitedBlock->next = newAlloc->next;
+    *((int*)((char*)newAlloc + sizeof(descriptor_t) + newAlloc->blockSize)) = splitedBlock->blockSize;
 
-    // fill old block
-    newAlloc->blockSize = size;
-    beforeNewAlloc->next = newBlock;
-    s_memInfo.beforeLastAlloc = beforeNewAlloc;
-    newAlloc->blockSize = -newAlloc->blockSize;
-    *(int*)((char*)newAlloc + size + sizeof(descriptor_t)) = -size;
+    // fill allocated block
+    newAlloc->next = NULL;
+    newAlloc->blockSize = -size;
+    *((int*)splitedBlock - 1) = -size;
+
     return newAlloc + 1;
   }
 
-  // root not to split block
-  // replace old block
-  if (newAlloc == s_memInfo.startList) {
+  // root if block doesn't split
+  // set global values
+  if (s_memInfo.startList == newAlloc)
     s_memInfo.startList = newAlloc->next;
-    s_memInfo.endList->next = newAlloc->next;
-  }
-  if (newAlloc == s_memInfo.endList)
+  if (s_memInfo.endList == newAlloc)
     s_memInfo.endList = beforeNewAlloc;
-  // fill old block
-  s_memInfo.beforeLastAlloc = beforeNewAlloc;
+  // pop block from list
   beforeNewAlloc->next = newAlloc->next;
+  // fill new allocation block
+  newAlloc->next = NULL;
   newAlloc->blockSize = -newAlloc->blockSize;
-  *(int*)((char*)newAlloc - newAlloc->blockSize + sizeof(descriptor_t)) = newAlloc->blockSize;
+  *((int*)((char*)newAlloc + sizeof(descriptor_t) - newAlloc->blockSize)) = newAlloc->blockSize;
   return newAlloc + 1;
 }
 
@@ -135,13 +149,17 @@ void* memalloc(int size) {
 void memfree(void *p) {
   descriptor_t *blockDescr;
 
-  if (p == NULL)
+  // check pointer valid
+  if ((char*)p < (char*)s_memInfo.memBlock + BLOCK_INFO_SIZE ||
+    (char*)p > (char*)s_memInfo.memBlock + s_memInfo.totalSize - sizeof(int))
     return;
 
   blockDescr = (descriptor_t*)p - 1;
 
+  if (blockDescr->blockSize > 0)
+    return;
   // root to unite with forward block
-  if ((char*)p - blockDescr->blockSize + sizeof(int) - (char*)s_memInfo.memBlock < s_memInfo.totalSize &&
+  if ((char*)p - (char*)s_memInfo.memBlock - blockDescr->blockSize + (int)sizeof(int) < s_memInfo.totalSize &&
     ((descriptor_t*)((char*)p - blockDescr->blockSize + sizeof(int)))->blockSize > 0) {
     descriptor_t
       *prev = s_memInfo.endList,
@@ -161,7 +179,7 @@ void memfree(void *p) {
     if (s_memInfo.startList == next)
       s_memInfo.startList = next->next;
     if (s_memInfo.beforeLastAlloc == next)
-      s_memInfo.beforeLastAlloc = blockDescr;
+      s_memInfo.beforeLastAlloc = next->next;
   }
   // root to find with backward block
   if (*(int*)((char*)p - BLOCK_INFO_SIZE) > 0) {
@@ -169,14 +187,16 @@ void memfree(void *p) {
     descriptor_t *descr = (descriptor_t*)((char*)p - sizeof(descriptor_t) - BLOCK_INFO_SIZE - *(int*)((char*)p - BLOCK_INFO_SIZE));
     descr->blockSize -= blockDescr->blockSize - BLOCK_INFO_SIZE;
     *((int*)((char*)p - blockDescr->blockSize)) = descr->blockSize;
+    memset(descr + 1, 0, descr->blockSize);
     return;
   }
 
   // fill block to place it
-  s_memInfo.endList->next = blockDescr;
   blockDescr->next = s_memInfo.startList;
   blockDescr->blockSize = -blockDescr->blockSize;
   *(int*)((char*)blockDescr + blockDescr->blockSize + sizeof(descriptor_t)) = blockDescr->blockSize;
+  memset(blockDescr + 1, 0, blockDescr->blockSize);
+  s_memInfo.endList->next = blockDescr;
   s_memInfo.startList = blockDescr;
 }
 

@@ -24,7 +24,7 @@ TEST(TestCreate_OneElemNegative, OneElem_ReturnNegVal) {
 
 TEST(TestCreate_EmptyList, Emptylist_ReturnNull) {
 	FILE* f;
-	list_p* list = NULL;
+	list_p* list = (list_p*)malloc(sizeof(list_p));
 	f = fopen("temp3.txt", "r");
 	list = CreateList(f);
 	EXPECT_TRUE(list == NULL);
@@ -75,87 +75,83 @@ TEST(TestDestroy_ThreeElements, List_ReturnNULL) {
 	fclose(f);
 }
 
-TEST(TestSort_ZeroElements, EmptyList_ReturnNULL) {
-	FILE* f;
-	list_p* list = (list_p*)malloc(sizeof(list_p));
-	f = fopen("temp3.txt", "r");
+TEST(TestAdd_OneElement, List_ReturnRightList) {
+	FILE* f, * g;
+	list_p* list = (list_p*)malloc(sizeof(list_p)), * head = (list_p*)malloc(sizeof(list_p));
+	char str[50];
+	f = fopen("temp4.txt", "r");
+	g = fopen("temp1.txt", "r");
+	fgets(str, sizeof(str), g);
 	list = CreateList(f);
-	list = Sort(list);
+	head = list;
+	list = Add(head, str, list);
+	EXPECT_TRUE(list->T == -66);
+	list = list->next;
+	EXPECT_TRUE(list->T == 2);
+	list = list->next;
+	EXPECT_TRUE(list->T == 6);
+	list = list->next;
+	EXPECT_TRUE(list->T == 49);
+	list = list->next;
+	fclose(f);
+	fclose(g);
+}
+
+TEST(TestAdd_ThreeElements, List_ReturnRightList) {
+	FILE* f, * g;
+	list_p* list = (list_p*)malloc(sizeof(list_p)), * head = (list_p*)malloc(sizeof(list_p));
+	char str[50];
+	char* a;
+	int n = 0;
+	f = fopen("temp1.txt", "r");
+	g = fopen("temp4.txt", "r");
+	list = CreateList(f);
+	head = list;
+	while (1) {
+		n++;
+		a = fgets(str, sizeof(str), g);
+		if (a == NULL || a == "\n") {
+			if (n == 1) {
+				list = NULL;
+				break;
+			}
+			else
+				break;
+		}
+		list = Add(head, str, list);
+		head = list;
+	}
+	EXPECT_TRUE(list->T == -66);
+	list = list->next;
+	EXPECT_TRUE(list->T == 2);
+	list = list->next;
+	EXPECT_TRUE(list->T == 6);
+	list = list->next;
+	EXPECT_TRUE(list->T == 49);
+	list = list->next;
+	fclose(f);
+	fclose(g);
+}
+
+TEST(TestAdd_ZeroElements, List_ReturnRightList) {
+	FILE* f, * g;
+	list_p* list = (list_p*)malloc(sizeof(list_p)), * head = (list_p*)malloc(sizeof(list_p));
+	char str[50];
+	char* a;
+	f = fopen("temp1.txt", "r");
+	g = fopen("temp3.txt", "r");
+	list = CreateList(f);
+	head = list;
+	a = fgets(str, sizeof(str), g);
+	if (a == NULL || a == "\n")
+		str[0] = '\n';
+
+	list = Add(head, str, list);
+	EXPECT_TRUE(list->T == 49);
+	list = list->next;
 	EXPECT_TRUE(list == NULL);
 	fclose(f);
-}
-
-TEST(TestSort_OneElement, List_ReturnElement) {
-	FILE* f;
-	list_p* list = (list_p*)malloc(sizeof(list_p));
-	f = fopen("temp1.txt", "r");
-	list = CreateList(f);
-	list = Sort(list);
-	EXPECT_TRUE(list != NULL);
-	EXPECT_TRUE(list->next == NULL);
-	fclose(f);
-}
-
-TEST(TestSort_ThreeElements, ListDifferent_ReturnRightsequence) {
-	FILE* f;
-	list_p* list = (list_p*)malloc(sizeof(list_p)), * tmp = (list_p*)malloc(sizeof(list_p)), * dop = (list_p*)malloc(sizeof(list_p));
-	f = fopen("temp4.txt", "r");
-	list = CreateList(f);
-	list = Sort(list);
-	tmp = list->next;
-	dop = tmp->next;
-	EXPECT_TRUE(list->T < tmp->T);
-	EXPECT_TRUE(tmp->T < dop->T);
-	printf("\n");
-	fclose(f);
-}
-
-TEST(TestSort_ThreeElements, ListEqualtemp_ReturnRightsequence) {
-	FILE* f;
-	list_p* list = (list_p*)malloc(sizeof(list_p)), * tmp = (list_p*)malloc(sizeof(list_p)), * dop = (list_p*)malloc(sizeof(list_p));
-	f = fopen("temp5.txt", "r");
-	list = CreateList(f);
-	list = Sort(list);
-	tmp = list->next;
-	dop = tmp->next;
-	EXPECT_TRUE(list->day < tmp->day);
-	EXPECT_TRUE(tmp->year < dop->year);
-	printf("\n");
-	fclose(f);
-}
-
-TEST(TestSort_ThreeElements, ListEqualElements_ReturnRightsequence) {
-	FILE* f;
-	list_p* list = (list_p*)malloc(sizeof(list_p)), * tmp = (list_p*)malloc(sizeof(list_p)),*dop = (list_p*)malloc(sizeof(list_p));
-	f = fopen("temp6.txt", "r");
-	list = CreateList(f);
-	list = Sort(list);
-	tmp = list->next;
-	dop = tmp->next;
-	EXPECT_TRUE(list->T == tmp->T);
-	EXPECT_TRUE(list->day == tmp->day);
-	EXPECT_TRUE(list->month == tmp->month);
-	EXPECT_TRUE(list->year == tmp->year);
-
-	printf("\n");
-
-	EXPECT_TRUE(list->T == dop->T);
-	EXPECT_TRUE(list->day == dop->day);
-	EXPECT_TRUE(list->month == dop->month);
-	EXPECT_TRUE(list->year == dop->year);
-
-	printf("\n");
-
-	EXPECT_TRUE(dop->T == tmp->T);
-	EXPECT_TRUE(dop->day == tmp->day);
-	EXPECT_TRUE(dop->month == tmp->month);
-	EXPECT_TRUE(dop->year == tmp->year);
-
-	printf("\n");
-	EXPECT_TRUE(list != NULL);
-	EXPECT_TRUE(tmp != NULL);
-	EXPECT_TRUE(dop != NULL);
-	fclose(f);
+	fclose(g);
 }
 
 TEST(Test_Temp, ReturnRightTemp) {
@@ -164,7 +160,6 @@ TEST(Test_Temp, ReturnRightTemp) {
 	list_p* list = (list_p*)malloc(sizeof(list_p));
 	f = fopen("temp.txt", "r");
 	list = CreateList(f);
-	printf("write temperature you need to find\n");
 	scanf_s("%d", &t);
 	fl = FindTemp(list, t, fl);
 	EXPECT_TRUE(fl == t);

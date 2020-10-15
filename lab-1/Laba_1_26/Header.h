@@ -7,7 +7,6 @@ typedef struct list_p {
 	struct list_p* next;
 }list_p;
 
-list_p* Sort(list_p* head);
 
 list_p* CreateList(FILE* f);
 
@@ -23,7 +22,7 @@ int WhatYear(char str[]);
 
 int WhatTemperature(char str[]);
 
-list_p* Add(list_p* head, char str[]);
+list_p* Add(list_p* head, char str[], list_p* list);
 
 list_p* Init(list_p* head, char str[]);
 

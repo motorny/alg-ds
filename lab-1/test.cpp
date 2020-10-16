@@ -6,38 +6,77 @@ extern "C"
 #pragma warning (disable:4996)
 
 TEST(TestSortSubstitution, Test_SortSubstitution_RightPlaceOfWord_ReturnPointerToTheLocalBegining) {
-    list testlist = { NULL,"accp" };
-    list testlistp = { NULL, "axc" };
-    list testlistpp = { NULL,"tye" };
+    char word1[] = "accp";
+    char word2[] = "axc";
+    char word3[] = "tye";
+
+    list testlist;
+    testlist.previous = NULL;
+    strcpy(testlist.string, word1);
+
+    list testlistp;
+    testlistp.previous = NULL;
+    strcpy(testlistp.string, word2);
+
+    list testlistpp;
+    testlistpp.previous = NULL;
+    strcpy(testlistpp.string, word3);
+
     testlistp.previous = &testlistpp;
     testlist.previous = &testlistp;
 
     list* ad = &testlist;
     SortSubstitution(ad);
 
-    ASSERT_STREQ(ad->string, "accp");
+    ASSERT_STREQ(ad->string, word1);
     ASSERT_TRUE(ad->previous == NULL);
 }
 TEST(TestSortSubstitution, Test_SortSubstitution_MovingWords_ReturnPointerToTheLocalBegining) {
-    list testlist = {NULL,"accp"};
-    list testlistp = { NULL, "axc" };
-    list testlistpp = { NULL,"tye" };
+    char word1[] = "accp";
+    char word2[] = "axc";
+    char word3[] = "tye";
+
+    list testlist;
+    testlist.previous = NULL;
+    strcpy(testlist.string, word1);
+
+    list testlistp;
+    testlistp.previous = NULL;
+    strcpy(testlistp.string, word2);
+
+    list testlistpp;
+    testlistpp.previous = NULL;
+    strcpy(testlistpp.string, word3);
+
     testlistp.previous = &testlistpp;
     testlist.previous = &testlistp;
 
     list* ad = &testlist;
     list* proverka = SortSubstitution(ad);
 
-    ASSERT_STREQ(proverka->string,"axc");
-    ASSERT_STREQ(proverka->previous->string, "tye");
-    ASSERT_STREQ(proverka->previous->previous->string, "accp");
+    ASSERT_STREQ(proverka->string, word2);
+    ASSERT_STREQ(proverka->previous->string, word3);
+    ASSERT_STREQ(proverka->previous->previous->string, word1);
     ASSERT_TRUE(proverka->previous->previous->previous == NULL);
 }
 
 TEST(TestSortList, Test_SortList_SortingByLengthAndAlphabet_LiningUpInTheRightOrder) {
-    list testlist = { NULL,"accp" };
-    list testlistp = { NULL, "axc" };
-    list testlistpp = { NULL,"tye" };
+    char word1[] = "accp";
+    char word2[] = "axc";
+    char word3[] = "tye";
+
+    list testlist;
+    testlist.previous = NULL;
+    strcpy(testlist.string, word1);
+
+    list testlistp;
+    testlistp.previous = NULL;
+    strcpy(testlistp.string, word2);
+
+    list testlistpp;
+    testlistpp.previous = NULL;
+    strcpy(testlistpp.string, word3);
+
     testlistp.previous = &testlistpp;
     testlist.previous = &testlistp;
 
@@ -45,16 +84,29 @@ TEST(TestSortList, Test_SortList_SortingByLengthAndAlphabet_LiningUpInTheRightOr
     ad.previous = &testlist;
     SortList(&ad);
 
-    ASSERT_STREQ(ad.previous->string, "axc");
-    ASSERT_STREQ(ad.previous->previous->string, "tye");
-    ASSERT_STREQ(ad.previous->previous->previous->string, "accp");
+    ASSERT_STREQ(ad.previous->string, word2);
+    ASSERT_STREQ(ad.previous->previous->string, word3);
+    ASSERT_STREQ(ad.previous->previous->previous->string, word1);
     ASSERT_TRUE(ad.previous->previous->previous->previous == NULL);
 }
 
 TEST(TestSortList, Test_SortList_TheEndOfSorting_ReturnEmptyCheckBox) {
-    list testlist = { NULL,"accp" };
-    list testlistp = { NULL, "axc" };
-    list testlistpp = { NULL,"tye" };
+    char word1[] = "accp";
+    char word2[] = "axc";
+    char word3[] = "tye";
+
+    list testlist;
+    testlist.previous = NULL;
+    strcpy(testlist.string, word1);
+
+    list testlistp;
+    testlistp.previous = NULL;
+    strcpy(testlistp.string, word2);
+
+    list testlistpp;
+    testlistpp.previous = NULL;
+    strcpy(testlistpp.string, word3);
+
     testlistp.previous = &testlistpp;
     testlist.previous = &testlistp;
 

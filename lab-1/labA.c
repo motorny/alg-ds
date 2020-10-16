@@ -5,8 +5,8 @@
 #include<stdlib.h>
 #include "LabA.h"
 
-//функци€, считывающа€ слова из файла в список
-int ReadList(list* mylist, FILE* F) {
+//функци€, считывающа€ каждое слово из файла в список
+void ReadList(list* mylist, FILE* F) {
 
     list* WordBase = (list*)calloc(1, sizeof(list));
 
@@ -14,12 +14,17 @@ int ReadList(list* mylist, FILE* F) {
 
     WordBase->previous = mylist->previous;
     mylist->previous = WordBase;
-
-    if (feof(F) != 0 )  
-        return 0;
-    else
-        ReadList(mylist, F);
 }
+
+//функци€ сортировки после считывани€ очередного слова
+void SortAndRead(list* mylist, FILE* F) {
+    ReadList(mylist, F);
+    while (feof(F) == 0) {
+        ReadList(mylist, F);
+        SortList(mylist);
+    }
+}
+
 //функци€, мен€юща€ 2 слова местами при необходимости и возвращающа€ указатель на образовавшеес€ локальное начало
 list* SortSubstitution(list* word) {
     //если слова сто€т в нужном пор€дке

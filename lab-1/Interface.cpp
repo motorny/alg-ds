@@ -37,6 +37,7 @@ int PrintByDate(ListNode* head,int date)
 	for (int i = 0;i < count;i++) printf("%s--%d\n", Array[i]->name, Array[i]->date);
 	printf("-------------\n");
 	printf("%d at all.\n\n", count);
+	free(Array);
 	return count;
 }
 

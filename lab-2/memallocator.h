@@ -29,7 +29,6 @@ void memfree(void *p);
 // free(ptr);
 int memgetminimumsize();
 
-
 // Returns size in bytes of additional information per allocation
 // use case:
 // void *p1 = 0, *p2 = 0;

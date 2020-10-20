@@ -18,6 +18,9 @@ void FillPlenty(plenty_t* A, int size, data_t step) {
 	node_t* p;
 	int i;
 	A->head = (node_t*)malloc(sizeof(node_t));
+	if (A->head == NULL) {
+		return;
+	}
 	p = A->head;
 	for (i = 1; i <= size; i++) {
 		p->data = step * i;
@@ -46,6 +49,9 @@ void DestroyPlenty(plenty_t* A) {
 void AddInPlenty(plenty_t* A, data_t item) {
 	assert(A != 0);
 	node_t *p, *t = (node_t*)malloc(sizeof(node_t)), *h;
+	if (t == NULL) {
+		return;
+	}
 	t->next = NULL;
 
 	//if one element

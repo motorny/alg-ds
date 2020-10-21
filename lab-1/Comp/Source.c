@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 
-#define N 1000000
+#define N 100000
 
 int main() {
 
@@ -38,7 +38,7 @@ int main() {
 
 	t1 = clock();
 	for (i = N; i > 0; i--) {
-		getM(q2, &c);
+		if (getM(q2, &c) == MALLOC_ERROR) return MALLOC_ERROR;;
 	}
 	t2 = clock();
 	printf("time to free the queue with Array == %d\n", t2 - t1);

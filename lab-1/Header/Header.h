@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define arLen 1000
+#define MALLOC_ERROR 11
+#define EMPTY_LIST 1
+#define EMPTY_ARRAY 1
+#define ONE_ITEM_LEFT 2
 
 //////////////////// –еализаци€ через линейный список////////////////////////////
 
@@ -20,17 +25,19 @@ void empty(struct queue* q) { //инициализаци€
 	q->last = NULL;
 }
 
-void init(struct queue* q) {  // создание корн€
+int init(struct queue* q) {  // создание корн€
 
 	list* lst = (struct list*)malloc(sizeof(struct list));
+	if (lst == NULL) return MALLOC_ERROR;
 	q->first = lst;
 	q->last = lst;
+	return 0;
 }
 
 int isempty(struct queue* q) { //проверка на пустую очередь 
 							   // 1 если пуста€, 0 если есть элементы
 	if (q->first == NULL)
-		return 1;
+		return EMPTY_LIST;
 	else
 		return 0;
 }
@@ -42,11 +49,13 @@ int add(struct queue* q, int c) { // добавление в конец очереди
 		init(q);
 		q->last->a = c;
 		q->last->next = NULL;
-		return 1;
+		return  EMPTY_LIST;
 	}
 
 	struct list* lst;
 	lst = (struct list*)malloc(sizeof(struct list));
+	if (lst == NULL) return MALLOC_ERROR;
+
 	lst->a = c;
 	lst->next = NULL;
 	q->last->next = lst;
@@ -60,7 +69,7 @@ int get(queue* q, int* c) { // извлечение элемента
 
 	if (isempty(q)) {
 		c = NULL;
-		return 1;
+		return  EMPTY_LIST;
 	}
 
 	list* lst = q->first;
@@ -79,11 +88,12 @@ typedef struct queueM {
 	int first, last;
 }queueM;
 
-void initM(struct queueM* q) {
+int initM(struct queueM* q) {
 	q->first = 0;
 	q->last = 1;
-	q->qm = (int*)malloc(sizeof(int));
-	return;
+	q->qm = (int*)malloc(sizeof(int)*arLen);
+	if (q->qm == NULL) return MALLOC_ERROR;
+	return 0;
 }
 
 void emptyM(queueM* q) {
@@ -93,29 +103,39 @@ void emptyM(queueM* q) {
 }
 
 int isemptyM(queueM* q) {
-	if (q->last == 0) return 1;
+	if (q->last == 0)
+		return EMPTY_ARRAY;
 	else return 0;
 }
 
 int addM(struct queueM* q, int x) {
+	int* save;
 
 	if (isemptyM(q)) {
 		initM(q);
 		q->qm[0] = x;
-		return 1;
+		return EMPTY_ARRAY;
 	}
 	q->last++;
-	q->qm = (int*)realloc(q->qm, sizeof(int) * q->last);
+
+	if (q->last % arLen == 0) {
+		save = (int*)realloc(q->qm, sizeof(int) * (q->last + arLen));
+		if (save == NULL) return MALLOC_ERROR;
+		q->qm = save;
+	}
+
 	q->qm[q->last - 1] = x;
+
 	return 0;
 }
 
 int getM(queueM* q, int* x) {
 	int i;
+	int* save;
 
 	if (isemptyM(q)) {
 		x = NULL;
-		return 1;
+		return EMPTY_ARRAY;
 	}
 
 	*x = q->qm[0];
@@ -125,14 +145,19 @@ int getM(queueM* q, int* x) {
 	if (isemptyM(q)) {
 		free(q->qm);
 		emptyM(q);
-		return 2;
+		return ONE_ITEM_LEFT;
 	}
 
 	for (i = 0; i < q->last; i++) {
 		q->qm[i] = q->qm[i + 1];
 	}
 
-	q->qm = (int*)realloc(q->qm, sizeof(int) * q->last);
+
+	if (q->last % arLen == 0) {
+		save = (int*)realloc(q->qm, sizeof(int) * (q->last));
+		if (save == NULL) return MALLOC_ERROR;
+		q->qm = save;
+	}
 	return 0;
 }
 

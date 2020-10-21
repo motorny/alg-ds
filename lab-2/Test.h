@@ -111,37 +111,4 @@ TEST(MEMFREE_TEST, CORRECT)
   EXPECT_TRUE((char*)firstFreeNode == memory && (char*)firstFreeNode + firstFreeNode->size + memgetminimumsize() == memory + memSize);
 }
 
-
-
-
-/////////////////////////////////////////////////////////
-
-//TEST(TOO_BIG_SIZE_REQUEST, RECUEST_MORE_THAN_INIT)
-//{
-//  char memory[20];
-
-//  meminit(memory, 20);
-//  int* a = (int*)memalloc(400);
-//  ASSERT_EQ(a, nullptr);
-//}
-
-//TEST(TOO_BIG_SIZE_REQUEST, REQUEST_MORE_THAN_EXIST)
-//{
-//  char memory[60];
-
-//  meminit(memory, 60);
-//  void* a = memalloc(20);
-//  void*b = memalloc(60);
-//  EXPECT_EQ(b, nullptr);
-//  EXPECT_TRUE(a != nullptr);
-//}
-
-
-
-
-
-
-
-
-
 #endif // TST_2_H

@@ -5,17 +5,16 @@
 #include "StackArr.h"
 #pragma warning(disable: 4996)
 
-int delta = 10;
-
 stackArr_t* CreateStackArr(void) {
 	stackArr_t* stack = (stackArr_t*)malloc(sizeof(stackArr_t));
-	assert(stack);
+	if(stack==NULL) return NULL;
 	stack->last = -1;
-	stack->size = delta;
+	stack->delta = 10;
+	stack->size = stack->delta;
 	stack->array = (int*)malloc(stack->size * sizeof(int));
 	if (stack->array == NULL) {
 		free(stack);
-		assert(0);
+		return NULL;
 	}
 	return stack;
 }
@@ -28,7 +27,7 @@ void DestroyStackArr(stackArr_t* stack) {
 void ResizeStackArr(stackArr_t* stack) {
 	int* p;
 	assert(stack);
-	stack->size += delta;
+	stack->size += stack->delta;
 	p = (int*)realloc(stack->array, stack->size * sizeof(int));
 	assert(p);
 	stack->array = p;

@@ -55,18 +55,6 @@ TEST (ConverInputToNode, CorrectSecondNameRecordingReturnValidVal) {
 
 }
 
-TEST(GetPtrLast, EmptyListReturnNull) {
-	tnode* top = NULL;
-	EXPECT_EQ(NULL, GetPtrLast(top));
-}
-
-TEST(GetPtrLast, NonEmptyListReturnValidVal) {
-	tnode second = { "R", "T", "Y", NULL };
-	tnode top = { "Q", "W", "E", &second };
-	tnode* result = GetPtrLast(&top);
-	EXPECT_EQ(&second, result);
-}
-
 
 TEST(Compare, CompareWithEmptyElementFromListReturnNoMatch) {
 	tnode* element = NULL;
@@ -141,23 +129,106 @@ TEST(AddToList, AddToEmptyListReturnValidVal) {
 	EXPECT_EQ(top, &input);
 }
 
-TEST(AddToList, NonEmptyListReturnValidVal) {
-	tnode input = { "R", "T", "Y", NULL };
-	tnode elem = { "Q", "W", "E", NULL };
+TEST(AddToList, AddedNewLeastElementSortBySurnameReturnValidVal) {
+	tnode input = { "Ab", "Cd", "Ef", NULL }; // should be new top elem
+	tnode elem = { "Bb", "Zx", "Vb", NULL }; //present top elem
 	tnode* top = &elem;
+	AddToList(&top, &input);
+	EXPECT_EQ(top, &input);
+}
+
+TEST(AddToList, AddedNewLeastElementSortByNameReturnValidVal) {
+	tnode input = { "Ab", "Cd", "Ef", NULL }; // should be new top elem; surname equal,first by name
+	tnode elem = { "Ab", "Zx", "Vb", NULL }; //present top elem
+	tnode* top = &elem;
+	AddToList(&top, &input);
+	EXPECT_EQ(top, &input);
+}
+TEST(AddToList, AddedNewLeastElementSortByScndnameReturnValidVal) {
+	tnode input = { "Ab", "Zx", "Af", NULL }; // should be new top elem, surname & name equal, first by scndname
+	tnode elem = { "Bb", "Zx", "Vb", NULL }; //present top elem
+	tnode* top = &elem;
+	AddToList(&top, &input);
+	EXPECT_EQ(top, &input);
+}
+
+
+TEST(AddToList, AddedNewElementToEndSortBySurnameOneElementListReturnValidVal) {
+	tnode input = { "Tv", "Mf", "Rt", NULL };
+	tnode elem = { "Bb", "Ax", "Vb", NULL };
+	tnode* top = &elem;
+	EXPECT_EQ(AddToList(&top, &input), ADD_TO_END);
+}
+
+TEST(AddToList, AddedNewElementToEndSortByNameOneElementListReturnValidVal) {
+	tnode input = { "Bb", "Mf", "Rt", NULL }; 
+	tnode elem = { "Bb", "Ax", "Vb", NULL }; 
+	tnode* top = &elem;
+	EXPECT_EQ(AddToList(&top, &input), ADD_TO_END);
+
+}
+TEST(AddToList, AddedNewElementToEndSortByScndnameOneElementListReturnValidVal) {
+	tnode input = { "Bb", "Zx", "Zt", NULL };
+	tnode elem = { "Bb", "Zx", "Vb", NULL };
+	tnode* top = &elem;
+	EXPECT_EQ(AddToList(&top, &input), ADD_TO_END);
+}
+
+
+TEST(AddToList, AddedNewElementToEndSortBySurnameManyElementListReturnValidVal) {
+	tnode input = { "Tv", "Mf", "Rt", NULL };
+	tnode elem2 = { "Bb", "Cx", "Tb", NULL };
+	tnode elem1 = { "Ab", "Ax", "Vb", &elem2 };
+	tnode* top = &elem1;
+	EXPECT_EQ(AddToList(&top, &input), ADD_TO_END);
+}
+
+
+TEST (AddToList, AddedNewElementToEndSortByNameManyElementListReturnValidVal) {
+	tnode input = { "Bb", "Mf", "Rt", NULL };
+	tnode elem2 = { "Bb", "Cx", "Tb", NULL };
+	tnode elem1 = { "Ab", "Ax", "Vb", &elem2 };
+	tnode* top = &elem1;
+	EXPECT_EQ(AddToList(&top, &input), ADD_TO_END);
+}
+
+
+TEST(AddToList, AddedNewElementToEndSortByScndnameManyElementListReturnValidVal) {
+	tnode input = { "Bb", "Cx", "Zt", NULL };
+	tnode elem2 = { "Bb", "Cx", "Tb", NULL };
+	tnode elem1 = { "Ab", "Ax", "Vb", &elem2 };
+	tnode* top = &elem1;
+	EXPECT_EQ(AddToList(&top, &input), ADD_TO_END);
+}
+
+
+TEST(AddToList, AddedNewElementNotFirstOrLastSortBySurnameReturnValidVal) {
+	tnode input = { "Bw", "Cd", "Ef", NULL }; 
+	tnode elem2 = { "Cb", "Zx", "Vb", NULL };
+	tnode elem1 = { "Ab", "Vt", "Nm", &elem2 };
+	tnode* top = &elem1;
 	AddToList(&top, &input);
 	EXPECT_EQ(top->next, &input);
 }
 
 
-TEST(PrintFilteredList, NoMatchesInListReturnZero) {
-	tnode elem3 = { "R", "T", "Y", NULL };
-	tnode elem2= { "Q", "W", "E", &elem3 };
-	tnode elem1 = { "Z", "X", "C", &elem2 };
-	tnode input = { "M", "", "C", NULL };
+
+TEST(AddToList, AddedNewElementNotFirstOrLastSortByNameReturnValidVal) {
+	tnode input = { "Cb", "Cd", "Ef", NULL };
+	tnode elem2 = { "Cb", "Zx", "Vb", NULL };
+	tnode elem1 = { "Ab", "Vt", "Nm", &elem2 };
 	tnode* top = &elem1;
-	int count = PrintFilteredList(&top, &input);
-	EXPECT_EQ(0, count);
+	AddToList(&top, &input);
+	EXPECT_EQ(top->next, &input);
+}
+
+TEST(AddToList, AddedNewElementNotFirstOrLastSortByScndNameReturnValidVal) {
+	tnode input = { "Cb", "Wd", "Af", NULL };
+	tnode elem2 = { "Cb", "Wd", "Mb", NULL };
+	tnode elem1 = { "Ab", "Vt", "Nm", &elem2 };
+	tnode* top = &elem1;
+	AddToList(&top, &input);
+	EXPECT_EQ(top->next, &input);
 }
 
 

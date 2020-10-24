@@ -78,15 +78,6 @@ tnode* ConvertInputToNode(char* tmp) { //Converts request from <"surname" "name"
     return result;
 }
 
-tnode* GetPtrLast(tnode* top) { // gives pointer to last element of list
-    if (top == NULL) {             // needed for correct data reading from file
-        return NULL;
-    }
-    while (top->next != NULL) {
-        top = top->next;
-    }
-    return top;
-}
 
 int Compare(tnode* person_l, tnode* info) { // returns NO_MATCH(= 1) if person_l shouldn't be printed
     int lenth;                              // returs MATCH(= 0) if person_l should be printed
@@ -129,22 +120,62 @@ int Compare(tnode* person_l, tnode* info) { // returns NO_MATCH(= 1) if person_l
 }
 
 
-int AddToList(tnode** top, tnode* person) {  // adds element to end of list 
+int AddToList(tnode** top, tnode* person) {  // adds element to list in order 
+    
     if (person == NULL) {
         printf("tried to add empty element;");
         return EMPTY_ELEMENT;
     }
-    //if ((*top) == NULL) {   // if list's empty and person is first
+    if ((*top) == NULL) {   // if list's empty and person is first
         person->next = (*top);
         (*top) = person;
-        
-        /*
+        return SUCCESS_ADD;// remove 0 and add constant
     }
-    else {
-        tnode* last = GetPtrLast((*top));
-        person->next = NULL;
-        last->next = person;
-    }*/
+    tnode* tmp = (*top);
+    tnode* prev = NULL;
+    while (tmp != NULL) {
+        int surname_flag=strcmp(person->surname, tmp->surname);
+        int name_flag=strcmp(person->name, tmp->name);
+        int scndname_flag = strcmp(person->scndname, tmp->scndname);
+        
+        if ( surname_flag< 0) { 
+            if (prev == NULL) {// if person should be top 
+                person->next = (*top);
+                (*top) = person;
+                return SUCCESS_ADD;
+            }
+            prev->next = person;
+            person->next = tmp;
+            return SUCCESS_ADD;
+        }
+        
+        else if (surname_flag==0 && name_flag<0) {
+            if (prev == NULL) {
+                person->next = (*top);
+                (*top) = person;
+                return SUCCESS_ADD;
+            }
+            prev->next = person;
+            person->next = tmp;
+            return SUCCESS_ADD;
+        }
+        else if (surname_flag==0 && name_flag==0 && scndname_flag<0) {
+            if (prev == NULL) {
+                person->next = (*top);
+                (*top) = person;
+                return SUCCESS_ADD;
+            }
+            prev->next = person;
+            person->next = tmp;
+            return SUCCESS_ADD;
+        }
+        prev = tmp;
+        tmp =tmp->next;
+
+    }
+    prev->next = person;
+    person->next = NULL;
+    return ADD_TO_END;
 }
 
 int PrintFilteredList(tnode** top, tnode* input) { // applies entered filters "info" to list and prints it
@@ -185,3 +216,26 @@ void FreeList(tnode** top) {        // kills the list after the programm is done
     free(*top);
 }
 
+
+
+
+
+// OLD VERSION 
+//int AddToList(tnode** top, tnode* person) {  // adds element to list in order 
+//    if (person == NULL) {
+//        printf("tried to add empty element;");
+//        return EMPTY_ELEMENT;
+//    }
+//    if ((*top) == NULL) {   // if list's empty and person is first
+//        person->next = (*top);
+//        (*top) = person;
+//
+//
+//    }
+//    else {
+//        tnode* last = GetPtrLast((*top));
+//        person->next = NULL;
+//        last->next = person;
+//    }
+//
+//}

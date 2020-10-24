@@ -12,6 +12,8 @@
 #define MATCH 0
 #define ERROR_OPENING_FILE -1
 #define EMPTY_ELEMENT 2
+#define SUCCESS_ADD 0
+#define ADD_TO_END 2
 
 typedef struct node {
     char surname[MAX_LE];

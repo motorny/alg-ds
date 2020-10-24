@@ -3,7 +3,7 @@
 int main()
 
 {
-
+   
     tnode* top = NULL;
     FILE* fp;
     fp = fopen("spisok.txt", "r");

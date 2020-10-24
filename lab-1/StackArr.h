@@ -5,6 +5,7 @@ typedef struct {
 	int last;
 	int size;
 	int* array;
+	int delta;
 }stackArr_t;
 
 stackArr_t* CreateStackArr(void);

@@ -28,6 +28,7 @@ TEST(toLowerRuTest, 3) {
 TEST(initNodeTest, 4) {
     WordsListNode *tmp = (WordsListNode*) malloc(sizeof(WordsListNode));
     tmp->nextPtr = nullptr;
+    ASSERT_NE(&tmp, nullptr);
     tmp->word = "Тестовое";
     tmp->countOfLetters = 8;
     WordsListNode * autoTmp = initWordsListNode("Тестовое", 8);
@@ -41,6 +42,9 @@ TEST(insertInListTest, 5) {
     WordsListNode *tmp1 = (WordsListNode*) malloc(sizeof(WordsListNode));
     WordsListNode *tmp = (WordsListNode*) malloc(sizeof(WordsListNode));
     //tmp -> tmp1 -> tmp2
+    ASSERT_NE(&tmp1, nullptr);
+    ASSERT_NE(&tmp, nullptr);
+    ASSERT_NE(&tmp2, nullptr);
     tmp->nextPtr = tmp2;
     insert(tmp, tmp1);
     tmp1->word = "Пока";
@@ -52,6 +56,9 @@ TEST(insertFirstInListTest, 6) {
     WordsListNode *tmp2 = (WordsListNode*) malloc(sizeof(WordsListNode));
     WordsListNode *tmp1 = (WordsListNode*) malloc(sizeof(WordsListNode));
     WordsListNode *tmp = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&tmp1, nullptr);
+    ASSERT_NE(&tmp, nullptr);
+    ASSERT_NE(&tmp2, nullptr);
     WordsListNode *head = tmp1;
     //tmp -> tmp1 -> tmp2
     tmp1->nextPtr = tmp2;
@@ -72,6 +79,7 @@ TEST(add2ListTest, 7_head_empty) {
 
 TEST(add2ListTest, 7_head_more_len) {
     WordsListNode * head = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&head, nullptr);
     head->word = "Привет";
     head->countOfLetters = 6;
     add2List("Пока", head, 4);
@@ -82,6 +90,7 @@ TEST(add2ListTest, 7_head_more_len) {
 
 TEST(add2ListTest, 7_head_a_after_b) {
     WordsListNode * head = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&head, nullptr);
     head->word = "Привет";
     head->countOfLetters = 6;
     add2List("Аривет", head, 6);
@@ -91,6 +100,7 @@ TEST(add2ListTest, 7_head_a_after_b) {
 
 TEST(add2ListTest, 7_next_after_head) {
     WordsListNode * head = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&head, nullptr);
     head->word = "Привет";
     head->countOfLetters = 6;
     add2List("Здравствуйте", head, 12);
@@ -101,9 +111,11 @@ TEST(add2ListTest, 7_next_after_head) {
 
 TEST(add2ListTest, 7_next_after_n_with_EQ_len) {
     WordsListNode * head = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&head, nullptr);
     head->word = "Привет";
     head->countOfLetters = 6;
     WordsListNode * tmp = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&tmp, nullptr);
     tmp->word = "Приветствие";
     tmp->countOfLetters = 11;
     head->nextPtr = tmp;
@@ -114,12 +126,15 @@ TEST(add2ListTest, 7_next_after_n_with_EQ_len) {
 
 TEST(add2ListTest, 7_next_nullptr) {
     WordsListNode * head = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&head, nullptr);
     head->word = "Привет";
     head->countOfLetters = 6;
     WordsListNode * tmp = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&tmp, nullptr);
     tmp->word = "Приветули";
     tmp->countOfLetters = 9;
     WordsListNode * tmp1 = (WordsListNode*) malloc(sizeof(WordsListNode));
+    ASSERT_NE(&tmp1, nullptr);
     tmp1->word = "Приветствие";
     tmp1->countOfLetters = 11;
     head->nextPtr = tmp;

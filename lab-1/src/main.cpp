@@ -5,11 +5,11 @@
 
 #define moreThanN 7
 
-int main() {
+int main(int argc, char** argv) {
     WordsListNode *listHead = nullptr;
     int lenN;
     FILE *file;
-    const char *fName =  "/home/ikuzin/study/algo_and_struct/alg-ds/lab-1/src/words.txt";
+    const char *fName =  argv[1];
     file = fopen(fName, "r");
     if (file != nullptr) {
         fseek(file, 0, SEEK_END);

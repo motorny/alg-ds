@@ -18,10 +18,13 @@ int tolowerRu(int c) {
 
 WordsListNode *initWordsListNode(char *word, unsigned int len) {
     auto *newNode = (WordsListNode *) malloc(sizeof(WordsListNode));
-    newNode->nextPtr = nullptr;
-    newNode->word = word;
-    newNode->countOfLetters = len;
-    return newNode;
+    if(newNode){
+        newNode->nextPtr = nullptr;
+        newNode->word = word;
+        newNode->countOfLetters = len;
+        return newNode;
+    }
+    return nullptr;
 }
 
 unsigned int getCountOfLetters(const char word[]) {
@@ -45,6 +48,10 @@ void insertFirst(WordsListNode *&currentFstNode, WordsListNode *&newNode) {
 
 void add2List(char *word, WordsListNode *&listHead, unsigned int len) {
     WordsListNode *newWord = initWordsListNode(word, len);
+    if(!newWord){
+        printf("\nНе работает малок");
+        return;
+    }
     if (listHead == nullptr || listHead->countOfLetters > len ||
         (ruChar(listHead->word) > ruChar(word) && listHead->countOfLetters == len)) {
         insertFirst(listHead, newWord);

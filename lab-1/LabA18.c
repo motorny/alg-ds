@@ -5,16 +5,16 @@
 #include <string.h>
 #include <malloc.h>
 
-// Структура элемента списка.
+// The structure of the list item: Структура элемента списка.
 typedef struct LNode
 {
-    // Указатель на ASCIIZ строку.
+    // Pointer to an ASCIIZ string: Указатель на ASCIIZ строку.
     char* data;
-    // Указатель на следующий элемент списка.
+    // Pointer to the next item in the list: Указатель на следующий элемент списка.
     struct LNode* next;
 } LNode;
 
-// Добавить элемент в список.
+// Add an item to the list: Добавить элемент в список.
 void push(LNode** head, char* data)
 {
     LNode* tmp;
@@ -28,7 +28,7 @@ void push(LNode** head, char* data)
     (*head) = tmp;
 }
 
-// Очистить список.
+// Clear the list: Очистить список.
 LNode* freeList(LNode* head)
 {
     LNode* curr = head->next;
@@ -48,6 +48,7 @@ LNode* freeList(LNode* head)
 }
 
 
+//Sorting the list using the insert method. The function returns a pointer to the head of the sorted list
 // Сортировка списка методом вставок. Функция возвращает указатель на голову отсортированного списка.
 LNode* sort(LNode* head)
 {
@@ -56,21 +57,21 @@ LNode* sort(LNode* head)
     LNode* c;
     LNode* res = NULL;
 
-    // Пока не пуст список.
+    // Until the list is empty: Пока не пуст список.
     while (head != NULL)
     {
         a = head; head = head->next;
 
-        // Поиск места вставки.
+        // Search for an insertion point: Поиск места вставки.
         for (b = res, c = NULL; b != NULL && strcmp(a->data, b->data) > 0; c = b, b = b->next);
 
-        // Включение перед первым.
+        // Enabling before the first one: Включение перед первым.
         if (c == NULL)
         {
             a->next = res;
             res = a;
         }
-        // Включение после предыдущего.
+        // Enabling after the previous one: Включение после предыдущего.
         else
         {
             a->next = b;
@@ -83,7 +84,7 @@ LNode* sort(LNode* head)
 
 
 
-// Вывод элементов списка.
+// Input list : Вывод элементов списка.
 void printList(const LNode* head)
 {
     if (head == NULL)

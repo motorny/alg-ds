@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "gtest/gtest.h"
 #include "../XORList/XorList.c"
 
@@ -61,11 +62,35 @@ TEST(FindElemByKey, find_in_emptyList) {
 	clearList(&list);
 }
 
-TEST(FindElemByKey, find_in_1ElemList) {
+List CreateList_1elem(void) {
 	List list;
 	init(&list);
 
-	addElem(&list, "one");
+	// Сохраняем строку в ОП
+	int len = strlen("one");  // определяем длину строки
+	char* p = (char*)malloc(len + 1); // выделяем память под строку
+	// Создаем элемент списка
+	Elem* new_elem = (Elem*)malloc(sizeof(Elem));
+
+	strcpy(p, "one"); // копирование строки
+	p[len] = '\0'; // добавим терминальный ноль
+
+	new_elem->data = p; // значение элемента (адрес строки)
+
+	// Встраиваем элемент в конец списка
+	new_elem->xor_addr = XOR(0, 0);
+	list.first = new_elem;
+	
+	list.last = new_elem;
+	return list;
+}
+
+TEST(FindElemByKey, find_in_1ElemList) {
+	List list = CreateList_1elem();
+	//init(&list);
+	//ADD();
+
+	//addElem(&list, "one");
 	ASSERT_TRUE(FindElemByKey(&list, "one"));
 	ASSERT_EQ(FindElemByKey(&list, "one"), list.first);
 	ASSERT_EQ(FindElemByKey(&list, "one"), list.last);
@@ -74,10 +99,10 @@ TEST(FindElemByKey, find_in_1ElemList) {
 }
 
 TEST(FindElemByKey, find_in_1ElemList_noExistElem) {
-	List list;
-	init(&list);
+	List list = CreateList_1elem();
+	//init(&list);
 
-	addElem(&list, "one");
+	//addElem(&list, "one");
 	ASSERT_TRUE(FindElemByKey(&list, "one"));
 	ASSERT_EQ(FindElemByKey(&list, "one"), list.first);
 	ASSERT_EQ(FindElemByKey(&list, "one"), list.last);
@@ -87,40 +112,105 @@ TEST(FindElemByKey, find_in_1ElemList_noExistElem) {
 	clearList(&list);
 }
 
-TEST(FindElemByKey, find_in_moreElemList) {
+List CreateList_moreElem(void) {
 	List list;
 	init(&list);
 
-	addElem(&list, "one");
-	addElem(&list, "two");
-	addElem(&list, "three");
-	addElem(&list, "for");
+	//1 elem
+	// Сохраняем строку в ОП
+	int len = strlen("one");  // определяем длину строки
+	char* p = (char*)malloc(len + 1); // выделяем память под строку
+	// Создаем элемент списка
+	Elem* elem1 = (Elem*)malloc(sizeof(Elem));
+	strcpy(p, "one"); // копирование строки
+	p[len] = '\0'; // добавим терминальный ноль
+	elem1->data = p; // значение элемента (адрес строки)
+	// Встраиваем элемент в конец списка
+	elem1->xor_addr = XOR(0, 0);
+	list.first = elem1;
+	list.last = elem1;
+
+	//2 elem
+	len = strlen("two");
+	p = (char*)malloc(len + 1);
+	Elem* elem2 = (Elem*)malloc(sizeof(Elem));
+	strcpy(p, "two"); // копирование строки
+	p[len] = '\0'; // добавим терминальный ноль
+	elem2->data = p; // значение элемента (адрес строки)
+	// уже есть больше одного элемента
+	elem2->xor_addr = XOR(list.last, 0);
+	elem1 = XOR(list.last->xor_addr, 0); // адрес предпоследнего элемента
+	// обновление xor-адреса последнего элемента списка
+	list.last->xor_addr = XOR(elem1, elem2);
+	list.last = elem2;
+
+	//3 elem
+	len = strlen("three");
+	p = (char*)malloc(len + 1);
+	Elem* elem3 = (Elem*)malloc(sizeof(Elem));
+	strcpy(p, "three"); // копирование строки
+	p[len] = '\0'; // добавим терминальный ноль
+	elem3->data = p; // значение элемента (адрес строки)
+	// уже есть больше одного элемента
+	elem3->xor_addr = XOR(list.last, 0);
+	elem2 = XOR(list.last->xor_addr, 0); // адрес предпоследнего элемента
+	// обновление xor-адреса последнего элемента списка
+	list.last->xor_addr = XOR(elem2, elem3);
+	list.last = elem3;
+
+	//4 elem
+	len = strlen("four");
+	p = (char*)malloc(len + 1);
+	Elem* elem4 = (Elem*)malloc(sizeof(Elem));
+	strcpy(p, "four"); // копирование строки
+	p[len] = '\0'; // добавим терминальный ноль
+	elem4->data = p; // значение элемента (адрес строки)
+	// уже есть больше одного элемента
+	elem4->xor_addr = XOR(list.last, 0);
+	elem3 = XOR(list.last->xor_addr, 0); // адрес предпоследнего элемента
+	// обновление xor-адреса последнего элемента списка
+	list.last->xor_addr = XOR(elem3, elem4);
+	list.last = elem4;
+
+	return list;
+
+}
+TEST(FindElemByKey, find_in_moreElemList) {
+	List list = CreateList_moreElem();
+	//init(&list);
+
+	//addElem(&list, "one");
+	//addElem(&list, "two");
+	//addElem(&list, "three");
+	//addElem(&list, "four");
 
 	ASSERT_TRUE(FindElemByKey(&list, "one"));
 	ASSERT_TRUE(FindElemByKey(&list, "two"));
 	ASSERT_TRUE(FindElemByKey(&list, "three"));
-	ASSERT_TRUE(FindElemByKey(&list, "for"));
+	ASSERT_TRUE(FindElemByKey(&list, "four"));
 	ASSERT_EQ(FindElemByKey(&list, "one"), list.first);
-	ASSERT_EQ(FindElemByKey(&list, "for"), list.last);
+	ASSERT_EQ(FindElemByKey(&list, "four"), list.last);
+	//ASSERT_EQ(FindElemByKey(&list, "three"), list.last);
+
 
 	clearList(&list);
 }
 
 TEST(FindElemByKey, find_in_moreElemList_noExistElem) {
-	List list;
-	init(&list);
+	List list = CreateList_moreElem();
+	//init(&list);
 
-	addElem(&list, "one");
-	addElem(&list, "two");
-	addElem(&list, "three");
-	addElem(&list, "for");
+	//addElem(&list, "one");
+	//addElem(&list, "two");
+	//addElem(&list, "three");
+	//addElem(&list, "for");
 
 	ASSERT_TRUE(FindElemByKey(&list, "one"));
 	ASSERT_TRUE(FindElemByKey(&list, "two"));
 	ASSERT_TRUE(FindElemByKey(&list, "three"));
-	ASSERT_TRUE(FindElemByKey(&list, "for"));
+	ASSERT_TRUE(FindElemByKey(&list, "four"));
 	ASSERT_EQ(FindElemByKey(&list, "one"), list.first);
-	ASSERT_EQ(FindElemByKey(&list, "for"), list.last);
+	ASSERT_EQ(FindElemByKey(&list, "four"), list.last);
 
 	ASSERT_FALSE(FindElemByKey(&list, "six"));
 	ASSERT_FALSE(FindElemByKey(&list, "seven"));

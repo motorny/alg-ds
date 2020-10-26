@@ -57,7 +57,7 @@ void memdone() {
             printf("0x%p %i byte\n", pCheckBlock, pCheckBlock->size);
         }
 
-        (void *) pCheckBlock = (char *) pCheckBlock + memgetblocksize() + pCheckBlock->size;
+        pCheckBlock = (block_t *)((char *) pCheckBlock + memgetblocksize() + pCheckBlock->size);
     }
 #endif
 }
@@ -68,6 +68,9 @@ void *memalloc(int size) {
     block_t *pFreeBlock = pStartBlock;
     block_t **pPrevBlockToNext = &pStartBlock; // Указатель на переменную в которой храниться адресс следующего блока
     void *pAlloc = NULL;
+
+    if ( size < 0 )
+        return NULL;
 
     // Поиск свободного блока с нужным размером 
     while ( pFreeBlock != NULL ) {
@@ -84,7 +87,7 @@ void *memalloc(int size) {
 
     // Создание ещё одного блока для оставшейся памяти в блоке
     if ( pFreeBlock->size >= memgetblocksize() + size ) {
-        block_t *pNextFreeBlock = (char *)pFreeBlock + memgetblocksize() + size;
+        block_t *pNextFreeBlock = (block_t *)((char *)pFreeBlock + memgetblocksize() + size);
         pNextFreeBlock->size = pFreeBlock->size - (memgetblocksize() + size);
         *((int *) ((char *) pNextFreeBlock + pNextFreeBlock->size + sizeof(block_t))) = pNextFreeBlock->size;
         pNextFreeBlock->next = pFreeBlock->next;
@@ -110,11 +113,11 @@ void memfree(void *p) {
     if ( p == NULL || (char *)p - sizeof(block_t) < (char *) pMemoryHead || (char *) p > (char *)pMemoryHead + fullSize )
         return;
 
-    pBlock = (char *) p - sizeof(block_t);
+    pBlock = (block_t *)((char *) p - sizeof(block_t));
 
     // Объединение с левым блоком
-    if ( pBlock >= (char *)pMemoryHead + memgetblocksize() ) {
-        block_t *pPrevBlock = (char *) pBlock - memgetblocksize() - *((int *) ((char *) pBlock - sizeof(int)));
+    if ( (char *) pBlock >= (char *) pMemoryHead + memgetblocksize() ) {
+        block_t *pPrevBlock = (block_t *) ((char *) pBlock - memgetblocksize() - *((int *) ((char *) pBlock - sizeof(int))));
         block_t *pFindBlock = pStartBlock;
 
         while ( pFindBlock != NULL ) {
@@ -132,7 +135,7 @@ void memfree(void *p) {
 
     // Объединение с правым блоком
     if ( pBlock + pBlock->size + memgetblocksize() + memgetblocksize() >= (block_t *) pMemoryHead + fullSize ) {
-        block_t *pNextBlock = (char *)pBlock + pBlock->size + memgetblocksize();
+        block_t *pNextBlock = (block_t *) ((char *)pBlock + pBlock->size + memgetblocksize());
         block_t **pFindBlock = &pStartBlock;
 
         while ( *pFindBlock != NULL ) {

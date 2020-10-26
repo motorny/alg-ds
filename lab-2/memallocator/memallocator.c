@@ -5,12 +5,12 @@
 #define MEM_SUCCESS 1
 #define MEM_FAIL 0
 
-#pragma pack(push, 1)
+//#pragma pack(push, 1)
 typedef struct block_t {
   int size;
   struct block_t *next;
 } block_t;
-#pragma pack(pop)
+//#pragma pack(pop)
 
 void *pMemoryHead = NULL;
 int fullSize = 0;
@@ -28,33 +28,38 @@ int meminit(void *pMemory, int size) {
     pStartBlock->next = NULL;
     pStartBlock->size = fullSize - memgetblocksize();
     *((int *) ((char *) pMemoryHead + fullSize - sizeof(int))) = pStartBlock->size;
-
+    
     return 0;
 }
 
 // You can implement memory leak checks here
 void memdone() {
     void *pMemoryEnd;
-    block_t *pLastFreeBlock = pStartBlock, *pCheckBlock = (block_t *)pMemoryHead;
+    block_t *pLastFreeBlock = pStartBlock, *pCheckBlock = (block_t *) pMemoryHead;
 
-    if ( pMemoryHead == NULL || fullSize <= 0 || fullSize == pStartBlock->size + memgetblocksize() )
+    if ( pMemoryHead == NULL || fullSize <= 0 || pStartBlock != NULL && fullSize == pStartBlock->size + memgetblocksize() )
         return;
     
     pMemoryEnd = (char *) pMemoryHead + fullSize;
-    while ( pLastFreeBlock->next != NULL ) {
-        pLastFreeBlock = pLastFreeBlock->next;
-    }
+    if( pLastFreeBlock != NULL)
+        while ( pLastFreeBlock->next != NULL ) {
+            pLastFreeBlock = pLastFreeBlock->next;
+        }
 
     printf("Detected memory leaks!\n");
     /*
         Суть в том, что если у блока есть указатель на следующий блок, то этот блок свободен,
         иначе если нет указателя на следующий блок и адрес блока не совпадает с последним свободным блоком, то он занят
     */
-    for ( pCheckBlock = (block_t *) pMemoryHead; pCheckBlock != NULL && pCheckBlock < pMemoryEnd; pCheckBlock = (char *) pCheckBlock + memgetblocksize() + pCheckBlock->size ) {
+#ifdef _DEBUG
+    while ( pCheckBlock != NULL && (void *) pCheckBlock < pMemoryEnd ) {
         if ( pCheckBlock->next == NULL && pCheckBlock != pLastFreeBlock ) {
             printf("0x%p %i byte\n", pCheckBlock, pCheckBlock->size);
         }
+
+        (void *) pCheckBlock = (char *) pCheckBlock + memgetblocksize() + pCheckBlock->size;
     }
+#endif
 }
 
 // Allocate memory block of size 'size'.
@@ -78,15 +83,15 @@ void *memalloc(int size) {
     pAlloc = (char *) pFreeBlock + sizeof(block_t);
 
     // Создание ещё одного блока для оставшейся памяти в блоке
-    if ( pFreeBlock->size - size >= memgetblocksize() ) {
-        block_t *pNextFreeBlock = pFreeBlock + memgetblocksize() + size;
+    if ( pFreeBlock->size >= memgetblocksize() + size ) {
+        block_t *pNextFreeBlock = (char *)pFreeBlock + memgetblocksize() + size;
         pNextFreeBlock->size = pFreeBlock->size - (memgetblocksize() + size);
         *((int *) ((char *) pNextFreeBlock + pNextFreeBlock->size + sizeof(block_t))) = pNextFreeBlock->size;
         pNextFreeBlock->next = pFreeBlock->next;
         *pPrevBlockToNext = pNextFreeBlock;
 
         pFreeBlock->size = size;
-        *((int *) ((char *) pNextFreeBlock - sizeof(int))) = size;
+        *((int *) ((char *) pFreeBlock + pFreeBlock->size + sizeof(block_t))) = pFreeBlock->size;
     }
     else {
         *pPrevBlockToNext = pFreeBlock->next;
@@ -105,11 +110,11 @@ void memfree(void *p) {
     if ( p == NULL || (char *)p - sizeof(block_t) < (char *) pMemoryHead || (char *) p > (char *)pMemoryHead + fullSize )
         return;
 
-    pBlock = (block_t *) p - sizeof(block_t);
+    pBlock = (char *) p - sizeof(block_t);
 
     // Объединение с левым блоком
-    if ( pBlock >= (block_t *)pMemoryHead + memgetblocksize() ) {
-        block_t *pPrevBlock = (block_t *) pBlock - memgetblocksize() - *((int *) ((char *) pBlock - sizeof(int)));
+    if ( pBlock >= (char *)pMemoryHead + memgetblocksize() ) {
+        block_t *pPrevBlock = (char *) pBlock - memgetblocksize() - *((int *) ((char *) pBlock - sizeof(int)));
         block_t *pFindBlock = pStartBlock;
 
         while ( pFindBlock != NULL ) {
@@ -127,7 +132,7 @@ void memfree(void *p) {
 
     // Объединение с правым блоком
     if ( pBlock + pBlock->size + memgetblocksize() + memgetblocksize() >= (block_t *) pMemoryHead + fullSize ) {
-        block_t *pNextBlock = (block_t *)pBlock + pBlock->size + memgetblocksize();
+        block_t *pNextBlock = (char *)pBlock + pBlock->size + memgetblocksize();
         block_t **pFindBlock = &pStartBlock;
 
         while ( *pFindBlock != NULL ) {

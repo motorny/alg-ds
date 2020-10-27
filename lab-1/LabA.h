@@ -11,9 +11,11 @@ typedef struct list {
     char string[100];
 } list;
 
-void ReadList(list* mylist, FILE* F);
+void MakeList(list* mylist, FILE* F);
 
-list* SortSubstitution(list* word);
+list* PutWord(list* old, list* newWord);
+
+void WordToList(list* mylist, list* newWord);
 
 void ListPrint(list* word);
 
@@ -21,6 +23,3 @@ void ListCountMore(list* word);
 
 void ListCountSame(list* word, int number);
 
-void SortList(list* mylist);
-
-void SortAndRead(list* mylist, FILE* F);

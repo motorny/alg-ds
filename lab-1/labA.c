@@ -5,48 +5,46 @@
 #include<stdlib.h>
 #include "LabA.h"
 
-//функция, считывающая каждое слово из файла в список
-void ReadList(list* mylist, FILE* F) {
-
-    list* WordBase = (list*)calloc(1, sizeof(list));
-
-    fscanf(F, "%s", &WordBase->string);
-
-    WordBase->previous = mylist->previous;
-    mylist->previous = WordBase;
+//функция, ищущая место для слова
+list* PutWord(list* old, list* newWord) {
+    if (strlen(newWord->string) < strlen(old->string) || (strlen(newWord->string) == strlen(old->string) && strcmp(newWord->string, old->string) <= 0)) {
+        newWord->previous = old;
+        return newWord;
+    }
+    else if (old->previous == NULL) {
+        newWord->previous = NULL;
+        old->previous = newWord;
+        return old;
+    }
+    else {
+        old->previous = PutWord(old->previous, newWord);
+        return old;
+    }
 }
 
-//функция сортировки после считывания очередного слова
-void SortAndRead(list* mylist, FILE* F) {
-    ReadList(mylist, F);
+//функция, формирующая список
+void MakeList(list* mylist, FILE* F) {
     while (feof(F) == 0) {
-        ReadList(mylist, F);
-        SortList(mylist);
+        list* new = (list*)calloc(1, sizeof(list));
+        if (new != NULL) {
+            fscanf(F, "%s", &new->string);
+            WordToList(mylist, new);
+        }
+        else printf("Error: no memory");
     }
 }
 
-//функция, меняющая 2 слова местами при необходимости и возвращающая указатель на образовавшееся локальное начало
-list* SortSubstitution(list* word) {
-    //если слова стоят в нужном порядке
-    if (strlen(word->string) < strlen(word->previous->string)  || (strlen(word->string) == strlen(word->previous->string) && strcmp(word->string, word->previous->string) <= 0)) {
-        if (word->previous->previous != NULL)
-            word->previous = SortSubstitution(word->previous);
-        return word;
+//функция, записывающее слово в нужное место
+void WordToList(list* mylist, list* newWord) {
+    if (mylist->previous == NULL) {
+        newWord->previous = NULL;
+        mylist->previous = newWord;
     }
-    //если слова нужно поменять местами
-    else if (strlen(word->string) > strlen(word->previous->string) || (strlen(word->string) == strlen(word->previous->string) && strcmp(word->string, word->previous->string)>0)) {
-        list intermediate;
-        list* sortedStart;
-        sortedStart = word->previous;
-        intermediate.previous = word->previous->previous;
-        word->previous->previous = word;
-        word->previous = intermediate.previous;
-        flagSort++; //подсчет количества подмен
-        if (sortedStart->previous->previous != NULL)
-            sortedStart->previous = SortSubstitution(sortedStart->previous);
-        return sortedStart;
+    else {
+        mylist->previous = PutWord(mylist->previous, newWord);
     }
 }
+
 //функция, печатающая список
 void ListPrint(list* word) {
     printf("%s\n", word->string);
@@ -81,10 +79,4 @@ void ListCountSame(list* word, int number) {
     else  if (flagSameLength == 0)
         printf("No words of the same length.");
 }
-//функция, сортирующая список целиком
-void SortList(list* mylist) {
-    flagSort = 0;
-    mylist->previous = SortSubstitution(mylist->previous);
-    if (flagSort != 0) //если не сделано ни одной подмены, значит, список отсортирован
-        SortList(mylist);
-}
+

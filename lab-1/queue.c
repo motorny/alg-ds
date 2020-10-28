@@ -1,5 +1,7 @@
 #include "queue.h"
 
+extern int error;
+
 void PriorityIncrease(node_t* current) {
 	node_t* ptr = current;
 	node_t* ptr1 = NULL;
@@ -22,6 +24,10 @@ void PriorityDecrease(node_t* current) {
 
 node_t* NewNode(node_t* previous) {//adding between nodes
 	node_t* newnode = (node_t*)malloc(sizeof(node_t));
+	if (!newnode) {
+		error = NO_MEMORY_ALLOCATED;
+		return NULL;
+	}
 	node_t* pointer = NULL;
 	if (newnode == NULL)
 		return NULL;
@@ -42,9 +48,9 @@ node_t* GoToNode(node_t* node, int newpriority) {
 	return node;
 }
 
-void EnqueueByPriority(queue_t* queue, int newdata, int newpriority, bool_t* flag) {
+void EnqueueByPriority(queue_t* queue, int newdata, int newpriority) {
 	if (IsEmpty(queue) == TRUE) {//is empty
-		*flag = FALSE;//impossible to complete
+		error = IMPOSSIBLE_TO_COMPLETE;
 		return;
 	}
 
@@ -53,12 +59,17 @@ void EnqueueByPriority(queue_t* queue, int newdata, int newpriority, bool_t* fla
 
 	if (newpriority == node->priority) {//add by zero priority
 		newnode = (node_t*)malloc(sizeof(node_t));
+		if (!newnode) {
+			error = NO_MEMORY_ALLOCATED;
+			return;
+		}
+
 		newnode->next = node;
 		newnode->number = newdata;
 		newnode->priority = 0;
 		queue->head = newnode;
 		PriorityIncrease(newnode);
-		return ;
+		return;
 	}
 	node = GoToNode(node, newpriority - 1);
 	newnode = NewNode(node);
@@ -67,14 +78,18 @@ void EnqueueByPriority(queue_t* queue, int newdata, int newpriority, bool_t* fla
 	PriorityIncrease(newnode);
 }
 
-void InsertTail(queue_t* queue, int newdata, bool_t* flag) {
+void InsertTail(queue_t* queue, int newdata) {
 	if (IsEmpty(queue) == TRUE) {//is empty
-		*flag = FALSE;//impossible to complete
+		error = IMPOSSIBLE_TO_COMPLETE;
 		return;
 	}
 
 	int tailpriority = queue->tail->priority;
 	node_t* newnode = (node_t*)malloc(sizeof(node_t));
+	if (!newnode) {
+		error = NO_MEMORY_ALLOCATED;
+		return;
+	}
 
 	queue->tail->next = newnode;
 	newnode->number = newdata;
@@ -83,9 +98,9 @@ void InsertTail(queue_t* queue, int newdata, bool_t* flag) {
 	queue->tail = newnode;
 }
 
-void DeleteMax(queue_t* queue, bool_t* flag) {
+void DeleteMax(queue_t* queue) {
 	if (IsEmpty(queue) == TRUE) {//is empty
-		*flag = FALSE;//impossible to complete
+		error = IMPOSSIBLE_TO_COMPLETE;
 		return;
 	}
 	
@@ -98,25 +113,36 @@ void DeleteMax(queue_t* queue, bool_t* flag) {
 	return;
 }
 
-int ExtractMax(queue_t* queue, bool_t* flag) {
+int ExtractMax(queue_t* queue) {
 	if (IsEmpty(queue) == TRUE) {//is empty
-		*flag = FALSE;//impossible to complete
+		error = IMPOSSIBLE_TO_COMPLETE;
 		return 0;
 	}
 
 	int extracted = queue->head->number;
-	DeleteMax(queue, flag);
+	DeleteMax(queue);
 	return extracted;
 }
 
 queue_t* QueueCreate(int* mass, int N) {
 	queue_t* queue = NULL;
 
-	if (N == 0 && mass == NULL)
+	if (N == 0 && mass == NULL) {
 		return queue;
+	}
 
 	queue = (queue_t*)malloc(sizeof(queue_t));
+	if (!queue) {
+		error = NO_MEMORY_ALLOCATED;
+		return NULL;
+	}
+
 	node_t* head = (node_t*)malloc(sizeof(node_t));
+	if (!head) {
+		error = NO_MEMORY_ALLOCATED;
+		free(queue);
+		return NULL;
+	}
 	node_t* tail = NULL;
 	queue->head = head;
 	queue->tail = tail;
@@ -133,6 +159,14 @@ queue_t* QueueCreate(int* mass, int N) {
 			break;
 		}
 		node1 = (node_t*)malloc(sizeof(node_t));
+		//node1 = NULL;
+		if (!node1) {
+			error = NO_MEMORY_ALLOCATED;
+			queue->tail = node;
+			node->next = NULL;
+			QueueDestroy(queue);
+			return NULL;
+		}
 		node->next = node1;
 		node = node1;		
 	}

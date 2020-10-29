@@ -17,7 +17,7 @@ typedef enum comp {
 
 list_t* CreateList(void);
 
-void DestroyList(list_t* list);
+list_t* DestroyList(list_t* list);
 
 void PrintLine(char* str);
 

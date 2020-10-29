@@ -13,16 +13,13 @@ list_t* CreateList(void) {
 	return list;
 }
 
-void DestroyList(list_t* list) {
-	node_t* tmp;
-	if (list == NULL) return;
+list_t* DestroyList(list_t* list) {
 	while (list->head != NULL) {
-		tmp = list->head;
-		list->head = tmp->next;
-		free(tmp->data);
-		free(tmp);
+		node_t* p = list->head;
+		list->head = list->head->next;
+		free(p);
 	}
-	free(list);
+	return list->head;
 }
 
 void PrintLine(char* str) {
@@ -111,21 +108,21 @@ list_t* SortList(list_t* list) {
 	return newhead;
 }
 
-int main(void) {
-	list_t* list = CreateList();
-	AddToList(list, "cck flk");
-	AddToList(list, "-4u4");
-	AddToList(list, "42kf ngp0");
-	AddToList(list, "42kf deffn gp0");
-	AddToList(list, "&3298 328u31/fwef12./,");
-	AddToList(list, "u *%");
-	AddToList(list, "-_-");
-
-	PrintList(list);
-	list = SortList(list);
-	printf("\n");
-	PrintList(list);
-	DestroyList(list);
-	return 0;
-}
+//int main(void) {
+//	list_t* list = CreateList();
+//	AddToList(list, "cck flk");
+//	AddToList(list, "-4u4");
+//	AddToList(list, "42kf ngp0");
+//	AddToList(list, "42kf deffn gp0");
+//	AddToList(list, "&3298 328u31/fwef12./,");
+//	AddToList(list, "u *%");
+//	AddToList(list, "-_-");
+//
+//	PrintList(list);
+//	list = SortList(list);
+//	printf("\n");
+//	PrintList(list);
+//	DestroyList(list);
+//	return 0;
+//}
 

@@ -3,11 +3,11 @@
 static void getStrBeforeSlashN(char* str, char**newStr, char** newEnd) {
   int i = 0;
 
-  while (*str != '\n' && *str != 0 && i < 99) {
+  while (*str != '\n' && *str != 0 && i < MAX_STR - 1) {
     (*newStr)[i++] = *str;
     str++;
   }
-  if (*str == '\n' && i < 99) {
+  if (*str == '\n' && i < MAX_STR - 1) {
     (*newStr)[i++] = '\n';
     str++;
   }
@@ -25,11 +25,11 @@ static int isNumber(char c) {
 
 int ReadGraphInfo(int* graphSize, int** graphMatrix) {
   int i, firstNode, secondNode;
-  char str[100],
+  char str[MAX_STR],
     * strPtr, * endNum;
   FILE* F = stdin;
 
-  fgets(str, 100, F);
+  fgets(str, MAX_STR, F);
   strPtr = str;
   *graphSize = (int)strtod(strPtr, &endNum);
   if (*graphSize <= 0)
@@ -45,7 +45,7 @@ int ReadGraphInfo(int* graphSize, int** graphMatrix) {
 
   do {
     i = 0;
-    fgets(str, 100, F);
+    fgets(str, MAX_STR, F);
 
     if (str[0] != '\0') {
       strPtr = str;
@@ -85,7 +85,7 @@ int ParseStrLikeSTDIN(char* str, int* graphSize, int** graphMatrix) {
     str++;
   if (*str == '*')
     return FALSE;
-  strPtr = (char*)malloc(250);
+  strPtr = (char*)malloc(MAX_STR);
   getStrBeforeSlashN(str, &strPtr, &endNum);
   str = endNum;
 
@@ -113,14 +113,14 @@ int ParseStrLikeSTDIN(char* str, int* graphSize, int** graphMatrix) {
       if (*strPtr == '*')
         return TRUE;
       
-      if (isNumber(*strPtr) == 0)
+      if (isNumber(*strPtr) == FALSE)
         return FALSE;
       firstNode = (int)strtod(strPtr, &endNum);
       strPtr = endNum;
 
       while (isspace(*strPtr))
         strPtr++;
-      if (isNumber(*strPtr) == 0)
+      if (isNumber(*strPtr) == FALSE)
         return FALSE;
       secondNode = (int)strtod(strPtr, &endNum);
       strPtr = endNum;
@@ -149,20 +149,25 @@ void PrintMatrix(int graphSize, int* graphMatrix) {
   }
 }
 
-int DFS(int graphSize, int* graphMatrix, int* wasInTheseNodes, int currentNode, int** answer) {
+int DFS(int graphSize, int* graphMatrix, int* wasInTheseNodes, int currentNode, int** answer, int startFunc) {
   int nextNode;
   static int answerPos = 0;
 
   if (graphMatrix == NULL || graphSize < 1 || wasInTheseNodes == NULL || currentNode < 0 || currentNode >= graphSize)
     return FALSE;
-  
+
+  if (startFunc == 1) {
+    answerPos = 0;
+    memset(wasInTheseNodes, 0, graphSize * sizeof(int));
+  }
+
   if (wasInTheseNodes[currentNode] != 1) {
     (*answer)[answerPos++] = currentNode;
     wasInTheseNodes[currentNode] = 1;
   }
   for (nextNode = 0; nextNode < graphSize; nextNode++) {
     if (wasInTheseNodes[nextNode] == 0 && graphMatrix[currentNode * graphSize + nextNode] == 1 && currentNode != nextNode)
-      DFS(graphSize, graphMatrix, wasInTheseNodes, nextNode, answer);
+      DFS(graphSize, graphMatrix, wasInTheseNodes, nextNode, answer, 0);
   }
   return TRUE;
 }

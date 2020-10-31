@@ -22,7 +22,7 @@ TEST(DFS, DFS_1NodeGraph_returnAnswerVector) {
   wasThereNodes = (int *)malloc(sizeof(int) * graphSize);
   answerVector = (int *)malloc(sizeof(int) * graphSize);
   answerVector[0] = -1;
-  DFS(graphSize, graphMatr, wasThereNodes, 0, &answerVector);
+  DFS(graphSize, graphMatr, wasThereNodes, 0, &answerVector, 1);
   ASSERT_EQ(answerVector[0], 0);
 
   free(wasThereNodes);
@@ -40,8 +40,8 @@ TEST(DFS, DFS_2andMoreNodeGraph_returnAnswerVector) {
   wasThereNodes = (int*)malloc(sizeof(int) * graphSize);
   answerVector = (int*)malloc(sizeof(int) * graphSize);
 
-  DFS(graphSize, graphMatr, wasThereNodes, 0, &answerVector);
   answerVector[0] = answerVector[1] = -1;
+  DFS(graphSize, graphMatr, wasThereNodes, 0, &answerVector, 1);
   ASSERT_EQ(answerVector[0], 0);
   ASSERT_EQ(answerVector[1], 1);
 

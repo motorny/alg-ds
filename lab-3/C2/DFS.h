@@ -9,6 +9,7 @@
 #define TRUE 1
 #define FALSE 0
 
+#define MAX_STR 100
 
 #pragma warning (disable: 4996)
 
@@ -27,6 +28,6 @@ void PrintMatrix(int graphSize, int* graphMatrix);
 void PrintDFS(int* answer, int size);
 void FreeDFSPointers(int* answer, int* graphMatrix, int* wasTheseNodes);
 
-int DFS(int graphSize, int* graphMatrix, int* wasInTheseNodes, int currentNode, int** answer);
+int DFS(int graphSize, int* graphMatrix, int* wasInTheseNodes, int currentNode, int** answer, int startFunc);
 
 #endif _DFS_H__

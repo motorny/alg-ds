@@ -19,16 +19,16 @@ TEST(Test, TestFindCount) {
 		*fortestn = { "me", fortestnn, 2 };
 		*fortest = {"i", fortestn, 1};
 		head = fortest;
-		ASSERT_EQ(FindCount(&fortest, 0), 0);
+		ASSERT_EQ(FindCount(&fortest, 0), NEW_HEAD);
 		ASSERT_TRUE(fortest == head);
-		ASSERT_EQ(FindCount(&fortest, 1), -2);
+		ASSERT_EQ(FindCount(&fortest, 1), SAME_LENGTH_WITH_HEAD);
 		ASSERT_TRUE(fortest == head);
-		ASSERT_EQ(FindCount(&fortest, 2), -1);
+		ASSERT_EQ(FindCount(&fortest, 2), SAME_LENGTH);
 		ASSERT_TRUE(fortest == head);
-		ASSERT_EQ(FindCount(&fortest, 3), -1);
+		ASSERT_EQ(FindCount(&fortest, 3), SAME_LENGTH);
 		ASSERT_TRUE(fortest == fortestn);
 		fortest = head;
-		ASSERT_EQ(FindCount(&fortest, 4), 1);
+		ASSERT_EQ(FindCount(&fortest, 4), ADD_AFTER_SELECTED_LIST);
 		ASSERT_TRUE(fortest == fortestnn);
 	}
 }
@@ -44,24 +44,24 @@ TEST(Test, TestFindLetter) {
 		*fortest = { "i", fortestn, 1 };
 		head = fortest;
 		*newfortest = { "a", NULL, 1 };
-		ASSERT_EQ(FindLetter(&fortest, newfortest, -2), 0);
+		ASSERT_EQ(FindLetter(&fortest, newfortest, SAME_LENGTH_WITH_HEAD), NEW_HEAD);
 		ASSERT_TRUE(fortest == head);
 		*newfortest = { "o", NULL, 1 };
-		ASSERT_EQ(FindLetter(&fortest, newfortest, -1), 1);
+		ASSERT_EQ(FindLetter(&fortest, newfortest, SAME_LENGTH), ADD_AFTER_SELECTED_LIST);
 		ASSERT_TRUE(fortest == head);
 		*newfortest = { "ab", NULL, 2 };
-		ASSERT_EQ(FindLetter(&fortest, newfortest, -1), 1);
+		ASSERT_EQ(FindLetter(&fortest, newfortest, SAME_LENGTH), ADD_AFTER_SELECTED_LIST);
 		ASSERT_TRUE(fortest == head);
 		*newfortest = { "no", NULL, 2 };
-		ASSERT_EQ(FindLetter(&fortest, newfortest, -1), 1);
+		ASSERT_EQ(FindLetter(&fortest, newfortest, SAME_LENGTH), ADD_AFTER_SELECTED_LIST);
 		ASSERT_TRUE(fortest == fortestn);
 		fortest = fortestn;
 		*newfortest = { "abc", NULL, 3 };
-		ASSERT_EQ(FindLetter(&fortest, newfortest, -1), 1);
+		ASSERT_EQ(FindLetter(&fortest, newfortest, SAME_LENGTH), ADD_AFTER_SELECTED_LIST);
 		ASSERT_TRUE(fortest == fortestn);
 		fortest = fortest;
 		*newfortest = { "yox", NULL, 3 };
-		ASSERT_EQ(FindLetter(&fortest, newfortest, -1), 1);
+		ASSERT_EQ(FindLetter(&fortest, newfortest, SAME_LENGTH), ADD_AFTER_SELECTED_LIST);
 		ASSERT_TRUE(fortest == fortestnn);
 	}
 }

@@ -6,7 +6,8 @@ Set * SetInit()
 {
   Set *A;
   A = malloc(sizeof(Set));
-  assert(A != NULL);
+  if (A == NULL)
+    return NULL;
   A->Root = NULL;
   return A;
 }
@@ -15,6 +16,8 @@ void SetAdd(Set* S, int Data)
 {
   Node** El = NULL;
   Node* tmp;
+  if (S == NULL)
+    return NULL;
   El = &(S->Root);
   while ((*El) != NULL && (*El)->data < Data) // Untill next becomes bigger than us
     El = &((*El)->next);
@@ -34,6 +37,8 @@ void SetAdd(Set* S, int Data)
 int SetCheck(Set* S, int Data)
 {
   Node* El;
+  if (S == NULL)
+    return 0;
   El = S->Root;
   while (El != NULL)
   {
@@ -47,6 +52,8 @@ int SetCheck(Set* S, int Data)
 int SetDel(Set* S, int Data)
 {
   Node* El;
+  if (S == NULL)
+    return 0;
   El = S->Root;
   if (El != NULL && El->data == Data)
   {
@@ -72,7 +79,11 @@ Set* SetUnion(Set* S1, Set* S2)
 {
   Node *El1, *El2;
   Set *Srez;
+  if (S1 == NULL || S2 == NULL)
+    return NULL;
   Srez = SetInit();
+  if (Srez == NULL)
+    return NULL;
   El1 = S1->Root;
   El2 = S2->Root;
   while (El1 != NULL && El2 != NULL)
@@ -110,7 +121,11 @@ Set * SetIntersect(Set *S1, Set *S2)
 {
   Node *El1, *El2;
   Set *Srez;
+  if (S1 == NULL || S2 == NULL)
+    return NULL;
   Srez = SetInit();
+  if (Srez == NULL)
+    return NULL;
   El1 = S1->Root;
   El2 = S2->Root;
   while (El1 != NULL && El2 != NULL)

@@ -3,7 +3,7 @@
 #pragma warning(disable:4996)
 unsigned int getcount(char* word) {
 	unsigned int count = 0;
-	while (word[count] != '\0' && count<100) {
+	while (word[count] != '\0' && count < MAX_LETTER_COUNT) {
 		count += 1;
 	}
 	return count;
@@ -18,64 +18,64 @@ list* ReadWord(FILE* f) {
 }
 int FindCount(list** mylist, unsigned int contofnew) {
 	if ((*mylist)->CountOfLet == contofnew) {
-		return -2;
+		return SAME_LENGTH_WITH_HEAD;
 	}
 	else if ((*mylist)->CountOfLet > contofnew) {
-		return 0;
+		return NEW_HEAD;
 	}
 	while ((*mylist)->next) {
 		if ((*mylist)->next->CountOfLet == contofnew) {
-			return -1;
+			return SAME_LENGTH;
 		}
 		else if ((*mylist)->next->CountOfLet > contofnew) {
-			return 1;
+			return ADD_AFTER_SELECTED_LIST;
 		}
 	(*mylist) = (*mylist)->next;
 	}
-	return 1;
+	return ADD_AFTER_SELECTED_LIST;
 }
 int FindLetter(list** mylist, list* newlist, int i) {
 	unsigned int count = 0;
-	if (i == -2) {
+	if (i == SAME_LENGTH_WITH_HEAD) {
 		for (count; count < newlist->CountOfLet; count++) {
 			if ((*mylist)->word[count] > newlist->word[count])
-				return 0;
+				return NEW_HEAD;
 			else if ((*mylist)->word[count] < newlist->word[count])
-				return 1;
+				return ADD_AFTER_SELECTED_LIST;
 		}
 		if (count == newlist->CountOfLet)
-			return 1;
+			return ADD_AFTER_SELECTED_LIST;
 	}
 	while ((*mylist)->next != NULL && (*mylist)->next->CountOfLet == newlist->CountOfLet) {
 		for (count=0; count < newlist->CountOfLet; count++) {
 			if ((*mylist)->next->word[count] > newlist->word[count])
-				return 1;
+				return ADD_AFTER_SELECTED_LIST;
 			else if ((*mylist)->next->word[count] < newlist->word[count]) {
 				break;
 			}
 		}
 		if (count == newlist->CountOfLet)
-			return 1;
+			return ADD_AFTER_SELECTED_LIST;
 		*mylist = (*mylist)->next;
 	}
-	return 1;
+	return ADD_AFTER_SELECTED_LIST;
 }
 int FindRightPlace(list** mylist, list* newlist) {
-	int i = FindCount(mylist, newlist->CountOfLet);
-	if (i < 0) {
-		i = FindLetter(mylist, newlist, i);
+	int rightplace = FindCount(mylist, newlist->CountOfLet);
+	if (rightplace == SAME_LENGTH || rightplace == SAME_LENGTH_WITH_HEAD) {
+		rightplace = FindLetter(mylist, newlist, rightplace);
 	}
-	return i;
+	return rightplace;
 }
 void AddtoList(list** head, list* newlist) {
 	list* mylist = *head;
 	switch (FindRightPlace(&mylist, newlist))
 		{
-		case 1:
+		case ADD_AFTER_SELECTED_LIST:
 			newlist->next = mylist->next;
 			mylist->next = newlist;
 			break;
-		case 0:
+		case NEW_HEAD:
 			newlist->next = mylist;
 			mylist = newlist;
 			*head = mylist;

@@ -13,7 +13,7 @@ typedef struct list {
 
 void MakeList(list* mylist, FILE* F);
 
-list* PutWord(list* old, list* newWord);
+void PutWord(list* old, list* newWord);
 
 void WordToList(list* mylist, list* newWord);
 

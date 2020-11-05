@@ -8,8 +8,9 @@ void CompareTime(stackArr_t* stackA, stackList_t* stackL, int iterations) {
 	int i;
 	double timeA_Push, timeL_Push, timeA_Pop, timeL_Pop;
 	LARGE_INTEGER t1, t2, fr;
-	assert(stackA);
-	assert(stackL);
+	if(stackA == NULL || stackL == NULL){
+		return;
+	}
 	QueryPerformanceFrequency(&fr);
 
 	QueryPerformanceCounter(&t1);

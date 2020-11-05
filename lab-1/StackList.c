@@ -1,20 +1,23 @@
 #pragma once
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 #include "StackList.h"
 #pragma warning(disable: 4996)
 
 stackList_t* CreateStackList(void) {
 	stackList_t* stack = (stackList_t*)malloc(sizeof(stack));
-	assert(stack);
+	if(stack == NULL){
+		return NULL;
+	}
 	stack->head = NULL;
 	return stack;
 }
 
 void DestroyStackList(stackList_t* stack) {
 	node_t* tmp;
-	if (stack == NULL) return;
+	if (stack == NULL){
+		return;
+	}
 	while (stack->head != NULL) {
 		tmp = stack->head;
 		stack->head = tmp->next;
@@ -25,9 +28,13 @@ void DestroyStackList(stackList_t* stack) {
 
 void PushList(stackList_t* stack, int data) {
 	node_t* newNode;
-	assert(stack);
+	if(stack == NULL){
+		return;
+	}
 	newNode = (node_t*)malloc(sizeof(node_t));
-	assert(newNode);
+	if(newNode == NULL){
+		return;
+	}
 	newNode->next = stack->head;
 	stack->head = newNode;
 	newNode->data = data;
@@ -36,8 +43,12 @@ void PushList(stackList_t* stack, int data) {
 int PopList(stackList_t* stack) {
 	node_t* top;
 	int data;
-	assert(stack);
-	if (stack->head == NULL) return 0;
+	if(stack == NULL){
+		return 0;
+	}
+	if (stack->head == NULL){
+		return 0;
+	}
 	top = stack->head;
 	data = top->data;
 	stack->head = top->next;
@@ -46,7 +57,9 @@ int PopList(stackList_t* stack) {
 }
 
 int LastList(stackList_t* stack) {
-	assert(stack);
+	if(stack == NULL){
+		return 0;
+	}
 	return stack->head->data;
 }
 

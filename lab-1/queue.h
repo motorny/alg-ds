@@ -37,14 +37,14 @@ typedef enum {
 
 void PriorityIncrease(node_t* current);//priority removal +1
 void PriorityDecrease(node_t* current);//priority removal -1
-node_t* NewNode(node_t* previous);
+node_t* NewNode(node_t* previous, bool_t* flag);
 node_t* GoToNode(node_t* head, int newpriority);
-void EnqueueByPriority(queue_t* queue, int newdata, int newpriority);
-void InsertTail(queue_t* queue, int newdata);
-void DeleteMax(queue_t* queue);
-int ExtractMax(queue_t* queue);
+void EnqueueByPriority(queue_t* queue, int newdata, int newpriority, bool_t* flag);
+void InsertTail(queue_t* queue, int newdata, bool_t* flag);
+void DeleteMax(queue_t* queue, bool_t* flag);
+int ExtractMax(queue_t* queue, bool_t* flag);
 bool_t IsEmpty(queue_t* queue);
-queue_t* QueueCreate(int* mass, int N);
+queue_t* QueueCreate(int* mass, int N, bool_t* flag);
 void QueueDestroy(queue_t* queue);
 void PrintQueue(queue_t* queue);
 

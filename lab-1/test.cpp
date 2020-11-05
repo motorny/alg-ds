@@ -4,7 +4,9 @@
 
 stackArr_t* CreateStackArr_Test(void) {
 	stackArr_t* stack = (stackArr_t*)malloc(sizeof(stackArr_t));
-	if(stack==NULL) return NULL;
+	if(stack==NULL){
+		return NULL;
+	}
 	stack->last = -1;
 	stack->size = 10;
 	stack->array = (int*)malloc(stack->size * sizeof(int));
@@ -16,7 +18,9 @@ stackArr_t* CreateStackArr_Test(void) {
 }
 
 void DestroyStackArr_Test(stackArr_t* stack) {
-	if (stack == NULL) return;
+	if (stack == NULL){
+		return;
+	}
 	if (stack->array != NULL) free(stack->array);
 	free(stack);
 }
@@ -76,14 +80,18 @@ TEST(StackArray, PopArr_EmptyArray_Returns0) {
 
 stackList_t* CreateStackList_Test(void) {
 	stackList_t* stack = (stackList_t*) malloc(sizeof(stack));
-	if (stack == NULL) return NULL;
+	if (stack == NULL){
+		return NULL;
+	}
 	stack->head = NULL;
 	return stack;
 }
 
 void DestroyStackList_Test(stackList_t* stack) {
 	node_t* tmp;
-	if (stack == NULL) return;
+	if (stack == NULL){
+		return;
+	}
 	while (stack->head != NULL) {
 		tmp = stack->head;
 		stack->head = tmp->next;

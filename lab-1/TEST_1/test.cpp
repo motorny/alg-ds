@@ -1,6 +1,6 @@
 #include "pch.h"
 
-extern "C"{ 
+extern "C" {
 #include "../Lab_1/Header.h"
 }
 
@@ -13,7 +13,7 @@ TEST(TestDestroyElements, DestroyList) {
 	AddToList(list, "&3298 328u31/fwef12./,");
 	AddToList(list, "u *%");
 	AddToList(list, "-_-");
-	list=DestroyList(list);
+	list = DestroyList(list);
 	EXPECT_TRUE(list == NULL);
 }
 
@@ -28,57 +28,61 @@ TEST(CheckLength, Length) {
 TEST(TestCopyStr, CopyStr) {
 	char* from = (char*)malloc(sizeof(char));
 	char* to = (char*)malloc(sizeof(char));
-	int a;
+	int n;
 	from = "vnkfvn.";
 	to = CopyStr(from);
-	a = strcmp(to, from);
-	EXPECT_TRUE(a==0);
+	n = strcmp(to, from);
+	EXPECT_TRUE(n == 0);
 }
 
 TEST(TestAddToList, AddToList) {
 	list_t* list = CreateList();
-	char* str = "cck flk";
-	int a;
+	char* arr = (char*)malloc(sizeof(char));
+	int n;
 	AddToList(list, "cck flk");
-	a = strcmp(str, list->head->data);
-	EXPECT_TRUE(a == 0);
+	arr = "cck flk";
+	n = strcmp(list->head->data, arr);
+	EXPECT_TRUE(n == 0);
 	EXPECT_TRUE(list->head->next == NULL);
 }
 
 TEST(TestAddToListNULL, AddToList) {
 	list_t* list = CreateList();
-	char* str = "";
-	int a;
+	char* arr = (char*)malloc(sizeof(char));
+	int n;
 	AddToList(list, "");
-	a = strcmp(str, list->head->data);
-	EXPECT_TRUE(a == 0);
+	arr = "";
+	n = strcmp(arr, list->head->data);
+	EXPECT_TRUE(n == 0);
 	EXPECT_TRUE(list->head->next == NULL);
 }
 
 TEST(TestTwoSortList, SortList) {
 	list_t* list = CreateList();
-	char* str1 = "cck flk";
-	char* str2 = "-4u4";
+	char* arr1 = (char*)malloc(sizeof(char)), * arr2 = (char*)malloc(sizeof(char));
+	int n1, n2;
 	AddToList(list, "cck flk");
 	AddToList(list, "-4u4");
-	int a, b;
+	arr1 = "cck flk";
+	arr2 = "-4u4";
 	list = SortList(list);
-	a= strcmp(str2, list->head->data);
-	b= strcmp(str1, list->head->next->data);
-	EXPECT_TRUE(a == 0);
-	EXPECT_TRUE(b == 0);
+	n1 = strcmp(list->head->data, arr2);
+	n2 = strcmp(list->head->next->data, arr1);
+	EXPECT_TRUE(n1 == 0);
+	EXPECT_TRUE(n2 == 0);
 }
 
 TEST(TestSortedList, SortList) {
 	list_t* list = CreateList();
+	char* arr1 = (char*)malloc(sizeof(char)), * arr2 = (char*)malloc(sizeof(char));
+	int n1, n2;
 	AddToList(list, "-4u4");
 	AddToList(list, "cck flk");
-	char* str1 = "cck flk";
-	char* str2 = "-4u4";
-	int a, b;
+	arr1 = "cck flk";
+	arr2 = "-4u4";
 	list = SortList(list);
-	a = strcmp(str2, list->head->data);
-	b = strcmp(str1, list->head->next->data);
-	EXPECT_TRUE(a == 0);
-	EXPECT_TRUE(b == 0);
+	n1 = strcmp(list->head->data, arr2);
+	n2 = strcmp(list->head->next->data, arr1);
+	EXPECT_TRUE(n1 == 0);
+	EXPECT_TRUE(n2 == 0);
 }

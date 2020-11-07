@@ -8,7 +8,8 @@
 
 list_t* CreateList(void) {
 	list_t* list = malloc(sizeof(list));
-	assert(list);
+	if (list == NULL)
+		return NULL;
 	list->head = NULL;
 	return list;
 }
@@ -30,7 +31,6 @@ void PrintLine(char* str) {
 }
 
 void PrintList(list_t* list) {
-	assert(list);
 	node_t* tmp = list->head;
 	while (tmp != NULL) {
 		PrintLine(tmp->data);
@@ -48,6 +48,8 @@ int Length(char* str) {
 char* CopyStr(char* from) {
 	int length = Length(from), i;
 	char* to = malloc((length + 1) * sizeof(char));
+	if (to == NULL)
+		return NULL;
 	for (i = 0; i <= length; i++) {
 		to[i] = from[i];
 	}
@@ -56,7 +58,8 @@ char* CopyStr(char* from) {
 
 void AddToList(list_t* list, char data[]) {
 	node_t* newNode = malloc(sizeof(node_t));
-	assert(newNode);
+	if (newNode == NULL)
+		list == NULL;
 	newNode->data = CopyStr(data);
 	newNode->next = list->head;
 	list->head = newNode;
@@ -66,13 +69,20 @@ list_t* SortList(list_t* list) {
 	node_t* startlist = (node_t*)malloc(sizeof(node_t)), * current = (node_t*)malloc(sizeof(node_t)), * listprev = (node_t*)malloc(sizeof(node_t)), * listnext = (node_t*)malloc(sizeof(node_t)), * newlist = (node_t*)malloc(sizeof(node_t));
 	list_t* newhead = (list_t*)malloc(sizeof(list_t));
 	char* maxdata = (char*)malloc(sizeof(char));
+	if (maxdata == NULL)
+		return NULL;
 	comp_t iscompare;
 	int count = 0;
-	assert(startlist);
-	assert(listnext);
-	assert(newhead);
-	assert(current);
-	assert(listprev);
+	if (startlist == NULL)
+		return NULL;
+	if (listnext == NULL)
+		return NULL;
+	if (newhead == NULL)
+		return NULL;
+	if (current == NULL)
+		return NULL;
+	if (listprev == NULL)
+		return NULL;
 	newlist = list->head;
 	newhead->head = NULL;
 	current = list->head;

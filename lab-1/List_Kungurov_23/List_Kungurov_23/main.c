@@ -13,10 +13,13 @@ int main(void) {
 	DoubleLinkedList* List = CreateDoubleLinkedList();
 	f = fopen("slon.txt", "r");
 	if (f == NULL) {
+		exit(1);
 		printf("sad(");
 	}
 	while (!feof(f)) {
 		char* word = (char*)malloc(sizeof(char) * SIZE);
+		if (word == NULL)
+			exit(2);
 		fscanf(f,"%[ \n]%s", word);
 		PutOnTheRightPlace(word,List);
 	}

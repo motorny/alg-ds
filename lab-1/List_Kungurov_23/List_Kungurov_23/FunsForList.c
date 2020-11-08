@@ -56,10 +56,11 @@ void PutOnTheRightPlace(char* word, DoubleLinkedList* List) {
 }
 void Push(DoubleLinkedList* List, char* value) {
 	Node* tmp = (Node*)malloc(sizeof(Node));
+	if (tmp == NULL)
+		exit(2);
 	tmp->value = value;
 	List->head = tmp;
 	//List->tail = tmp;
-	List->head->prev = NULL;
 	//List->tail->next = NULL;
 	//List->tail->prev = List->head;
 	List->head->next = List->tail;
@@ -67,6 +68,8 @@ void Push(DoubleLinkedList* List, char* value) {
 }
 DoubleLinkedList* CreateDoubleLinkedList() {
 	DoubleLinkedList* tmp = (DoubleLinkedList*)malloc(sizeof(DoubleLinkedList));
+	if (tmp == NULL)
+		exit(2);
 	tmp->size = 0;
 	tmp->head = tmp->tail = NULL;
 	return tmp;
@@ -85,6 +88,8 @@ void DeleteDoubleLinkedList(DoubleLinkedList** List) {
 
 void PushFront(DoubleLinkedList* list, char* data) {
 	Node* tmp = (Node*)malloc(sizeof(Node));
+	if (tmp == NULL)
+		exit(2);
 	tmp->value = data;
 	tmp->next = list->head;
 	tmp->prev = NULL;
@@ -100,6 +105,8 @@ void PushFront(DoubleLinkedList* list, char* data) {
 }
 void PushBack(DoubleLinkedList* list, char* value) {
 	Node* tmp = (Node*)malloc(sizeof(Node));
+	if (tmp == NULL)
+		exit(2);
 	tmp->value = value;
 	tmp->next = NULL;
 	tmp->prev = list->tail;
@@ -144,6 +151,8 @@ int Compare(char* Word, char* WordFromList) {
 void PutBeforeElement(DoubleLinkedList* List, Node* Element, char* value) {
 	Node* Putting = NULL;
 	Putting = (Node*)malloc(sizeof(Node));
+	if (Putting == NULL)
+		exit(2);
 	Putting->value = value;
 	Putting->prev = Element->prev;
 	Element->prev->next = Putting;

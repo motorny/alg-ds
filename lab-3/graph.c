@@ -8,23 +8,35 @@
 
 #define TRUE 1
 #define FALSE 0
+#define NUM_OF_VERTEX_UPDATE 100
+#define NUM_OF_NUMBERS_IN_STRING
 
 data_t* ReadData(int* numOfVertex, int* numOfEdges) {
-  int i = 0;
+  int numOfElement = 0;
   data_t* data;
-  int f = 2;
-  int maxSize = 100;
+  date_t* tmp;
+  int numOfReadNumbers;
+  int maxSize = NUM_OF_VERTEX_UPDATE;
   scanf("%i", numOfVertex);
   data = malloc(maxSize * sizeof(data_t));
-  while (f > 1) {
-    f = scanf("%i %i", &data[i].a, &data[i].b);
-    ++i;
-    if (i == maxSize) {
-      maxSize += 100;
-      data = realloc(data, maxSize * sizeof(data_t));
-    }
+  if (!data) {
+    return NULL;
   }
-  *numOfEdges = i;
+  do {
+    numOfReadNumbers = scanf("%i %i", &data[numOfElement].a, &data[numOfElement].b);
+    ++numOfElement;
+    if (numOfElement == maxSize) {
+      maxSize += NUM_OF_VERTEX_UPDATE;
+      tmp = realloc(data, maxSize * sizeof(data_t)); 
+      if (!tmp) {
+        free(data);
+        return NULL;
+      } else {
+        data = tmp;
+      }
+    }
+  } while (numOfReadNumbers == NUM_OF_NUMBERS_IN_STRING);
+  *numOfEdges = numOfElement;
   return data;
 }
 

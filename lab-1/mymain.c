@@ -4,10 +4,10 @@
 #include <stdlib.h>
 #pragma warning(disable: 4996)
 
+
 int main(void) {
 	int len = 0;
 	list_t list;
-
 	error_t error = NO_ERRORS;
 	char* result = NULL;
 	char buff[10] = "hello!\0";
@@ -22,7 +22,7 @@ int main(void) {
 	printf("%s", result);
 
 	free(result);
-
+	
 	return 0;
 }
 

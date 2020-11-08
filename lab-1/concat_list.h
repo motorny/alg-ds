@@ -12,6 +12,11 @@ typedef enum {
 	END_OF_STREAM,
 }error_t;
 
+typedef enum {
+	MYFAIL,
+	MYSUCCESS,
+}bool_t;
+
 typedef char elem_t;
 
 typedef struct node_t {
@@ -24,7 +29,7 @@ typedef struct {
 	node_t* tail;
 } list_t;
 
-void Push(char* string, list_t* list, error_t* err);
+bool_t Push(char* string, list_t* list, error_t* err);
 
 char* ReadStr(FILE* stream, error_t* err);
 

@@ -3,53 +3,60 @@
 #include <string.h>
 #include <stdlib.h>
 #pragma warning(disable: 4996)
+#define MAX_SIZE 25
 
 
 // Функция, пищущая в конец списка.
-void Push(char* string, list_t* list, error_t* err) {
-
-	// Если список пустой, то выделяем память под первый элемент
-	// и ставим на него оба указателя head и tail.
-	if (list->tail == NULL) {
-		list->tail = (node_t*)malloc(sizeof(node_t));
-		if (list->tail) {
-			list->head = list->tail;
-			list->tail->data = string;
-			list->tail->next = NULL;
+bool_t Push(char* string, list_t* list, error_t* err) {
+	if (list) {
+		// Если список пустой, то выделяем память под первый элемент
+		// и ставим на него оба указателя head и tail.
+		if (list->tail == NULL) {
+			list->tail = (node_t*)malloc(sizeof(node_t));
+			if (list->tail) {
+				list->head = list->tail;
+				list->tail->data = string;
+				list->tail->next = NULL;
+			}
+			else
+				*err = NO_MEMORY_ERROR;
 		}
-		else
-			*err = NO_MEMORY_ERROR;
-	}
-	// Если список не пустой, то выделяем память на новый элемент.
-	// Сдвигаем tail.
-	else {
-		list->tail->next = (node_t*)malloc(sizeof(node_t));
-		if (list->tail->next) {
-			list->tail = list->tail->next;
-			list->tail->data = string;
-			list->tail->next = NULL;
+		// Если список не пустой, то выделяем память на новый элемент.
+		// Сдвигаем tail.
+		else {
+			list->tail->next = (node_t*)malloc(sizeof(node_t));
+			if (list->tail->next) {
+				list->tail = list->tail->next;
+				list->tail->data = string;
+				list->tail->next = NULL;
+			}
+			else
+				*err = NO_MEMORY_ERROR;
 		}
-		else
-			*err = NO_MEMORY_ERROR;
+		return MYSUCCESS;
 	}
 	// Если память выделилась, то записываем в хвост данные
 	// и присваиваем последнему указателю NULL.
+	else {
+		*err = EMPTY_LIST_ERROR;
+		return MYFAIL;
+	}
 }
 
 // Функция, возвращающая указатель на строку.
 // len - длина строки, не учитывает символ завершения.
 char* ReadStr(FILE* stream, error_t* err) {
-	int i = 0, maxSize = 25, length = 0, mult = 1, a = 0;
+	int i = 0, length = 0, mult = 1, a = 0;
 	char sym = 0;
 	char* string = NULL;
 	char* reserve = NULL;
-	string = (char*)malloc(maxSize * sizeof(char));
+	string = (char*)malloc(MAX_SIZE * sizeof(char));
 	if (string == NULL) {
 		*err = NO_MEMORY_ERROR;
 		return NULL;
 	}
 	else {
-		fgets(string, maxSize * mult * sizeof(char), stream);
+		fgets(string, MAX_SIZE * mult * sizeof(char), stream);
 		if (string[0] == '0') {
 			*err = END_OF_STREAM;
 			free(string);
@@ -58,9 +65,9 @@ char* ReadStr(FILE* stream, error_t* err) {
 		//	a = fscanf(stream, "%s", string);
 		length = strlen(string);
 
-		while (length >= ((maxSize * mult) - 1)) {
+		while (length >= ((MAX_SIZE * mult) - 1)) {
 			mult++;
-			reserve = (char*)realloc(string, sizeof(char) * maxSize * mult);
+			reserve = (char*)realloc(string, sizeof(char) * MAX_SIZE * mult);
 			if (reserve == NULL) {
 				free(string);
 				*err = NO_MEMORY_ERROR;
@@ -70,7 +77,7 @@ char* ReadStr(FILE* stream, error_t* err) {
 				string = reserve;
 				//		fseek(stream, (maxSize * (mult - 1) * (-1)), SEEK_CUR);
 				printf("Ooops, something went wrong, please, enter your string again!\n");
-				fgets(string, maxSize * mult * sizeof(char), stream);
+				fgets(string, MAX_SIZE * mult * sizeof(char), stream);
 
 				length = strlen(string);
 			}
@@ -135,12 +142,12 @@ char* Concat(list_t* list, int* len, error_t* err) {
 	int counter = 0;
 
 	while (reserve->next) {
-		num = strlen(reserve->data) - 1;
+		num = strlen(reserve->data);
 		memcpy((result + counter), reserve->data, num);
 		counter = counter + num;
 		reserve = reserve->next;
 	}
-	num = strlen(reserve->data) - 1;
+	num = strlen(reserve->data);
 	memcpy((result + counter), reserve->data, num);
 	result[counter + num] = '\0';
 

@@ -1,6 +1,0 @@
-1 Smirnov
-2 Ivanov
-4 Petrov
-7 Sidorov
-12 Komarov
-150 Titov

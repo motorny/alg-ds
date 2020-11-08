@@ -1,3 +1,5 @@
+#define OUT_OF_MEM -1
+#define SUCCESS 0
 typedef struct Node {
 	char* value;
 	struct Node* next;
@@ -8,14 +10,12 @@ typedef struct DoubleLinkedList {
 	Node* head;
 	Node* tail;
 }DoubleLinkedList;
-void PutOnTheRightPlace(char* word, DoubleLinkedList* List);
-void Push(DoubleLinkedList* List, char* value);
-DoubleLinkedList* CreateDoubleLinkedList();
-void DeleteDoubleLinkedList(DoubleLinkedList** List);
-void PushFront(DoubleLinkedList* list, char* data);
-void PushBack(DoubleLinkedList* list, char* value);
-int Compare(char* Word, char* WordFromList);
-void PutBeforeElement(DoubleLinkedList* List, Node* Element, char* value);
-void PrintMoreThanN(int N, char* value);
-void PrintTheN(int N, char* value);
-void PrintDoubleLinkedList(DoubleLinkedList* List, void (*fun)(int N, char* value), int N);
+int PutOnTheRightPlace(char* word, DoubleLinkedList* list);
+DoubleLinkedList* CreateDoubleLinkedList(int RESULT);
+void DeleteDoubleLinkedList(DoubleLinkedList** list);
+int PushFront(DoubleLinkedList* list, char* data);
+int PushBack(DoubleLinkedList* list, char* value);
+int Compare(char* word, char* wordFromList);
+int PutBeforeElement(DoubleLinkedList* eist, Node* element, char* value);
+void PrintDoubleLinkedListMoreThanN(DoubleLinkedList* list, int N);
+void PrintDoubleLinkedListTheN(DoubleLinkedList* list, int N);

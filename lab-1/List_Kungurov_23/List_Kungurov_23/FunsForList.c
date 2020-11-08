@@ -2,131 +2,141 @@
 #include "FunsForList.h"
 #include <stdlib.h>
 #include <string.h>
-void PutOnTheRightPlace(char* word, DoubleLinkedList* List) {
-	Node* Begin = NULL;
+#define OUT_OF_MEM -1
+#define SUCCESS 0
+int PutOnTheRightPlace(char* word, DoubleLinkedList* list) {
+	Node* begin = NULL;
 	Node* tmp = NULL;
-	if (List->size == 0) {
-		Push(List, word);
-		return;
-	}
-	if (List->size == 1) {
-		tmp = (Node*)malloc(sizeof(Node));
+	int RESULT;
 
-		if (Compare(word, List->head->value) == 1) {
-			tmp->value = word;
-			List->head->prev = NULL;
-			List->tail = tmp;
-			List->tail->next = NULL;
-			List->tail->prev = List->head;
-			List->head->next = List->tail;
-			List->size++;
-		}
-		if (Compare(word, List->head->value) == 0) {
-			tmp->value = word;
-			List->tail = List->head;
-			List->tail->next = NULL;
-			List->head = tmp;
-			List->head->prev = NULL;
-			List->head->next = List->tail;
-			List->tail->prev = List->head;
-			List->size++;
-		}
-		return;
+	if (list->size == 0 /*||(Compare(word, list->head->value) == 0) */) {
+			RESULT = PushFront(list, word);
+			return RESULT;
 	}
-	else {
-		if (Compare(word, List->head->value) == 0) {
-			PushFront(List, word);
-			return;
+	if (list->size == 1 /* || (Compare(word, list->tail->value) == 1)*/ ) {
+			RESULT = PushBack(list, word);
+			return RESULT;
+	}
+	if (list->size > 1) {
+		if ((Compare(word, list->tail->value) == 1)) {
+			RESULT = PushBack(list, word);
+			return RESULT;
 		}
-		if (Compare(word, List->tail->value) == 1) {
-			PushBack(List, word);
-			return;
+		if ((Compare(word, list->head->value) == 0)) {
+			RESULT = PushFront(list, word);
+			return RESULT;
 		}
 		else {
-			Begin = List->head;
-			while (Compare(word, Begin->value) == 1) {
-				if (Compare(word, Begin->next->value) == 0) {
-					PutBeforeElement(List, Begin->next, word);
-					return;
+			begin = list->head;
+			while (Compare(word, begin->value) == 1) {
+				if (Compare(word, begin->next->value) == 0) {
+					PutBeforeElement(list, begin->next, word);
+					return SUCCESS;
 				}
-				Begin = Begin->next;
+				begin = begin->next;
 			}
 		}
 	}
+	return SUCCESS;
 }
-void Push(DoubleLinkedList* List, char* value) {
-	Node* tmp = (Node*)malloc(sizeof(Node));
-	if (tmp == NULL)
-		exit(2);
-	tmp->value = value;
-	List->head = tmp;
-	//List->tail = tmp;
-	//List->tail->next = NULL;
-	//List->tail->prev = List->head;
-	List->head->next = List->tail;
-	List->size++;
-}
-DoubleLinkedList* CreateDoubleLinkedList() {
+DoubleLinkedList* CreateDoubleLinkedList(int RESULT) {
 	DoubleLinkedList* tmp = (DoubleLinkedList*)malloc(sizeof(DoubleLinkedList));
-	if (tmp == NULL)
-		exit(2);
+	if (tmp == NULL) {
+		RESULT = OUT_OF_MEM;
+		return NULL;
+	}
 	tmp->size = 0;
-	tmp->head = tmp->tail = NULL;
+	tmp->head = NULL;
+	tmp->tail = NULL;
+	RESULT = SUCCESS;
 	return tmp;
 }
-void DeleteDoubleLinkedList(DoubleLinkedList** List) {
-	Node* tmp = (*List)->head;
+void DeleteDoubleLinkedList(DoubleLinkedList** list) {
+	Node* now = (*list)->head;
 	Node* next = NULL;
-	while (tmp) {
-		next = tmp->next;
-		free(tmp);
-		tmp = next;
+	while (now) {
+		next = now->next;
+		free(now);
+		now = next;
 	}
-	free(*List);
-	(*List) = NULL;
+	free(*list);
+	(*list) = NULL;
 }
 
-void PushFront(DoubleLinkedList* list, char* data) {
+int PushFront(DoubleLinkedList* list, char* data) {
 	Node* tmp = (Node*)malloc(sizeof(Node));
-	if (tmp == NULL)
-		exit(2);
+	if(tmp == NULL) {
+		return OUT_OF_MEM;
+	}
 	tmp->value = data;
+	if (list->size == 0) {
+		list->tail = NULL;
+		list->head = tmp;
+		list->head->prev = NULL;
+		list->head->next = list->tail;
+		list->size++; 
+		return SUCCESS;
+	}
 	tmp->next = list->head;
 	tmp->prev = NULL;
-	if (list->head) {
-		list->head->prev = tmp;
-	}
+	list->head->prev = tmp;
 	list->head = tmp;
-
-	if (list->tail == NULL) {
-		list->tail = tmp;
-	}
 	list->size++;
+	return SUCCESS;
+
 }
-void PushBack(DoubleLinkedList* list, char* value) {
+int PushBack(DoubleLinkedList* list, char* data) {
 	Node* tmp = (Node*)malloc(sizeof(Node));
-	if (tmp == NULL)
-		exit(2);
-	tmp->value = value;
+	if (tmp == NULL) {
+		return OUT_OF_MEM;
+	}
+	tmp->value = data;
+	if (list->size == 1) {
+		if (Compare(data, list->head->value) == 0) {
+			list->tail = list->head;
+			list->tail->next = NULL;
+			tmp->next = list->tail;
+			tmp->prev = NULL;
+			list->tail->prev = tmp;
+			list->head = tmp;
+			list->size++;
+			return SUCCESS;
+		}
+		if (Compare(data, list->head->value) == 1) {
+			tmp->next = NULL;
+			tmp->prev = list->head;
+			list->head->next = tmp;
+			list->head->prev = NULL;
+			list->tail = tmp;
+			list->size++;
+			return SUCCESS;
+		}
+	}
 	tmp->next = NULL;
 	tmp->prev = list->tail;
-	if (list->tail) {
-		list->tail->next = tmp;
-	}
+	list->tail->next = tmp;
 	list->tail = tmp;
-
-	if (list->head == NULL) {
-		list->head = tmp;
-	}
 	list->size++;
+	return SUCCESS;
 }
-void PrintDoubleLinkedList(DoubleLinkedList* List,void (*fun)(int N,char* value),int N) {
-	Node* tmp = List->head;
-	while (tmp!= NULL) {
-		fun(N, tmp->value);
-		tmp = tmp->next;
+void PrintDoubleLinkedListMoreThanN(DoubleLinkedList* list, int N) {
+	Node* now = list->head;
+	while (now!= NULL) {
+		if (strlen(now->value) > N) {
+			printf("%s ", now->value);
+		}
+		now = now->next;
 	}
-	
+	printf("\n");
+}
+void PrintDoubleLinkedListTheN(DoubleLinkedList* list, int N) {
+	Node* now = list->head;
+	while (now != NULL) {
+		if (strlen(now->value) == N) {
+			printf("%s ", now->value);
+		}
+		now = now->next;
+	}
 	printf("\n");
 }
 int Compare(char* Word, char* WordFromList) {
@@ -148,27 +158,17 @@ int Compare(char* Word, char* WordFromList) {
 		return 0;
 	}
 }
-void PutBeforeElement(DoubleLinkedList* List, Node* Element, char* value) {
-	Node* Putting = NULL;
-	Putting = (Node*)malloc(sizeof(Node));
-	if (Putting == NULL)
-		exit(2);
-	Putting->value = value;
-	Putting->prev = Element->prev;
-	Element->prev->next = Putting;
-	Element->prev = Putting;
-	Putting->next = Element;
-	List->size++;
-}
-void PrintTheN(int N, char* value) {
-	if (strlen(value) == N) {
-		printf("%s ", value);
+int PutBeforeElement(DoubleLinkedList* list, Node* element, char* value) {
+	Node* putting = NULL;
+	putting = (Node*)malloc(sizeof(Node));
+	if (putting == NULL) {
+		return OUT_OF_MEM;
 	}
-	return;
-}
-void PrintMoreThanN(int N, char* value) {
-	if (strlen(value) > N) {
-		printf("%s ", value);
-	}
-	return;
+	putting->value = value;
+	putting->prev = element->prev;
+	element->prev->next = putting;
+	element->prev = putting;
+	putting->next = element;
+	list->size++;
+	return SUCCESS;
 }

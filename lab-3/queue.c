@@ -4,6 +4,9 @@
 
 queue_t* CreateQueue() {
   queue_t* newQueue = malloc(sizeof(queue_t));
+  if (!newQueue) {
+    return NULL;
+  }
   newQueue->start = NULL;
   newQueue->end = NULL;
   return newQueue;
@@ -13,6 +16,9 @@ int QueuePush(queue_t* queue, int data) {
   if (!queue)
     return FAIL;
   node_t* newNode = malloc(sizeof(node_t));
+  if (!newNode) {
+    return FAIL;
+  }
   newNode->vertex = data;
   newNode->next = NULL;
   if (queue->end != NULL) {

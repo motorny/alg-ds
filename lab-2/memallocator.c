@@ -134,7 +134,7 @@ void memfree(void* p) {
 
 	if ((char*)right_descr >= (char*)memory_system.start + memory_system.total_size || right_descr->key != MAGICKEY)
 		return;
-	if (right_descr->size != BLOCK_USED) {
+	if (end_right->size != BLOCK_USED) {
 		current->size += right_descr->size + memgetblocksize();
 		end_right->size = current->size;
 		right_descr->key = 0;

@@ -13,9 +13,11 @@ typedef struct ItemHead {
   int size;
 }ItemHead;
 
-typedef union ItemEnd {
+typedef struct ItemEnd {
+  union {
     ItemHead* head_p;
     int key;
+  };
 }ItemEnd;
 
 #define ItemData_p(item_p) ((char*)(item_p) + sizeof(ItemHead))
@@ -221,6 +223,15 @@ void memfree(void* p)
   {
     if (leftItem_p == NULL)
     {
+      ItemHead** prevItemNextPointer_p = &(headItem_p);
+      ItemHead* itm_p = headItem_p;
+      while (itm_p != NULL && itm_p != rightItem_p)
+      {
+        prevItemNextPointer_p = &(itm_p->next_p);
+        itm_p = itm_p->next_p;
+      }
+      *prevItemNextPointer_p = item_p;
+
       item_p->next_p = rightItem_p->next_p;
       ItemEndP_p(item_p)->key = -ALLOC_KEY;
       item_p->size = item_p->size + rightItem_p->size;

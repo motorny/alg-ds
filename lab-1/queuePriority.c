@@ -14,7 +14,6 @@ queuePrior_t* InitQueuePriority(int* arr, int N, error_t* error) {
 	queue = (queuePrior_t*)malloc(sizeof(queuePrior_t));
 	if (queue != NULL) {
 		el1 = (node_t*)malloc(sizeof(node_t));
-		//el2 = (node_t*)malloc(sizeof(node_t));
 		if (!el1) {
 			*error = NO_MEMORY;
 			free(queue);
@@ -222,6 +221,11 @@ int FindEl(queuePrior_t* queue, int N, int el, error_t* error) {
 void InsertEnd(queuePrior_t* queue, int newEl, error_t* error) {
 	if (!IsEmptyQueue(queue, error)) {
 		node_t* newData = (node_t*)malloc(sizeof(node_t));
+		if (!newData) {
+			*error = NO_MEMORY;
+			free(queue);
+			return NULL;
+		}
 		newData->data = newEl;
 		int tailPriority;
 		if (queue->head == NULL) {

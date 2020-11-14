@@ -81,9 +81,9 @@ TEST(memfree, FREE_CORRECTLY) {
 	char memory[100];
 	meminit(memory, 100);
 
-	char* ptr1 = (char*)memalloc(20 - memgetminimumsize());
-	char* ptr2 = (char*)memalloc(20 - memgetminimumsize());
-	char* ptr3 = (char*)memalloc(20 - memgetminimumsize());
+	char* ptr1 = (char*)memalloc(20);
+	char* ptr2 = (char*)memalloc(20);
+	char* ptr3 = (char*)memalloc(20);
 
 	memfree(ptr2);
 	memfree(ptr1);

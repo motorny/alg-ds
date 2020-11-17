@@ -134,13 +134,13 @@ void memfree(void* p) {
 		head->size = nextHead->size + head->size + memgetblocksize();
 		nextHead->key = FALSE;
 		nextEnd->size = head->size;
-		tmp = freeList;
-		while (tmp->Next != NULL && tmp->Next != nextHead) {
-			tmp = tmp->Next;
+		tmp = &freeList;
+		while (*tmp != NULL && (*tmp) != nextHead) {
+			tmp = &(*tmp)->Next;
 		}
 
-		if (tmp->Next && (tmp->Next)->Next) {
-			tmp->Next = (tmp->Next)->Next;
+		if (*tmp == nextHead) {
+			*tmp = (*tmp)->Next;
 		}
 	}
 }

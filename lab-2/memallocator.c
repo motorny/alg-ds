@@ -3,7 +3,7 @@
 
 
 #define BLOCK_SIZE ((int)(sizeof(ItemHead) + sizeof(ItemEnd)))
-#define ALLOC_KEY 42*42*42
+#define ALLOC_KEY 0451
 
 typedef struct ItemHead {
   union {

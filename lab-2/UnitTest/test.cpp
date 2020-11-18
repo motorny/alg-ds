@@ -3,208 +3,170 @@ extern "C" {
 #include "..\memallocator.h"
 }
 
-TEST(meminit_NULLpointer, return0) {
-	EXPECT_EQ(0, meminit(NULL, 1));
-}
-
-TEST(meminit_NegativeSize, return0) {
-	void* ptr = malloc(memgetminimumsize() + 1);
-	EXPECT_EQ(0, meminit(ptr, -1));
-	free(ptr);
-}
-
-TEST(meminit_CorrectData, return1) {
-	void* ptr = malloc(memgetminimumsize() + 1);
-	EXPECT_EQ(1, meminit(ptr, memgetminimumsize() + 1));
-	free(ptr);
-}
-
-TEST(memalloc_NegativeSize, returnNULL) {
-	void* ptr = malloc(memgetminimumsize() + 1);
-	meminit(ptr, memgetminimumsize() + 1);
-	EXPECT_EQ(NULL, memalloc(-1));
-	free(ptr);
-}
-
-TEST(memalloc_CorrectData, returnValidPointer) {
-	void* ptr = malloc(memgetminimumsize() + 1);
-	meminit(ptr, memgetminimumsize() + 1);
-	void* p1 = memalloc(1);
-	EXPECT_TRUE(p1 != NULL);
-	memfree(p1);
-	free(ptr);
-}
-
-TEST(memalloc_NotEnoughMem, returnNULL) {
-	void* ptr = malloc(memgetminimumsize() + 1);
-	meminit(ptr, memgetminimumsize() + 1);
-	void* p1 = memalloc(2);
-	EXPECT_TRUE(p1 == NULL);
-	memfree(p1);
-	free(ptr);
-}
-
-TEST(TestMemalloc, SizeLess0_NULLReturned)
+TEST(Memalloc, SizeLess0_NULLReturned)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz), * rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  char* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  rez = (char*)memalloc(-1);
+  output = (char*)memalloc(-1);
 
-  ASSERT_EQ(rez, (char*)NULL);
+  ASSERT_EQ(output, (char*)NULL);
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemalloc, Size0_NULLReturned)
+TEST(Memalloc, Size0_NULLReturned)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz), * rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  char* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  rez = (char*)memalloc(0);
+  output = (char*)memalloc(0);
 
-  ASSERT_EQ(rez, (char*)NULL);
+  ASSERT_EQ(output, (char*)NULL);
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemalloc, SizeBiggerRealMemSize_NULLReturned)
+TEST(Memalloc, SizeBiggerRealMemSize_NULLReturned)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz), * rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  char* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  rez = (char*)memalloc(sizeof(int) + 1);
+  output = (char*)memalloc(sizeof(int) + 1);
 
-  ASSERT_EQ(rez, (char*)NULL);
+  ASSERT_EQ(output, (char*)NULL);
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemalloc, MemDontInited_NULLReturned)
+TEST(Memalloc, MemDontInited_NULLReturned)
 {
-  char* rez;
+  char* output;
 
-  rez = (char*)memalloc(1);
+  output = (char*)memalloc(1);
 
-  ASSERT_EQ(rez, (char*)NULL);
+  ASSERT_EQ(output, (char*)NULL);
 }
 
-TEST(TestMemalloc, MaxPossibleSize_ValidPtrReturned)
+TEST(Memalloc, MaxPossibleSize_ValidPtrReturned)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz);
-  int* rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  int* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  rez = (int*)memalloc(sizeof(int));
+  output = (int*)memalloc(sizeof(int));
 
-  ASSERT_NE(rez, (int*)NULL);
+  ASSERT_NE(output, (int*)NULL);
 
-  *rez = 30;  //if we write in invalid ptr it must crush, if we run from IDE
+  *output = 42;
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemalloc, SizeLessMaxPossible_ValidPtrReturned)
+TEST(Memalloc, SizeLessMaxPossible_ValidPtrReturned)
 {
-  int sz = memgetminimumsize() + sizeof(int) + 1;
-  char* a = (char*)malloc(sz);
-  int* rez;
+  int size = memgetminimumsize() + sizeof(int) + 1;
+  char* pool = (char*)malloc(size);
+  int* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  rez = (int*)memalloc(sizeof(int));
+  output = (int*)memalloc(sizeof(int));
 
-  ASSERT_NE(rez, (int*)NULL);
+  ASSERT_NE(output, (int*)NULL);
 
-  *rez = 30;
+  *output = 42;
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemfree, NULL_DontCrush)
+TEST(Memfree, NULL_DontCrush)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz);
-  int* rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  int* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
   memfree(NULL);
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemfree, PtrNotFromMemoryRange_DontCrush)
+TEST(Memfree, PtrNotFromMemoryRange_DontCrush)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz);
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
   int* rez;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  memfree(a - 1);
+  memfree(pool - 1);
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemfree, InvalidPtrFromMemoryRange_DontCrush)
+TEST(Memfree, InvalidPtrFromMemoryRange_DontCrush)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz);
-  char* rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  char* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  rez = (char*)memalloc(sizeof(int));
-  memfree(rez - 1);
+  output = (char*)memalloc(sizeof(int));
+  memfree(output - 1);
 
   memdone();
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemfree, MemDoned_DontCrush)
+TEST(Memfree, MemDoned_DontCrush)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz);
-  int* rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  int* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
   memdone();
 
-  memfree(a + 1);
+  memfree(pool + 1);
 
-  free(a);
+  free(pool);
 }
 
-TEST(TestMemfree, ValidPtr_DontCrush)
+TEST(Memfree, ValidPtr_DontCrush)
 {
-  int sz = memgetminimumsize() + sizeof(int);
-  char* a = (char*)malloc(sz);
-  int* rez;
+  int size = memgetminimumsize() + sizeof(int);
+  char* pool = (char*)malloc(size);
+  int* output;
 
-  meminit(a, sz);
+  meminit(pool, size);
 
-  rez = (int*)memalloc(sizeof(int));
-  *rez = 30;
-  memfree(rez);
-  rez = (int*)memalloc(sizeof(int));
-  *rez = 3030;
+  output = (int*)memalloc(sizeof(int));
+  *output = 42;
+  memfree(output);
+  output = (int*)memalloc(sizeof(int));
+  *output = 0451;
 
   memdone();
-  free(a);
+  free(pool);
 }

@@ -73,9 +73,8 @@ void* memalloc(int size) {
 	if (fit == NO_FIT)
 		return NULL;
 	else {
-		if (fit == FIRST_FIT) {
+		if (fit == FIRST_FIT) 
 			current = first_fit;
-		}
 		if (fit == NEXT_FIT)
 			current = temp;
 

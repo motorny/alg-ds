@@ -38,7 +38,7 @@ int meminit(void *ptr, int size) {
     memH->nextPtr = nullptr;
     memH->prevPtr = nullptr;
     memH->size = size - memgetblocksize();
-    ((END_DESCR *) (memBase + size + memgetblocksize()))->size = memH->size;
+    ((END_DESCR *) (memBase + memH->size +sizeof(DESCR)))->size = memH->size;
     return 1;
 }
 

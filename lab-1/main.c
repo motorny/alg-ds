@@ -8,13 +8,13 @@
 #pragma warning(disable:4996)
 
 
-
 int main(void) {
 	char s[][maxLength]  = {"lpl", " ghtyghtdgd"};
-	int n = sizeof(s) / maxLength*sizeof(char);
+	int n = sizeof(s) / maxLength * sizeof(char);
+	int len = Length(s, n);
 	list_t* list = NULL;
-	list = Insert (s, n);
-	char* str = Merge(list, n);
+	list = InsertTextToList (s, n);
+	char* str = Merge(list, len);
 	printf("%s", str);
 	free(str);
 	ListDestroy(list);

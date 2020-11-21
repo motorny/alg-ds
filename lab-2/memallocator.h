@@ -1,10 +1,6 @@
 #ifndef __MEMALLOCATOR_H__E71A34CB
 #define __MEMALLOCATOR_H__E71A34CB
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // Init memory system with memory block pMemory.
 int meminit(void *pMemory, int size);
 
@@ -43,10 +39,5 @@ int memgetminimumsize();
 // memdone();
 // free(ptr);
 int memgetblocksize();
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

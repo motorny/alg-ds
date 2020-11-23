@@ -20,13 +20,12 @@ typedef struct list
 
 Bool memInitialized = FALSE;
 LIST* systemBlocks;
-void* firstPointer;
-void* endPointer;
-int amountOfUsedMemory = 0;
+LIST* firstBlock;
+void* endBlock;
 
 int memgetminimumsize()
 {
-	return 2 * (sizeof(LIST) + sizeof(int));
+	return sizeof(LIST) + sizeof(int);
 }
 
 int memgetblocksize()
@@ -36,21 +35,22 @@ int memgetblocksize()
 
 int meminit(void* pMemory, int size)
 {
-	int minSizeBlock = memgetminimumsize()
-		, descriptorBlockSize = memgetblocksize();
+	int minSize = memgetminimumsize()
+		, blockSize = memgetblocksize();
 	int* endDescriptor;
-	if (size < minSizeBlock || pMemory == NULL || memInitialized == TRUE)
+
+	if (size < minSize || pMemory == NULL || memInitialized == TRUE)
 	{
 		return MEMORY_INITIALIZE_FAILED;
 	}
-	systemBlocks = (LIST*)((char*)pMemory + sizeof(LIST));
-	memInitialized = TRUE;
+	systemBlocks = (LIST*)pMemory;
 	systemBlocks->nextBlock = NULL;
-	systemBlocks->blockSize = size - descriptorBlockSize;
-	firstPointer = (void*)((char*)pMemory + sizeof(LIST));
-	endPointer = (void*)((char*)pMemory + size);
+	systemBlocks->blockSize = size - blockSize;
+	memInitialized = TRUE;
 	endDescriptor = (int*)((char*)pMemory + size - sizeof(int));
-	*endDescriptor = -size;
+	*endDescriptor = -systemBlocks->blockSize;
+	firstBlock = systemBlocks;
+	endBlock = (void*)((char*)pMemory + size);
 
 	return MEMORY_INITIALIZE_SUCCESS;
 }
@@ -58,165 +58,153 @@ int meminit(void* pMemory, int size)
 void* memalloc(int size)
 {
 	int* endDescriptor;
-	int descriptorBlockSize = memgetblocksize();
-	LIST* suitableBlock = systemBlocks
-		, * previousBlock = NULL
-		, * tempList;
-
+	LIST* suitableBlock = systemBlocks,
+		* previousBlock = NULL;
+	int blockSize = memgetblocksize();
 	if (memInitialized == FALSE || size <= 0)
 	{
 		return NULL;
 	}
-
 	while (suitableBlock != NULL)
 	{
-		if (suitableBlock->blockSize >= size + descriptorBlockSize)
+		if (suitableBlock->blockSize >= size)
 		{
 			break;
 		}
 		previousBlock = suitableBlock;
 		suitableBlock = suitableBlock->nextBlock;
 	}
-
 	if (suitableBlock == NULL)
 	{
-		return COULD_NOT_FIND_SUITABLE_BLOCK;
+		return NULL;
 	}
-
-	if (suitableBlock->blockSize >= size + 2 * descriptorBlockSize)
+	if (suitableBlock->blockSize >= blockSize + size)
 	{
-		
-		if (previousBlock != NULL)
+		if (previousBlock == NULL)
 		{
-			previousBlock->nextBlock = (LIST*)((char*)suitableBlock + size + descriptorBlockSize);
-			previousBlock->nextBlock->blockSize = suitableBlock->blockSize - size - descriptorBlockSize;
-			previousBlock->nextBlock->nextBlock = suitableBlock->nextBlock;
+			systemBlocks = (LIST*)((char*)suitableBlock + size + blockSize);
+			systemBlocks->nextBlock = suitableBlock->nextBlock;
+			systemBlocks->blockSize = suitableBlock->blockSize - size - blockSize;
+			endDescriptor = (int*)((char*)systemBlocks + blockSize + systemBlocks->blockSize - sizeof(int));
+			*endDescriptor = -systemBlocks->blockSize;
 		}
 		else
 		{
-			tempList = systemBlocks;
-			systemBlocks = (LIST*)((char*)suitableBlock + size + descriptorBlockSize);
-			systemBlocks->blockSize = suitableBlock->blockSize - size - descriptorBlockSize;
-			systemBlocks->nextBlock = tempList->nextBlock;
-			endDescriptor = (int*)((char*)systemBlocks + systemBlocks->blockSize - sizeof(int));
-			*endDescriptor = -(systemBlocks->blockSize);
+			previousBlock->nextBlock = (LIST*)((char*)suitableBlock + size + blockSize);
+			previousBlock->nextBlock->nextBlock = suitableBlock->nextBlock;
+			previousBlock->nextBlock->blockSize = suitableBlock->blockSize - size - blockSize;
+			endDescriptor = (int*)((char*)previousBlock->nextBlock + blockSize + previousBlock->nextBlock->blockSize - sizeof(int));
+			*endDescriptor = -previousBlock->nextBlock->blockSize;
 		}
-		suitableBlock->blockSize = size + descriptorBlockSize;
-		endDescriptor = (int*)((char*)suitableBlock + size + descriptorBlockSize - sizeof(int));
-		*endDescriptor = size + descriptorBlockSize;
+		suitableBlock->blockSize = size;
+		endDescriptor = (int*)((char*)suitableBlock + blockSize + size - sizeof(int));
+		*endDescriptor = size;
 	}
 	else
 	{
-		endDescriptor = (int*)((char*)suitableBlock + suitableBlock->blockSize - sizeof(int));
+		endDescriptor = (int*)((char*)suitableBlock + suitableBlock->blockSize + sizeof(LIST));
 		*endDescriptor = suitableBlock->blockSize;
-		if (previousBlock != NULL)
-		{
-			previousBlock->nextBlock = suitableBlock->nextBlock;
-		}
-		else
+		if (previousBlock == NULL)
 		{
 			systemBlocks = suitableBlock->nextBlock;
 		}
+		else
+		{
+			previousBlock->nextBlock = suitableBlock->nextBlock;
+		}
 	}
-	amountOfUsedMemory += suitableBlock->blockSize;
+	suitableBlock->nextBlock = NULL;
 	return (void*)((char*)suitableBlock + sizeof(LIST));
 }
 
-void memfree(void* pBlock)
+void memfree(void* p)
 {
-	int* leftBlockEndDescriptor
-		, * rightBlockEndDescriptor
-		, * endDescriptor;
-	int descriptorBlockSize = memgetblocksize()
-		, tmp = 0;
-	LIST* newFreeBlock
-		, * leftBlock
-		, * rightBlock
-		, * tempList;
-
-	if (pBlock == NULL)
+	int* leftEndDescriptor,
+	   * rightEndDescriptor,
+	   * endDescriptor;
+	int blockSize = memgetblocksize();
+	LIST* newFreeBlock,
+		* rightBlock,
+		* leftBlock;
+	LIST* tmp;
+	if (p == NULL)
 	{
 		return;
 	}
-	
-	newFreeBlock = (LIST*)((char*)pBlock - sizeof(LIST));
+	newFreeBlock = (LIST*)((char*)p - sizeof(LIST));
 	newFreeBlock->nextBlock = systemBlocks;
 	systemBlocks = newFreeBlock;
-	amountOfUsedMemory -= newFreeBlock->blockSize;
-	endDescriptor = (int*)((char*)newFreeBlock + newFreeBlock->blockSize - sizeof(int));
+	endDescriptor = (int*)((char*)newFreeBlock + sizeof(LIST) + newFreeBlock->blockSize);
 	*endDescriptor = -newFreeBlock->blockSize;
 
-	if (newFreeBlock == firstPointer)
+	if (newFreeBlock == firstBlock)
 	{
-		leftBlockEndDescriptor = NULL;
+		leftEndDescriptor = NULL;
 	}
 	else
 	{
-		leftBlockEndDescriptor = (int*)((char*)newFreeBlock - sizeof(int));
+		leftEndDescriptor = (int*)((char*)newFreeBlock - sizeof(int));
 	}
-	if ((void*)((char*)newFreeBlock + newFreeBlock->blockSize) == endPointer)
+	if ((void*)((char*)newFreeBlock + newFreeBlock->blockSize + blockSize) == endBlock)
 	{
-		rightBlockEndDescriptor = NULL;
+		rightEndDescriptor = NULL;
 	}
 	else
 	{
-		rightBlockEndDescriptor = (int*)((char*)newFreeBlock + newFreeBlock->blockSize);
-		rightBlockEndDescriptor = (int*)((char*)rightBlockEndDescriptor + ((LIST*)rightBlockEndDescriptor)->blockSize - sizeof(int));
+		rightEndDescriptor = (int*)((char*)newFreeBlock + newFreeBlock->blockSize + blockSize);
+		rightEndDescriptor = (int*)((char*)rightEndDescriptor + ((LIST*)rightEndDescriptor)->blockSize + sizeof(LIST));
 	}
-	if (leftBlockEndDescriptor != NULL && *leftBlockEndDescriptor < 0)
+	if (leftEndDescriptor != NULL && *leftEndDescriptor <= 0)
 	{
-		leftBlock = (LIST*)((char*)leftBlockEndDescriptor + sizeof(int) + *leftBlockEndDescriptor);
-		tempList = systemBlocks;
-		while (tempList != NULL)
+		leftBlock = (LIST*)((char*)newFreeBlock - blockSize + *leftEndDescriptor);
+		leftBlock->blockSize += (newFreeBlock->blockSize + blockSize);
+		tmp = systemBlocks;
+		while (tmp != NULL)
 		{
-			if (tempList->nextBlock == leftBlock)
+			if (tmp->nextBlock == leftBlock)
 			{
 				break;
 			}
-			tempList = tempList->nextBlock;
+			tmp = tmp->nextBlock;
 		}
-		if (tempList == NULL)
+		if (tmp == NULL)
 		{
 			return;
 		}
-		tempList->nextBlock = leftBlock->nextBlock;
-		leftBlock->blockSize += newFreeBlock->blockSize;
+		tmp->nextBlock = leftBlock->nextBlock;
 		leftBlock->nextBlock = systemBlocks->nextBlock;
 		systemBlocks = leftBlock;
 		newFreeBlock = systemBlocks;
-		endDescriptor = (int*)((char*)leftBlock + leftBlock->blockSize - sizeof(int));
+		endDescriptor = (int*)((char*)leftBlock + sizeof(LIST) + leftBlock->blockSize);
 		*endDescriptor = -leftBlock->blockSize;
 	}
-	if (rightBlockEndDescriptor != NULL && *rightBlockEndDescriptor < 0)
+	if (rightEndDescriptor != NULL && *rightEndDescriptor <= 0)
 	{
-		rightBlock = (LIST*)((char*)rightBlockEndDescriptor + sizeof(int) + *rightBlockEndDescriptor);
-		tempList = systemBlocks;
-		while (tempList != NULL)
+		rightBlock = (LIST*)((char*)rightEndDescriptor + *rightEndDescriptor - sizeof(LIST));
+		tmp = systemBlocks;
+		while (tmp != NULL)
 		{
-			if (tempList->nextBlock == rightBlock)
+			if (tmp->nextBlock == rightBlock)
 			{
 				break;
 			}
-			tempList = tempList->nextBlock;
+			tmp = tmp->nextBlock;
 		}
-		if (tempList == NULL)
+		if (tmp == NULL)
 		{
 			return;
 		}
-		tempList->nextBlock = rightBlock->nextBlock;
-		newFreeBlock->blockSize += rightBlock->blockSize;
-		endDescriptor = (int*)((char*)newFreeBlock + newFreeBlock->blockSize - sizeof(int));
+		tmp->nextBlock = rightBlock->nextBlock;
+		newFreeBlock->blockSize += (rightBlock->blockSize + blockSize);
+		endDescriptor = (int*)((char*)newFreeBlock + sizeof(LIST) + newFreeBlock->blockSize);
 		*endDescriptor = -newFreeBlock->blockSize;
 	}
 }
 
 void memdone()
 {
-	if (amountOfUsedMemory != 0)
-	{
-
-	}
-	systemBlocks = NULL;
-	firstPointer = NULL;
 	memInitialized = FALSE;
+	systemBlocks = NULL;
+	firstBlock = NULL;
+	endBlock = NULL;
 }

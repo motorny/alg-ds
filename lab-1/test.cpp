@@ -67,11 +67,14 @@ TEST(list_pop_test_series, pop_save_data_test) {
 	data = list_pop(&test);
 	EXPECT_EQ(data, 5);
 }
+
 TEST(list_pop_test_series, pop_save_next_data_test) {
 	Node* test = NULL;
 	int data = 0;
-	list_init_data(&test, 5);
-	list_push(test, 12);
+	test = (Node*)malloc(sizeof(Node*));
+	test->data = 5;
+	test->next = (Node*)malloc(sizeof(Node*));
+	test->next->data = 12;
 	data = list_pop(&test);
 	EXPECT_EQ(data, 5);
 	data = list_pop(&test);
@@ -81,18 +84,21 @@ TEST(list_pop_test_series, pop_save_next_data_test) {
 TEST(list_get_test_series, get_head_data_test) {
 	Node* test = NULL;
 	int get_data = 0;
-	list_init_data(&test, 5);
+	test = (Node*)malloc(sizeof(Node*));
+	test->data = 5;
 	get_data = list_get(test, 0);
 	EXPECT_EQ(get_data, 5);
 }
 
-TEST(list_get_test_series, get_next_data_test) {
+TEST(list_get_test, series, get_next_data_test) {
 	Node* test = NULL;
 	int get_data = 0;
-	list_init_data(&test, 5);
-	list_push(test, 12);
+	test = (Node*)malloc(sizeof(Node*));
+	test->data = 5;
+	test->next = (Node*)malloc(sizeof(Node*));
+	test->next->data = 12;
 	get_data = list_get(test, 1);
-	EXPECT_EQ(get_data, 12);
+    EXPECT_EQ(get_data, 12);
 }
 
 TEST(list_get_test_series, get_list_data_test) {

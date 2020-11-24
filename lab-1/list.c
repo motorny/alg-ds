@@ -4,6 +4,8 @@
 int list_init_data(Node** head, int data)
 {
 	(*head) = (Node*)malloc(sizeof(Node));
+	if (head == NULL)
+		return NULL;
 	(*head)->data = data;
 	(*head)->next = NULL;
 }
@@ -16,6 +18,8 @@ void list_push(Node* head, int data)
 	}
 
 	current->next = (Node*)malloc(sizeof(Node));
+	if (current->next == NULL)
+		return NULL;
 	current->next->data = data;
 	current->next->next = NULL;
 }

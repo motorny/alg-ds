@@ -103,8 +103,9 @@ void memfree(void* p) {
 void memdone() {
 	blockofmemory* block = (blockofmemory*)start;
 	while (block) {
-		if (block->Free == 0)
+		if (block->Free == 0){
 			block->Free = 1;
+		}
 		block = block->next;
 	}
 }

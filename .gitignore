@@ -17,3 +17,10 @@ lab-2/memalloc/memalloc.vcxproj
 lab-2/memalloc/memalloc.vcxproj.filters
 lab-2/test/packages.config
 .git
+
+/.vs/alg-ds/v16/.suo
+/.vs/alg-ds/v16/Browse.VC.db
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
+/lab-3/lab-3

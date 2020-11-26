@@ -79,16 +79,6 @@ int main(void) {
     }
 
     BFS(nodes, countOfVertex);
-    printf("\n");
-    for (int i = 0; i < countOfVertex; i++)
-    {
-        printf("%i ", nodes[i].vertex);
-        for (int j = 0; j < nodes[i].countOfNeigh; j++)
-        {
-            printf("%i ", nodes[i].neighbor[j]);
-        }
-        printf("\n");
-    }
 
     for (int i = 0; i < countOfVertex; i++)
     {

@@ -21,7 +21,8 @@ extern "C" {
 #define SIZE_FULL_BLOCK memgetblocksize()   //size of full block
 #define SIZE_PART_BLOCK (memgetblocksize() - sizeof(int))   //size of construction at the begining
 
-
+#define FREE_BLOCK_MARKER -35
+	
 //LIST AND HELP BLOCK STRUCTURES
 typedef struct memblock_t {
 	int size;
@@ -76,7 +77,7 @@ static void SetFreeBytes(void* start, void* end) {
 
 	char* p = (char*)start;
 	do {
-		*p = -35;
+		*p = FREE_BLOCK_MARKER;
 		p++;
 	} while (p != (char*)end);
 }

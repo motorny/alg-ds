@@ -1,5 +1,5 @@
 #include "tree.h"
-#if 1
+
 void main(void)
 {
   tree T = {0};
@@ -16,7 +16,7 @@ void main(void)
   TreeAddElement(&T, 61);
   TreeAddElement(&T, 64);
   N = TreeFindElement(T, 70);
-  N = TreeKLower(N, 300);
+  N = TreeKLower(T, 9);
+  TreePrint(T)
   printf("Hello");
 }
-#endif

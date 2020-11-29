@@ -24,5 +24,5 @@ typedef struct tree
 int TreeAddElement(tree *T, int key);
 int TreeDeleteElement(tree *T, int key);
 node * TreeFindElement(tree T, int key);
-void TreePrint(void);
-node * TreeKLower(node *N, int k);
+void TreePrint(tree T);
+node * TreeKLower(tree T, int k);

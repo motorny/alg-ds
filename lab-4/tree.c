@@ -1,7 +1,7 @@
 #include "tree.h"
 #include "math.h"
 
-static int CountWidth(int key)
+static int CountNumberWidth(int key)
 {
   int ans = 0;
   if (key < 0)
@@ -23,7 +23,7 @@ static int AddNode(node **t, int key)
     (*t)->key = key;
     (*t)->number = 1;
     (*t)->parent = NULL;
-    (*t)->width = CountWidth(key);
+    (*t)->width = CountNumberWidth(key);
     (*t)->left = (*t)->right = NULL;
     return TRUE;
   }
@@ -126,17 +126,123 @@ node * TreeFindElement(tree T, int key)
     return t;
   }
 }
-/*
-static int CountH(node *t)
+
+static int CountWidth(node *t)
 {
   if (t == NULL)
     return 0;
-  if (t->left == 0 && t->right == 0)
-    return 1;
-  int a = CountH(t->left);
-  int b = CountH(t->right);
-  return max(a, b);
+  if (!t->left && !t->right)
+    return t->width = CountNumberWidth(t->key);
+  if (!t->left)
+    return t->width = CountNumberWidth(t->key) + CountWidth(t->right) + 1; // 2 for spaces
+  if (!t->right)
+    return t->width = CountNumberWidth(t->key) + CountWidth(t->left) + 1; // 2 for spaces
+  return t->width = CountNumberWidth(t->key) + CountWidth(t->left) + CountWidth(t->right) + 2; // 2 for spaces
 }
+
+static void PrintNode(node *t, int IsWidth)
+{
+  int spaces;
+
+  if (!t)
+    return;
+  if (t->left)
+    spaces = t->left->width + 1;
+  else
+    spaces = 0;
+
+  for (int i = 0; i < spaces; i++)
+    printf(" ");
+
+  if (IsWidth)
+  {
+    printf("%i", t->width);
+    spaces = +CountNumberWidth(t->key) - CountNumberWidth(t->width);
+  }
+  else
+  {
+    printf("%i", t->key);
+    spaces = 0;
+  }
+
+  if (t->right)
+    spaces += t->right->width;
+
+  for (int i = 0; i < spaces; i++)
+    printf(" ");
+}
+
+static int PrintLevel(node *t, int level, int curLevel, int IsWidth, node *root)
+{
+  int offset = 0, leftEnd = 0, rightEnd = 0, len;
+
+  if (!t)
+    return 1;
+
+  if (level == curLevel)
+  {
+    PrintNode(t, IsWidth);
+    return 0;
+  }
+
+  if (t->left)
+  {
+    leftEnd = PrintLevel(t->left, level, curLevel + 1, IsWidth, root);
+    printf(" ");
+  }
+  else
+  {
+    leftEnd = 1;
+    //offset = root->width - t->width - CountNumberWidth(t->key) * 2;
+    //for (int i = 0; i < offset; i++)
+//      printf(" ");
+  }
+
+  len = CountNumberWidth(t->key);
+  for (int i = 0; i < len; i++)
+    printf(" ");
+
+  if (t->right)
+  {
+    printf(" ");
+    rightEnd = PrintLevel(t->right, level, curLevel + 1, IsWidth, root);
+  }
+  else
+  {
+    rightEnd = 1;
+    //offset = root->width - t->width - CountNumberWidth(t->key) * 2;
+    //for (int i = 0; i < offset; i++)
+//      printf(" ");
+  }
+
+  return leftEnd && rightEnd;
+}
+
+void TreePrint(tree t)
+{
+  int level = 0, isEnd = 0;
+  node *cur;
+
+  if (!t.root)
+    return;
+
+  cur = t.root;
+
+  CountWidth(t.root);
+
+  while (!isEnd)
+  {
+    isEnd = PrintLevel(t.root, level, 0, FALSE, t.root);
+    printf("\n");
+    PrintLevel(t.root, level, 0, TRUE, t.root);
+    printf("\n");
+    level++;
+  }
+
+}
+
+/*
+
 
 int *A = NULL;
 int H = 0;
@@ -180,9 +286,7 @@ node *GetK(node *t, int k)
   int  r;
 
   if (t->left)
-  {
     r = t->left->number + 1;
-  }
   else
     r = 1;
   if (r != k)
@@ -196,25 +300,32 @@ node *GetK(node *t, int k)
 
 }
 
-node * TreeKLower(node *N, int k)
+void PrintLower(node *t, int k)
 {
-  node *f;
-  int r = 1 - k;
-  if (N->left != NULL)
-    r += N->left->number;
+  int r;
+  if (t == NULL)
+    return;
 
-  while (N->parent != NULL)
-  {
-    f = N->parent;
-    if (N == f->right)
-    {
-      r += 1;
-      if (f->left != NULL)
-        r += f->left->number;
-      if (r >= 0)
-        return GetK(f, r);
-    }
-    N = N->parent;
-  }
-  return NULL;
+  PrintLower(t->left, k);
+  if (t->left)
+    r = t->left->number + 1;
+  else
+    r = 1;
+  if (r < k)
+    printf("%i ", t->key);
+  else
+    return;
+  PrintLower(t->right, k - r);
+}
+
+node * TreeKLower(tree T, int k)
+{
+  node *t = T.root;
+  if (t == NULL || k <= 0 || k > t->number)
+    return NULL;
+  t = GetK(t, k);
+  if (t->key % 2 == 0)
+    PrintLower(T.root, k);
+  printf("\n");
+  return t;
 }

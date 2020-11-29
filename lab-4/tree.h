@@ -26,3 +26,4 @@ int TreeDeleteElement(tree *T, int key);
 node * TreeFindElement(tree T, int key);
 void TreePrint(tree T);
 node * TreeKLower(tree T, int k);
+void TreeFree(tree* T);

@@ -98,11 +98,15 @@ static int DeleteNode(node **t, int x)
 
 int TreeDeleteElement(tree *T, int key)
 {
+  if (T == NULL)
+    return 0;
   return DeleteNode(&T->root, key);
 }
 
 int TreeAddElement(tree *T, int key)
 {
+  if (T == NULL)
+    return 0;
   return AddNode(&T->root, key);
 }
 
@@ -241,47 +245,7 @@ void TreePrint(tree t)
 
 }
 
-/*
-
-
-int *A = NULL;
-int H = 0;
-int x = 0;
-
-static void PrepareA(node *t, int y)
-{
-  if (t == NULL)
-    return;
-  PrepareA(t->left, y + 2);
-  A[x * H + y] = t->key;
-  A[x * H + y + 1] = t->width;
-  x++;
-  PrepareA(t->right, y + 2);
-}
-
-void TreePrint(tree *T)
-{
-  H = CountH(T->root);
-  A = malloc(T->root->number * H * 2);
-  memset(A, 0, T->root->number * H * 2 * sizeof(int));
-  PrepareA(T->root, 0, T->root->number * H * 2 * sizeof(int));
-  for (int i = 0; i < H; i += 2)
-  {
-    // print elements
-    for (int j = 0; j <= x; j++)
-    {
-      if (A[j * H + i] == 0)
-        printf(" ");
-      else
-      {
-        printf("%i", A[j * H + i]);
-      }
-    }
-  }
-}
-*/
-
-node *GetK(node *t, int k)
+static node *GetK(node *t, int k)
 {
   int  r;
 
@@ -300,7 +264,7 @@ node *GetK(node *t, int k)
 
 }
 
-void PrintLower(node *t, int k)
+static void PrintLower(node *t, int k)
 {
   int r;
   if (t == NULL)
@@ -328,4 +292,21 @@ node * TreeKLower(tree T, int k)
     PrintLower(T.root, k);
   printf("\n");
   return t;
+}
+
+void NodeFree(node* T)
+{
+  if (T == NULL)
+    return;
+  NodeFree(T->left);
+  NodeFree(T->right);
+  free(T);
+}
+
+void TreeFree(tree* T)
+{
+  if (T == NULL)
+    return;
+  NodeFree(T->root);
+  T->root = NULL;
 }

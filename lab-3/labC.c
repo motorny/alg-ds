@@ -40,6 +40,7 @@ int main(void) {
     printf("Not enought memory");
     return -1;
   }
+
   for (i = 0; i < n; i++) {
     list[i].count = 0;
     list[i].nodes = (int*)malloc(sizeof(int) * n);

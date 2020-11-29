@@ -36,9 +36,17 @@ int main(void) {
   int n, i;
   scanf("%i", &n);
   list = (node*)malloc(sizeof(node) * n);
+  if (list == NULL) {
+    printf("Not enought memory");
+    return -1;
+  }
   for (i = 0; i < n; i++) {
     list[i].count = 0;
     list[i].nodes = (int*)malloc(sizeof(int) * n);
+    if (list[i].nodes == NULL) {
+      printf("Not enought memory");
+      return -1;
+    }
     list[i].visit = WASNOT;
   }
   Readlist(list, n);

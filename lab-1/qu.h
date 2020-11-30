@@ -16,6 +16,7 @@ typedef struct {
 typedef struct {
 
 	int size;
+	int malloc_er;
 	node_t* first;
 	node_t* last;
 

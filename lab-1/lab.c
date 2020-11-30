@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "qu.h"
 #include <malloc.h>
+#define ER_MALLOC 1;
 
 int* InitArray(int size) {
 	
@@ -23,7 +24,7 @@ int PushQuArray(int data, quArray_t* quAr) {
 			quAr->data = tmp;
 		}
 		else {
-			return 1;
+			return ER_MALLOC;
 		}
 		quAr->last = 0;
 		quAr->first = 0;
@@ -37,7 +38,7 @@ int PushQuArray(int data, quArray_t* quAr) {
 				quAr->data = tmp;
 			}
 			else {
-				return 1;
+				return ER_MALLOC;
 			}
 			quAr->last = quAr->first++;
 			quAr->data[quAr->last] = data;
@@ -49,7 +50,7 @@ int PushQuArray(int data, quArray_t* quAr) {
 				quAr->data = tmp;
 			}
 			else {
-				return 1;
+				return ER_MALLOC;
 			}
 			quAr->last++;
 			quAr->data[quAr->last] = data;
@@ -90,20 +91,36 @@ quList_t InitQuList(int size, int* data) {
 
 	if (size == 1) {
 		quLi.first = (node_t*)malloc(sizeof(node_t*));
+		if (quLi.first == NULL) {
+			quLi.malloc_er = ER_MALLOC;
+			return quLi;
+		}
 		quLi.last = quLi.first;
 		quLi.size = 1;
 		quLi.first->data = data[0];
 	}
 	else {
 		quLi.last = (node_t*)malloc(sizeof(node_t*));
+		if (quLi.last == NULL) {
+			quLi.malloc_er = ER_MALLOC;
+			return quLi;
+		}
 		quLi.last->data = data[0];
 		tmp = quLi.last;
 		for (i = 1; i < size-1; i++) {
-			tmp->next = (node_t*)malloc(sizeof(node_t*));			
+			tmp->next = (node_t*)malloc(sizeof(node_t*));
+			if (tmp->next == NULL) {
+				quLi.malloc_er = ER_MALLOC;
+				return quLi;
+			}
 			tmp->next->data = data[i];
 			tmp = tmp->next;
 		}
 		quLi.first = (node_t*)malloc(sizeof(node_t*));
+		if (quLi.first == NULL) {
+			quLi.malloc_er = ER_MALLOC;
+			return quLi;
+		}
 		tmp->next = quLi.last;
 		quLi.first->data = data[size - 1];
 		quLi.size = size;
@@ -117,7 +134,8 @@ int PushQuList(int data, quList_t* quLi) {
 	if (quLi->size == 0) {
 		quLi->first = (node_t*)malloc(sizeof(node_t*));
 		if (quLi->first == NULL) {
-			return 1;
+			quLi->malloc_er = ER_MALLOC;
+			return ER_MALLOC;
 		}
 		quLi->last = quLi->first;
 		quLi->first->data = data;
@@ -127,7 +145,8 @@ int PushQuList(int data, quList_t* quLi) {
 	else if (quLi->size == 1) {
 		quLi->last = (node_t*)malloc(sizeof(node_t*));
 		if (quLi->last == NULL) {
-			return 1;
+			quLi->malloc_er = ER_MALLOC;
+			return ER_MALLOC;
 		}
 		quLi->last->next = quLi->first;
 		quLi->last->data = data;
@@ -137,7 +156,8 @@ int PushQuList(int data, quList_t* quLi) {
 		node_t* tmp = quLi->last;
 		quLi->last = (node_t*)malloc(sizeof(node_t*));
 		if (quLi->last == NULL) {
-			return 1;
+			quLi->malloc_er = ER_MALLOC;
+			return ER_MALLOC;
 		}
 		quLi->last->data = data;
 		quLi->last->next = tmp;

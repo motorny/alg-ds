@@ -3,6 +3,10 @@
 #include <string.h>
 #include <ctype.h>
 
+#define NOT_ENOUGH_MEMORY 2
+#define EMPTY_QUEUE -1
+#define INCORRECT_SIZE 1
+
 typedef struct Queue
 {
   struct Queue* ptrToNext, * ptrToPrev;
@@ -20,7 +24,7 @@ int addElementInQueue(int value)
     gQueue = (QUEUE*)malloc(sizeof(QUEUE));
 
     if (!gQueue)
-      return 2;
+      return NOT_ENOUGH_MEMORY;
 
     gQueue->ptrToNext = gQueue->ptrToPrev = gQueue;
     gQueue->value = value;
@@ -28,7 +32,7 @@ int addElementInQueue(int value)
   }
   QUEUE* node = (QUEUE*)malloc(sizeof(QUEUE));
   if (!node)
-    return 2;
+    return NOT_ENOUGH_MEMORY;
 
   node->value = value;
   node->ptrToPrev = gQueue->ptrToPrev;
@@ -43,7 +47,7 @@ int addElementInQueue(int value)
 int popElement()
 {
   if (!gQueue)
-    return -1;
+    return EMPTY_QUEUE;
   int a;
   if (gQueue->ptrToNext == gQueue)
   {
@@ -69,17 +73,17 @@ int readMatrix()
   scanf("%i", &gMatrixSize);
 
   if (gMatrixSize < 1)
-    return 1;
+    return INCORRECT_SIZE;
 
   gM = (int**)malloc(sizeof(int*) * gMatrixSize);
   if (!gM)
-    return 2;
+    return NOT_ENOUGH_MEMORY;
 
   for (int i = 0; i < gMatrixSize; i++)
   {
     gM[i] = (int*)calloc(sizeof(int) * gMatrixSize, sizeof(int));
     if (!gM)
-      return 2;
+      return NOT_ENOUGH_MEMORY;
   }
   int n = 1, k = 1;
 
@@ -91,7 +95,7 @@ int readMatrix()
 
   char* str = (char*)malloc(sizeof(char) * (n + 1));
   if (!str)
-    return 2;
+    return NOT_ENOUGH_MEMORY;
 
   int  index = 0, mIndexI = 0, mIndexJ = 0, IindexRead = 0;
   while ((c = fgetc(stdin)) != EOF)

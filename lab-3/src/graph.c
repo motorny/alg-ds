@@ -6,9 +6,8 @@
 #include "malloc.h"
 #include "graph.h"
 
-
-V_t *createAdj(unsigned int n) {
-    V_t *adj = calloc(n, sizeof(V_t));
+V_t *createAdj(int n) {
+    V_t *adj = (V_t*)calloc(n, sizeof(V_t));
     if(adj == NULL)
         return NULL;
     int i;
@@ -49,6 +48,8 @@ struct Q *enqueue(struct Q *q, V_t *x) {
 
 struct Q *dequeue(struct Q **q) {
     struct Q *curr = *q, *prev = *q;
+    if((*q) == NULL)
+        return NULL;
     if ((*q)->next == NULL) {
         (*q) = NULL;
         return curr;
@@ -61,9 +62,9 @@ struct Q *dequeue(struct Q **q) {
     return curr;
 }
 
-void bfs(G_t *g) {
+int bfs(G_t *g) {
     if(g->adjHPtr == NULL)
-        return;
+        return 1;
     g->adjHPtr->color = GRAY;
     int i;
     for (i = 1; i < g->vMax; i++) {
@@ -73,6 +74,8 @@ void bfs(G_t *g) {
     tail = enqueue(NULL, g->adjHPtr);
     while (tail != NULL) {
         u = dequeue(&tail);
+        if(u == NULL)
+            break;
         V_t *tmp = &g->adjHPtr[u->i->i];
         for (i = 0; i < tmp->qSize; i++) {
             if (tmp->queue[i].i->color == WHITE) {
@@ -83,4 +86,5 @@ void bfs(G_t *g) {
         printf("%u ", g->adjHPtr[u->i->i].i);
         g->adjHPtr[u->i->i].color = BLACK;
     }
+    return 0;
 }

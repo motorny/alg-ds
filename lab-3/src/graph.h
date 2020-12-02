@@ -29,10 +29,10 @@ typedef struct Graph {
 } G_t;
 
 
-V_t *createAdj(unsigned int n);
+V_t *createAdj(int n);
 struct Q *readAdj(G_t *g);
 struct Q *enqueue(struct Q *q, V_t *x);
 struct Q *dequeue(struct Q **q);
-void bfs(G_t *g);
+int bfs(G_t *g);
 #endif //LAB_3_GRAPH_H
 

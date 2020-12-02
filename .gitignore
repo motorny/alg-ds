@@ -338,3 +338,13 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/lab-1/Lab_C1/framework.h
+/lab-1/Lab_C1/Lab_C1.vcxproj
+/lab-1/Lab_C1/Lab_C1.vcxproj.filters
+/lab-1/Lab_C1/pch.cpp
+/lab-1/Lab_C1/pch.h
+/lab-1/test_c1/packages.config
+/lab-1/test_c1/pch.cpp
+/lab-1/test_c1/pch.h
+/lab-1/test_c1/test_c1.vcxproj
+/lab-1/Lab_C1.sln

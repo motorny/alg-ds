@@ -20,11 +20,12 @@ int BFS(struct adjacencylist* adj, struct queue* q) {
   Push(q, 0);
   adj->nodes[0].visited = 1;
   while (Pop(q, &current)) {
-    for (i = 0; i < adj->nodes[current].number; i++)
+    for (i = 0; i < adj->nodes[current].number; i++){
       if (adj->nodes[adj->nodes[current].adjacency[i]].visited == 0) {
         Push(q, adj->nodes[current].adjacency[i]);
         adj->nodes[adj->nodes[current].adjacency[i]].visited = 1;
       }
+    }
   }
   return TRUE;
 }

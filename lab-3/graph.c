@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+#pragma warning (diasble: 4996)
 
 #include "graph.h"
 

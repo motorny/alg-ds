@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include<stdlib.h>
 #include<stdio.h>
 #include"Tree.h"
@@ -39,9 +41,7 @@ void InsertInTree(NODE** root, int data) {
 				return;
 			}
 		}
-		else {
-			return;
-		}
+		return;
 	}
 }
 
@@ -67,14 +67,15 @@ NODE* SearchNodeByData(NODE* root, int data) {
 			root = root->right;
 			continue;
 		}
-		else
-			return root;
+		return root;
 	}
 	return NULL;
 }
 
 //Рассмотреть случай, когда удаляем корень и ниже ничего нет, нужно чтобы корень стал NULL
 void RemoveNodeByPtr(NODE* target) {
+	if (target == NULL)
+		return;
 	if (target->left && target->right) {
 		NODE* localMax = GetMaxNode(target->left);
 		target->data = localMax->data;
@@ -91,9 +92,11 @@ void RemoveNodeByPtr(NODE* target) {
 		}
 		else if (target == target->parent->left) {
 			target->parent->left = target->left;
+			target->left->parent = target->parent;
 		}
 		else {
 			target->parent->right = target->left;
+			target->left->parent = target->parent;
 		}
 	}
 	else if (target->right) {
@@ -103,6 +106,14 @@ void RemoveNodeByPtr(NODE* target) {
 			target->left = nodeToDel->left;
 			target->right = nodeToDel->right;
 			target = nodeToDel;
+		}
+		else if (target == target->parent->right) {
+			target->parent->right = target->right;
+			target->right->parent = target->parent;
+		}
+		else {
+			target->parent->left = target->right;
+			target->right->parent = target->parent;
 		}
 	}
 	else {
@@ -132,8 +143,10 @@ void printTreePreOrder(NODE* root, const char* dir, int level) {
 void printTreePostOrder(NODE* root)
 {
 	if (root) {
-		printTreePostOrder(root->left);
-		printTreePostOrder(root->right);
+		if (root->left)
+			printTreePostOrder(root->left);
+		if (root->right)
+			printTreePostOrder(root->right);
 		printf("%d ", root->data);
 	}
 }
@@ -151,7 +164,7 @@ void ConsoleTree(NODE** root) {
 	int data;
 	char c = getchar();
 	while (c != EOF) {
-		scanf_s("%d", &data);
+		scanf("%d", &data);
 		if (c == 'a') {
 			InsertInTree(root, data);
 		}

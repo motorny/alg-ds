@@ -1,4 +1,0 @@
-banana
-force
-create
-destroy

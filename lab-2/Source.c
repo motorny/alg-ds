@@ -113,8 +113,21 @@ int BFS(int** A, int n) {
 
 	}
 
+	free(queue);
+	free(B);
+
 	return it;
 
+}
+
+void freeA(int** A,int n) {
+
+	int i;
+
+	for (i = 0; i < n; i++) {
+		free(A[i]);
+	}
+	free(A);
 }
 
 int main() {
@@ -130,5 +143,7 @@ int main() {
 	input(A);
 	BFS(A,n);
 	
+	freeA(A, n);
+
 	return 0;
 }

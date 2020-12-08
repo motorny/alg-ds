@@ -18,87 +18,49 @@ typedef struct tree_t {
 } tree_t;
 
 void NodeAppend(tree_t** tree, int num) {
-  tree_t* temp = (*tree), *parent = NULL;
-  way_t way = NONE;
-  //create tree
-  if ((*tree) == NULL) {
-    (*tree) = (tree_t*)malloc(sizeof(tree_t));
-    if (!(*tree))
-      return;
+  tree_t* temp = (*tree), *newnode, *ptr = (*tree);
 
-    (*tree)->num = num;
-    (*tree)->left = NULL;
-    (*tree)->right = NULL;
-    (*tree)->parent = NULL;
+  newnode = (tree_t*)malloc(sizeof(tree_t));
+  if (!newnode)
+    return;
+  newnode->left = NULL;
+  newnode->right = NULL;
+  newnode->parent = NULL;
+  newnode->num = num;
+
+  if (!(*tree)) {
+    (*tree) = newnode;
     return;
   }
-  parent = *tree;
-  //go to child once to put temp2 pointer on parent to put pointers later
-  if (num < temp->num) {
-    if (temp->left)
-      temp = temp->left;
-    else//remember where must go
-      way = LEFT;
-  }
-  //go to child once to put temp2 pointer on parent to put pointers later
-  else if (num > temp->num) {
-    if (temp->right)
-      temp = temp->right;
-    else
-      way = RIGHT;
-  }
 
-  while (way == NONE && temp && temp->num != num) {
-    parent = temp;
-
-    if (num < temp->num) {
-
-      if (temp->left) {
-        parent = temp;
-        temp = temp->left;
-      }
-      else {//remember where must go
-        way = LEFT;
+  while (ptr) {
+    if (num < ptr->num) {
+      if (ptr->left)
+        ptr = ptr->left;
+      else
         break;
-      }
     }
 
-    else if (num > temp->num){
-
-      if (temp->right) {
-        parent = temp;
-        temp = temp->right;
-      }
-      else {
-        way = RIGHT;
+    else if (num > ptr->num) {
+      if (ptr->right)
+        ptr = ptr->right;
+      else
         break;
-      }
     }
 
-  }
-  
-  //vertex exists, do nothing
-  if (temp && temp->num == num)
-    return;
-
-  //temp is empty, create node
-  if (way == LEFT) {
-    temp->left = (tree_t*)malloc(sizeof(tree_t));
-    if (!temp->left)
+    else {//such node exists
+      free(newnode);
       return;
-    temp = temp->left;
-  }
-  else if (way == RIGHT) {
-    temp->right = (tree_t*)malloc(sizeof(tree_t));
-    if (!temp->right)
-      return;
-    temp = temp->right;
+    }
   }
 
-  temp->num = num;
-  temp->left = NULL;
-  temp->parent = parent;
-  temp->right = NULL;
+  //put new node
+  if (num < ptr->num)
+    ptr->left = newnode;
+  else
+    ptr->right = newnode;
+
+  newnode->parent = ptr;
 }
 
 tree_t* NodeFind(tree_t* tree, int num) {
@@ -121,56 +83,100 @@ void NodeRemove(tree_t** tree, tree_t* vertex) {
   if (!vertex)
     return;
   int temp;
-  tree_t* max=vertex, *parent; //go to left child of vertex and then to right 
+  tree_t* max=vertex, *parent, *child; //go to left child of vertex and then to right 
   way_t parentway;
 
-  //change numbers of removing vertex and max
-  if (max->left)
-    max = max->left;
-
-  while (max->right)
-    max = max->right;
-
-  temp = max->num;
-  max->num = vertex->num;
-  vertex->num = temp;
-  
-  //now we should remove 'max'. He can have 1 child on the left.
-  if (max->left == NULL && max->right == NULL) {
-
-    if (max == (*tree)) {
-      free(max);
+  //no childs, free the element
+  if (vertex->left == NULL && vertex->right == NULL) {
+    if ((vertex == (*tree))) {
+      free(vertex);
       (*tree) = NULL;
       return;
     }
 
-    parent = max->parent;
-
-    parentway = (parent->left == max) ? LEFT : RIGHT;
+    parent = vertex->parent;
+    parentway = parent->left == vertex ? LEFT : RIGHT;
 
     if (parentway == LEFT)
       parent->left = NULL;
-    else //parentway==RIGHT
+    else
       parent->right = NULL;
 
-    free(max);
+    free(vertex);
+    return;
   }
 
-  else { //has one child on the left
 
+  //has one child, put child instead of itself
+  if ((vertex->left != NULL && vertex->right == NULL) || (vertex->left == NULL && vertex->right != NULL)) {
+
+    if (vertex == (*tree)) { //no parent
+      if (vertex->left)
+        (*tree) = vertex->left;
+      else
+        (*tree) = vertex->right;
+      (*tree)->parent = NULL;
+      free(vertex);
+      return;
+    }
+
+    parent = vertex->parent;
+    parentway = parent->left == vertex ? LEFT : RIGHT;
+
+    if (vertex->left) //only left child
+      child = vertex->left;
+    else //only right child
+      child = vertex->right;
+
+    child->parent = vertex->parent;
+
+    if (parentway == LEFT)
+      parent->left = child;
+    else
+      parent->right = child;
+
+    free(vertex);
+    return;
+  }
+
+  //node has two childs
+  max = max->right;
+
+  while (max->left)
+    max = max->left;
+
+  temp = max->num;
+  max->num = vertex->num;
+  vertex->num = temp;
+
+  //no need to delete max
+
+  //max can have one child on the right
+  if (max->right) {
+    child= max->right;
     parent = max->parent;
-    parentway = (parent->left == max) ? LEFT : RIGHT;
+    parentway = parent->left == max ? LEFT : RIGHT;
 
-    if (parentway == LEFT) {
-      parent->left = max->left;
-      max->left->parent = parent;
-    }
-    else { //parentway == RIGHT
-      parent->right = max->left;
-      max->left->parent = parent;
-    }
-    free(max);
+    if (parentway == LEFT)
+      parent->left = child;
+    else
+      parent->right = child;
+    
+    child->parent = parent;
   }
+
+  //max has no childs
+  else {
+    parent = max->parent;
+    parentway = parent->left == max ? LEFT : RIGHT;
+
+    if (parentway == LEFT)
+      parent->left = NULL;
+    else
+      parent->right = NULL;
+  }
+  free(max);
+  return;
 }
 
 void DestroyTree(tree_t* tree) {
@@ -178,6 +184,17 @@ void DestroyTree(tree_t* tree) {
     DestroyTree(tree->left);
     DestroyTree(tree->right);
     free(tree);
+  }
+}
+
+void PrintTree(tree_t* tree, int level) {
+  if (tree) {
+    int i;
+    PrintTree(tree->left, level + 1);
+    for (i = 0; i < level; i++)
+      printf("    ");
+    printf("%i\n", tree->num);
+    PrintTree(tree->right, level + 1);
   }
 }
 
@@ -212,7 +229,8 @@ int main(void) {
     num = 0;
     comand = fgetc(stdin); //get '\n' from stdin
   }
-
+  //PrintTree(tree, 1);
   DestroyTree(tree);
+
   return 0;
 }

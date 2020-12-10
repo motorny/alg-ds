@@ -9,11 +9,38 @@
 typedef struct node
 {
   struct node* left, * right, * parent;
-  int key,subTreeWidth;
+  int key, subTreeWidth, subTreeSize;
   char data[200];
 }NODE;
 
 NODE* firstNode = NULL;
+
+int SearchNodeKLowerLeft(NODE* start, int delta)
+{
+  if (!delta)
+    return start->key;
+
+  if (delta > start->subTreeSize || start->left == NULL)
+    return 0;
+
+  return (SearchNodeKLowerLeft(start->left, delta - 1));
+}
+
+int FindNodeKLower(NODE* start, int delta)
+{
+  int key;
+
+  if (start->left && start->subTreeSize >= delta && (key = SearchNodeKLowerLeft(start->left, delta - 1)))
+    return key;
+
+  if (!start->parent)
+    return 0;
+
+  if (start->parent->left == start)
+    return  FindNodeKLower(start->parent, delta + 1);
+  else
+    return FindNodeKLower(start->parent, delta - 1);
+}
 
 void ChangeWidthParents(NODE* start, int value)
 {
@@ -21,6 +48,16 @@ void ChangeWidthParents(NODE* start, int value)
   while (tmp)
   {
     tmp->subTreeWidth += value;
+    tmp = tmp->parent;
+  }
+}
+
+void ChangeSubTreeSizeOfParents(NODE* start, int value)
+{
+  NODE* tmp = start;
+  while (tmp)
+  {
+    tmp->subTreeSize += value;
     tmp = tmp->parent;
   }
 }
@@ -82,7 +119,9 @@ int AddNode(int key, const char* data)
   (*tmp)->left = NULL;
   (*tmp)->right = NULL;
   (*tmp)->subTreeWidth = 0;
+  (*tmp)->subTreeSize = 0;
   strcpy((*tmp)->data, data);
+  ChangeSubTreeSizeOfParents((*tmp)->parent, 1);
   ChangeWidthParents((*tmp)->parent, width);
   return 0;
 }
@@ -111,19 +150,27 @@ void DeleteNode(int key)
   if (!(*tmp))
     return;
 
-  ChangeWidthParents((*tmp)->left->parent, 0-  strlen((*tmp)->left->data));
   ChangeWidthParents((*tmp)->parent, 0 - strlen((*tmp)->data));
+  ChangeSubTreeSizeOfParents((*tmp)->parent, -1);
 
   if ((*tmp)->left == NULL)
   {
+    if ((*tmp)->right)
+      (*tmp)->right->parent = *tmp;
     *tmp = (*tmp)->right;
     return;
   }
   else if ((*tmp)->right == NULL)
   {
+    if ((*tmp)->left)
+      (*tmp)->left->parent = *tmp;
     *tmp = (*tmp)->left;
     return;
   }
+
+  ChangeWidthParents((*tmp)->left->parent, 0 - (strlen((*tmp)->left->data) + (*tmp)->left->subTreeWidth));
+  ChangeSubTreeSizeOfParents((*tmp)->parent, -(1 + (*tmp)->subTreeSize));
+
 
   newNode = SearchPlaceToAddNode((*tmp)->left->key, &(*tmp)->right);
   if (!newNode)
@@ -134,7 +181,9 @@ void DeleteNode(int key)
   *newNode = (*tmp)->left;
   (*newNode)->parent = buf;
 
-  ChangeWidthParents((*newNode)->parent,strlen((*newNode)->data));
+  ChangeWidthParents((*newNode)->parent, strlen((*newNode)->data));
+  ChangeSubTreeSizeOfParents((*newNode)->parent, 1);
+
   (*tmp)->right->parent = (*tmp)->parent;
   buf = (*tmp)->right;
   free(*tmp);
@@ -145,7 +194,7 @@ void PrintTree(NODE* start)
 {
   if (!start)
     return;
-  printf("%s\nwidth:%d  subtree width:%d\n",start->data,strlen(start->data),start->subTreeWidth);
+  printf("%s\nwidth:%d  subtree width:%d\n", start->data, strlen(start->data), start->subTreeWidth);
   if (start->left)
     PrintTree(start->left);
   if (start->right)
@@ -185,6 +234,6 @@ int main()
     if (c == '\n')
       c = getchar();
   }
-  
+
   system("pause");
 }

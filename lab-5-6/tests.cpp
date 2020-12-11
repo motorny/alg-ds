@@ -37,7 +37,7 @@ TEST(CheckOrderliness, OneElement)
     	setOrder(tree, &number);
 	EXPECT_EQ(tree->orderAscending, 1)
 
-	treeDestroy(tree);
+	destroyTree(tree);
 }
 
 TEST(CheckOrderliness, GroupOfElements)
@@ -62,7 +62,7 @@ TEST(CheckOrderliness, GroupOfElements)
 	EXPECT_EQ(tmp->orderAscending, 7);
 	EXPECT_EQ(tree->orderAscending, 6);
 
-	treeDestroy(tree);
+	destroyTree(tree);
 }
 
 TEST(CheckGetNumOfLeavesBelow, OneElement)
@@ -74,7 +74,7 @@ TEST(CheckGetNumOfLeavesBelow, OneElement)
 
 	EXPECT_EQ(tree->numOfLeavesBelow, 0);
 
-	treeDestroy(tree);
+	destroyTree(tree);
 }
 
 TEST(CheckGetNumOfLeavesBelow, GroupOfElements)
@@ -99,5 +99,5 @@ TEST(CheckGetNumOfLeavesBelow, GroupOfElements)
 	EXPECT_EQ(tree->numOfLeavesBelow, 6);
 	EXPECT_EQ(tmp->numOfLeavesBelow, 0);
 
-	treeDestroy(tree);
+	destroyTree(tree);
 }

@@ -4,7 +4,7 @@ extern "C"
 #include"tree.h"
 }
 
-TEST(CheckInsert, CorrectInsert)
+TEST(CheckInsert, IncorrectInsert)
 {
 	Node *tree = NULL
 	insert(&tree, 5);
@@ -18,12 +18,10 @@ TEST(CheckInsert, CorrectInsert)
 
 TEST(CheckFound, ViolationMemory)
 {
-	Node *tree = NULL, *tmp = NULL;
+	Node *tree = NULL;
 	EXPECT_TRUE(!getNodeByValue(tree, 5));
 	insert(&tree, 5);
-	tmp = getNodeByValue(tree, 5);
-	EXPECT_TRUE(tmp);
-	EXPECT_EQ(tmp->data, 5);
+	EXPECT_TRUE(getNodeByValue(tree, 5));
 	deleteValue(root, 5);
 	EXPECT_TRUE(!getNodeByValue(tree, 5));
 

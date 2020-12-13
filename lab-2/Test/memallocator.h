@@ -12,6 +12,12 @@ extern "C" {
 
 #pragma warning (disable:4996)
 
+#define ERROR_INIT 1
+#define ERROR_MEMORY_LEAK 2
+#define NOT_ERRORS 0
+
+#define CHECK_NUM 516  
+
 // Init memory system with memory block pMemory.
 int meminit(void* pMemory, int size);
 

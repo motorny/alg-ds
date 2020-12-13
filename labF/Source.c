@@ -14,9 +14,12 @@ int main(void) {
 	printf("Enter section that should be intered\n");
 	scanf("%d %d", &leftBorder, &rightBorder);
 	interMass = FindInterSegm(root, leftBorder, rightBorder);
-	PrintSectMass(interMass);
-	free(interMass);
-	
+	if (interMass != NO_MEMORY) {
+		PrintSectMass(interMass);
+		free(interMass);
+	}
+	else
+		printf("Not enough memory");
 	DestroyTree(&root);
 	
 	return 0;

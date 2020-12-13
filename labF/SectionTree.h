@@ -1,6 +1,8 @@
 #include<stdbool.h>
 
 #pragma once
+#define NO_MEMORY -1
+
 typedef struct NODE {
 	int leftBorder;
 	int rightBorder;
@@ -9,7 +11,7 @@ typedef struct NODE {
 	struct NODE* right;
 }NODE;
 
-void InsertInTree(NODE** root, int leftBorder, int rightBorder);
+int InsertInTree(NODE** root, int leftBorder, int rightBorder);
 static NODE* GetMinLeftBorderNode(NODE* root);
 static NODE* GetMaxLeftBorderNode(NODE* root);
 static void RemoveNodeByPtr(NODE* target, NODE* root);

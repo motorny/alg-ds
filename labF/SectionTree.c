@@ -5,12 +5,16 @@
 #include"SectionTree.h"
 #include<stdbool.h>
 
+
 #define FROM_PARENT 1
 #define FROM_LEFT_CHILD 2
 #define FROM_RIGHT_CHILD 3
 
+
 static NODE* CreateNode(int leftBorder, int rightBorder, NODE* parent) {
 	NODE* node = (NODE*)malloc(sizeof(NODE));
+	if (node == NULL)
+		return NULL;
 	node->leftBorder = leftBorder;
 	node->rightBorder = rightBorder;
 	node->left = NULL;
@@ -20,12 +24,14 @@ static NODE* CreateNode(int leftBorder, int rightBorder, NODE* parent) {
 }
 
 //Organization by leftBorder
-void InsertInTree(NODE** root, int leftBorder, int rightBorder) {
+int InsertInTree(NODE** root, int leftBorder, int rightBorder) {
 	NODE* temp = NULL;
 	if (leftBorder > rightBorder)
 		return;
 	if (*root == NULL) {
 		*root = CreateNode(leftBorder, rightBorder, NULL);
+		if (*root == NULL)
+			return NO_MEMORY;
 		return;
 	}
 	temp = *root;
@@ -37,6 +43,8 @@ void InsertInTree(NODE** root, int leftBorder, int rightBorder) {
 			}
 			else {
 				temp->right = CreateNode(leftBorder, rightBorder, temp);
+				if (temp->right == NULL)
+					return NO_MEMORY;
 				return;
 			}
 		}
@@ -47,6 +55,8 @@ void InsertInTree(NODE** root, int leftBorder, int rightBorder) {
 			}
 			else {
 				temp->left = CreateNode(leftBorder, rightBorder, temp);
+				if (temp->left== NULL)
+					return NO_MEMORY;
 				return;
 			}
 		}
@@ -167,7 +177,10 @@ void ConsoleTree(NODE** root) {
 	while (c != EOF) {
 		scanf("%d %d", &leftBorder, &rightBorder);
 		if (c == 'a') {
-			InsertInTree(root, leftBorder, rightBorder);
+			if (InsertInTree(root, leftBorder, rightBorder) == NO_MEMORY) {
+				printf("Not enough memory");
+				return;
+			}
 		}
 		else if (c == 'r') {
 			RemoveNodeByData(*root, leftBorder, rightBorder);
@@ -255,7 +268,9 @@ NODE** FindInterSegm(NODE* root, int leftBorder, int rightBorder) {
 		switch (way) {
 		case FROM_PARENT:
 			if (CheckForCrossing(leftBorder, rightBorder, current->leftBorder, current->rightBorder)) {
-				interSegm = (NODE**)realloc(interSegm, sizeof(NODE*) * (interSegm_C+1));
+				interSegm = (NODE**)realloc(interSegm, sizeof(NODE*) * (interSegm_C + 1));
+				if (interSegm == NULL)
+					return NO_MEMORY;
 				interSegm[interSegm_C] = current;
 				interSegm_C++;
 			}
@@ -274,10 +289,12 @@ NODE** FindInterSegm(NODE* root, int leftBorder, int rightBorder) {
 			GoToParrent(&way, &current);
 			break;
 		}
-		
+
 	}
 
-	interSegm = (NODE**)realloc(interSegm, sizeof(NODE*) * (interSegm_C+1));
+	interSegm = (NODE**)realloc(interSegm, sizeof(NODE*) * (interSegm_C + 1));
+	if (interSegm == NULL)
+		return NO_MEMORY;
 	interSegm[interSegm_C] = NULL;
 	return interSegm;
 }

@@ -152,13 +152,15 @@ int BFS(graph_t* graph, FILE* fp) {
 			while (l != NULL) {
 				if (l->ptr->isVisited == 0) {
 					//I think it's impossible to predict the size of the queue, so realloc
-					if(qEnd == qSize/sizeof(int) - 1) {
+					if((qEnd > qSize/sizeof(int) - 1) && (qEnd % (int)qSize/sizeof(int) - 1 == 0)) {
 						qSize = 2 * qSize;
 						temp = (int*)realloc(queue, qSize);
 						if (temp != NULL)
 							queue = temp;
-						else
+						else {
+							free(queue)
 							return -1;
+						}
 					}
 					queue[qEnd] = l->ptr->data;
 					qEnd++;

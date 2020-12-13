@@ -1,129 +1,82 @@
 #include "pch.h"
-#include "../LabBMalloc.2/memallocator.c"
+#include "..\LabEF\LabE.c"
 
-TEST(memInit, NULLpointer_Minus1)
+TEST(add, addingToEmptyTree)
 {
-	char* a = NULL;
-	ASSERT_EQ(-1, meminit(a, 100));
-	memdone();
+	TREE* node = NULL;
+	add(&node, 10);
+	ASSERT_EQ(10, node->key);
+	ASSERT_EQ(NULL, node->left);
+	ASSERT_EQ(NULL, node->right);
+	destroyTree(node);
 }
 
-TEST(memInit, NULLsize_Minus1)
+TEST(add, addingToLeftNode)
 {
-	char a[100];
-	ASSERT_EQ(-1, meminit(a, 0));
-	memdone();
+	TREE* node = NULL;
+	add(&node, 5);
+	add(&node, 4);
+	ASSERT_EQ(5, node->key);
+	ASSERT_EQ(4, node->left->key);
+	ASSERT_EQ(NULL, node->right);
+	destroyTree(node);
 }
 
-TEST(memInit, validArguments_1)
+TEST(add, addingToRightNode)
 {
-	char a[100];
-	ASSERT_EQ(1, meminit(a, 100));
-	memdone();
+	TREE* node = NULL;
+	add(&node, 5);
+	add(&node, 6);
+	ASSERT_EQ(5, node->key);
+	ASSERT_EQ(6, node->right->key);
+	ASSERT_EQ(NULL, node->left);
+	destroyTree(node);
 }
 
-TEST(memInit, sizeLessMin_Minus1)
+TREE* createTree()
 {
-	char a[10];
-	ASSERT_EQ(-1, meminit(a, 10));
-	memdone();
+	TREE* node = NULL;
+	add(&node, 5);
+	add(&node, 6);
+	add(&node, 4);
+	add(&node, 2);
+	add(&node, 1);
+	add(&node, 10);
+
+	return node;
 }
 
-TEST(memInit, reinitialization_Minus1)
+TEST(find, elemIsInTheTree)
 {
-	char a[20];
-	char b[20];
-	meminit(a, 20);
-	ASSERT_EQ(-1, meminit(b, 20));
-	memdone();
+	TREE* node = createTree();
+	ASSERT_EQ(1, findByValue(node, 4));
+	ASSERT_EQ(1, findByValue(node, 10));
+	destroyTree(node);
 }
 
-TEST(memalloc, NULLMinusBytes_NULL)
+TEST(find, elemIsNotInTheTree)
 {
-	char a[100];
-	meminit(a, 100);
-	ASSERT_EQ(NULL, memalloc(0));
-	ASSERT_EQ(NULL, memalloc(-1));
-	memdone();
+	TREE* node = createTree();
+	ASSERT_EQ(0, findByValue(node, 9));
+	ASSERT_EQ(0, findByValue(node, 11));
+	destroyTree(node);
 }
 
-TEST(memalloc, PositiveBytes_ValidPointer)
+TEST(del, delElemIsInTheTree)
 {
-	char a[100];
-	char* b, * c;
-	meminit(a, 100);
-	b = (char*)memalloc(20);
-	c = (char*)memalloc(20);
-
-	ASSERT_EQ(&a[8], b);
-	ASSERT_EQ(&a[40], c);
-	memdone();
+	TREE* node = createTree();
+	del(&node, 4);
+	ASSERT_EQ(0, findByValue(node, 4));
+	destroyTree(node);
 }
 
-TEST(memalloc, notEnoughMemory_NULL)
+TEST(countLeaf, subTreeCountLeaf)
 {
-	char a[20];
-	char* b;
-	meminit(a, 20);
-	b = (char*)memalloc(40);
-
-	ASSERT_EQ(NULL, b);
-	memdone();
-}
-
-TEST(memfree, freeFirstAndMallocSecond_Memory)
-{
-	char a[25];
-	char* p1, * p2;
-	meminit(a, 25);
-	p1 = (char*)memalloc(1);
-	memfree(p1);
-	p2 = (char*)memalloc(1);
-	ASSERT_EQ(&a[8], p2);
-	memdone();
-}
-
-TEST(memfree, mergeBlocksRight)
-{
-	char a[100];
-	char* d, * b, * c;
-	meminit(a, 100);
-	b = (char*)memalloc(20);
-	c = (char*)memalloc(20);
-	d = (char*)memalloc(10);
-	memfree(b);
-	memfree(c);
-	ASSERT_EQ(52, *(int*)(a));
-	memdone();
-}
-
-TEST(memfree, mergeBlocksLeft)
-{
-	char a[100];
-	meminit(a, 100);
-	char* d, * b, * c;
-	meminit(a, 100);
-	b = (char*)memalloc(20);
-	c = (char*)memalloc(20);
-	d = (char*)memalloc(10);
-	memfree(c);
-	memfree(b);
-	ASSERT_EQ(52, *(int*)(a));
-	memdone();
-}
-
-TEST(memfree, mergeBlocksTwoSides)
-{
-	char a[100];
-	meminit(a, 100);
-	char* d, * b, * c;
-	meminit(a, 100);
-	b = (char*)memalloc(20);
-	c = (char*)memalloc(20);
-	d = (char*)memalloc(10);
-	memfree(b);
-	memfree(d);
-	memfree(c);
-	ASSERT_EQ(88, *(int*)(a));
-	memdone();
+	TREE* tree = createTree();
+	countLeaf(&tree);
+	ASSERT_EQ(tree->leaf, 5);
+	ASSERT_EQ(tree->left->leaf, 2);
+	ASSERT_EQ(tree->right->leaf, 1);
+	ASSERT_EQ(tree->left->left->leaf, 1);
+	destroyTree(tree);
 }

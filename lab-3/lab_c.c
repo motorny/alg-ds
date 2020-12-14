@@ -6,6 +6,7 @@
 
 #define LAST_VERT -1
 #define MEM_ERROR -2
+#define MEM_CONST 10
 
 //Тип для определения посещенности той или иной вершины
 typedef enum {
@@ -97,11 +98,11 @@ void FindConnections(vertex* vertexes, int knotsC) {
 	char* fNum;
 	char* sNum;
 
-	fNum = (char*)malloc(10 * sizeof(char));
+	fNum = (char*)malloc(MEM_CONST * sizeof(char));
 	if (!fNum) {
 		return;
 	}
-	sNum = (char*)malloc(10 * sizeof(char));
+	sNum = (char*)malloc(MEM_CONST * sizeof(char));
 	if (!sNum) {
 		return;
 	}

@@ -2,13 +2,15 @@
 #include"../library/list.c"
 #include <stdlib.h>
 TEST(AddDataTest,NULL_list_return_error) {
-  EXPECT_EQ(AddData(NULL,5), 1);
+    int notnull = !NULL;
+  EXPECT_EQ(AddData(NULL,5), notnull);
 }
 TEST(AddData_Test, NULL_list_return_error1) {
+    int null = NULL;
     DblLinkedList* list = (DblLinkedList*)malloc(sizeof(DblLinkedList));
     list->size = 0;
     list->head = list->tail = NULL;
-    EXPECT_EQ(AddData(list, 5), 0);
+    EXPECT_EQ(AddData(list, 5), null);
 }
 TEST(DeleteList_Test, DeleteList_e) {
     DblLinkedList* list = (DblLinkedList*)malloc(sizeof(DblLinkedList));

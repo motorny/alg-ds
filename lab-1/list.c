@@ -23,7 +23,7 @@ void DeleteList(DblLinkedList* list) {
 int AddData(DblLinkedList* list, int data) {
     Node* tmp = (Node*)malloc(sizeof(Node));
     if (tmp == NULL||list==NULL) {
-        return 1;
+        return !NULL;
     }
     tmp->value = data;
     tmp->next = list->head;
@@ -37,7 +37,7 @@ int AddData(DblLinkedList* list, int data) {
         list->tail = tmp;
     }
     list->size++;
-    return 0;
+    return NULL;
 }
 
 //int popFront(DblLinkedList* list) {

@@ -1,149 +1,220 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 
 
-#define MALLOC_ERROR 1
-#define EMPTY 1;
+typedef struct tree_t { //структура дерева
+	int a;
 
-int** memA(int n, int *e) { // выделение памяти для двумерного массива
+	struct tree_t* left;
+
+	struct tree_t* right;
+
+	int v; //разница высот
+
+}tree;
+
+ 
+tree* memTree(int elem) {  // Выделение памяти для узла
 
 
-	int i;
+	tree* node = (tree*)malloc(sizeof(tree));
 
-	int** A = (int**)malloc(n * sizeof(int*));
-	if (A == NULL) {
-		*e = MALLOC_ERROR;
-		return NULL;
+
+	if (node!=NULL) {
+		node->left = NULL;
+		node->right = NULL;
+
+		node->a = elem;
+		
 	}
 
-	for (i = 0; i < n; i++) {
-		A[i] = (int*)malloc(n * sizeof(int));
-		if (A[i] == NULL) {
-			*e = MALLOC_ERROR;
-			return NULL;
+	return node;
+}
+void freeTree(tree* t) { //Освобождение памяти
+
+
+	if (t!=NULL) {
+		freeTree(t->left);
+		freeTree(t->right);
+
+		free(t);
+	}
+}
+
+
+void print(tree* t, char* dir, int level) {
+	if (t) {
+		printf("lvl %d %s = %d  order = %i\n", level, dir, t->a, t->v);
+		print(t->left, "left", level + 1);
+		print(t->right, "right", level + 1);
+	}
+}
+
+
+tree* Find(tree* t, int el) {
+
+
+	while (t) {
+
+		if (el > t->a) {
+
+			t = t->right;
+			continue;
 		}
-	}
 
+		if (el < t->a) {
 
-	return A;
+			t = t->left;
+			continue;
+		}
 
-}
-
-int* mem(int n, int *e) { // выделение памяти для массива
-
-
-	int i;
-
-	int* A = (int*)malloc(n * sizeof(int*));
-	if (A == NULL) {
-		*e = MALLOC_ERROR;
-		return NULL;
-	}
-	return A;
-}
-
-int push(int* q, int *it, int a) {
-	
-	q[*it] = a;
-	*it = *it + 1;
-
-	return 0;
-	
-}
-
-int pop(int* q, int *it) { // взять 1 элемент из очереди
-
-	int i, a;
-
-	a = q[0];
-
-	for (i = 0; i < *it; i++){
 		
-		q[i] = q[i + 1];
-	}
-	*it = *it - 1;
-
-	return a;
-	
-}
-
-int input(int **A) {
-
-	int a, b,i=0;
-
-	while (!feof(stdin) && 2 == scanf("%d %d %*[ \n]", &a, &b)) {
-
-		//c = fscanf(stdin,"%d%d", &a,&b);
-		//if (c == -1) break;
-
-		A[a][b] = 1;
-		A[b][a] = 1;
-		i++;
-	}
-
-	return i;
-}
-
-int BFS(int** A, int n) {
-
-	int e = 0, i = 0, g, it = 0;
-	int * queue, * B;
-
-	queue = mem(n, &e);
-	B = mem(n, &e);
-
-	printf("%d ", 0);
-	
-	push(queue, &it, 0);
-	B[0] = 1;
-	
-
-	while (it > 0) {
-
-		g = pop(queue, &it);
+			return t;
 		
+	}
+	return NULL;
+}
 
-		for (i = 0; i < n; i++) {
-			if (A[g][i] == 1 && B[i] != 1) {
-				push(queue, &it, i);
-				B[i] = 1;
-				printf("%d ", i);
+
+void Add(tree** t, int el) {
+
+
+	tree* lst = (*t);
+
+
+
+	if ((*t) == NULL) {  // если это корень
+
+		(*t) = memTree(el);
+
+		return;
+	}
+
+
+	
+		if (el > lst->a) {
+	
+			Add(&(lst->right), el);
+			
+		}
+
+		if (el < lst->a) {
+
+			Add(&(lst->left), el);
+		}
+
+
+		if (el == lst->a)
+			return;
+	
+
+}
+
+
+
+
+void Del(tree** t, int el) {
+
+
+	tree* lst = NULL;
+	tree** lst2;
+
+
+	if (t) {
+		while (*t) {
+
+			if (el > (*t)->a) {
+				(t) = &((*t)->right);
 			}
+
+			else if (el < (*t)->a) {
+				(t) = &((*t)->left);
+			}
+
+
+			else {
+
+				lst = (*t);
+
+				if (!(*t)->left && !(*t)->right) // Если нет детей
+					(*t) = NULL;
+
+				else if (!(*t)->left) // Если есть один из детей
+					(*t) = (*t)->right;
+
+				else if (!(*t)->right)
+					(*t) = (*t)->left;
+
+				else {
+
+					lst2 = &(*t)->left;
+
+					while ((*lst2)->right)
+						lst2 = &(*lst2)->right;
+
+
+					(*t)->a = (*lst2)->a;
+					lst = *lst2;
+					(*lst2) = (*lst2)->left;
+				}
+
+				free(lst);
+			}
+
+		}
+	}
+}
+
+
+int hight(tree* t) { // записывает разницу высот поддеревьев
+
+	int l, r, max;
+	
+	if (t == NULL)
+		return 0;
+	
+	l = hight(t->left);
+	r = hight(t->right);
+
+	t->v = l - r;
+
+	max = l > r ? l: r;
+
+
+	return max + 1;
+
+}
+
+
+int main(void) {
+    char  c = 0;
+	int r = -1, i = 0;
+
+
+	tree* tree = NULL;
+	
+	while (!feof(stdin) && 2 == scanf("%c %d %*[ \n]", &c, &r)) {
+		
+		i = 0;
+		if (c== 'a')
+			Add(&tree, r);
+			
+		if (c == 'f') {
+			if (Find(tree, r))
+				printf("yes\n");
+			else
+				printf("no\n");
 		}
 
+
+		if (c =='r') 
+			Del(&tree, r);
+			
+		
+		
 	}
 
-	free(queue);
-	free(B);
-
-	return it;
-
-}
-
-void freeA(int** A,int n) {
-
-	int i;
-
-	for (i = 0; i < n; i++) {
-		free(A[i]);
-	}
-	free(A);
-}
-
-int main() {
-
-	int n,e =0,i=0,j,a,b,g, it=0,c;
-	int** A, *queue,*B;
-
-	scanf("%d", &n);
-	//getc(stdin);
-
-	A = memA(n, &e);
-
-	input(A);
-	BFS(A,n);
-	
-	freeA(A, n);
-
+	freeTree(tree);
 	return 0;
 }

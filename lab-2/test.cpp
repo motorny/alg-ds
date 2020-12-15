@@ -1,47 +1,34 @@
 #include "pch.h"
 
-
-
-
-TEST(queue, push_addInQueue_return0) {
-
-
-	int* q,e;
-	int n = 5;
-	q = mem(n,&e);
-
-    EXPECT_EQ(push(q,0,0), 0);
-
-
-
-}
-
-TEST(queue, pop_removeFromQueue_return3) {
-
-
-	int* q, e;
-	int n = 5;
-	q = mem(n, &e);
-	q[0] = 3;
-
-	EXPECT_EQ(pop(q, 1), 3);
+TEST(Find_ElemNotfound, returnNULL) {
+	tree* tree = NULL;
+	Add(&tree, 1);
+	EXPECT_TRUE(Find(tree, 2) == NULL);
+	freeTree(tree);
 }
 
 
 
-
-	TEST(BFS, BFS_check_return0) {
-
-		int e;
-		A = memA(3,&e);
-		
-		A[0][1] = 1;
-		A[1][2] = 1;
-		A[1][3] = 1;
-		
-
-		EXPECT_EQ(BFS(A,3), 0);
+TEST(Find_Elemfound, returnPointer) {
+	tree* tree = NULL;
+	Add(&tree, 1);
+	EXPECT_TRUE(Find(tree, 1) != NULL);
+	freeTree(tree);
+}
 
 
 
-	}
+TEST(Add_addElem, return1) {
+	tree* tree = NULL;
+	EXPECT_EQ(Add(&tree, 1), 1);
+	freeTree(tree);
+}
+
+
+
+TEST(Add_addSameElem, return0) {
+	tree* tree = NULL;
+	Add(&tree, 1);
+	EXPECT_EQ(Add(&tree, 1), 0);
+	freeTree(tree);
+}

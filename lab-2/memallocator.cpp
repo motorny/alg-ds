@@ -4,6 +4,8 @@
 #define TRUE 1
 #define FALSE 0
 #define NULL 0
+#define KEY 42
+
 typedef unsigned char byte;
 
 typedef struct node_t node_t;
@@ -35,7 +37,7 @@ int meminit(void * pMemory, int size) {
     freeMem->next = NULL;
     freeMem->prev = NULL;
     freeMem->size = size - memgetblocksize();
-    freeMem->Key = 42;
+    freeMem->Key = KEY;
     freeMem->isAvalibale = TRUE;
 
     ((nodeEnd_t *) ((byte *) freeMem + freeMem->size + sizeof(node_t)))->size = freeMem->size;
@@ -61,7 +63,7 @@ void makeDefragmentation(node_t * memoryBlock) {
     node_t * prev = NULL, * next = NULL;
     nodeEnd_t * endPrev = NULL, * endOfBlock = NULL, * endNext = NULL;
 
-    if (memoryBlock == NULL || memoryBlock->Key != 42)
+    if (memoryBlock == NULL || memoryBlock->Key != KEY)
         return;
 
     endOfBlock = (nodeEnd_t *) ((byte *) memoryBlock + sizeof(node_t) + memoryBlock->size);
@@ -74,7 +76,7 @@ void makeDefragmentation(node_t * memoryBlock) {
         prev = (node_t *) ((byte *) endPrev - endPrev->size - sizeof(node_t));
     }
 
-    if (next != NULL && next->Key == 42 && next->isAvalibale) {
+    if (next != NULL && next->Key == KEY && next->isAvalibale) {
         deleteFromList(next);
 
         memoryBlock->size += sizeof(nodeEnd_t) + sizeof(node_t) + next->size;
@@ -82,7 +84,7 @@ void makeDefragmentation(node_t * memoryBlock) {
         next->Key = 0;
         endOfBlock = endNext;
     }
-    if (prev != NULL && prev->Key == 42 && prev->isAvalibale) {
+    if (prev != NULL && prev->Key == KEY && prev->isAvalibale) {
         deleteFromList(memoryBlock);
 
         prev->size += sizeof(nodeEnd_t) + sizeof(node_t) + memoryBlock->size;
@@ -110,7 +112,7 @@ void * memalloc(int size) {
 
                 node_t * newMemBlock = (node_t *) ((byte *) firstEnd + sizeof(nodeEnd_t));
                 newMemBlock->isAvalibale = TRUE;
-                newMemBlock->Key = 42;
+                newMemBlock->Key = KEY;
                 newMemBlock->next = freeMem;
                 newMemBlock->prev = NULL;
                 newMemBlock->size = toFindInList->size - size - sizeof(nodeEnd_t) - sizeof(node_t);
@@ -122,7 +124,7 @@ void * memalloc(int size) {
                 secondEnd->size = newMemBlock->size;
 
                 toFindInList->size = size;
-                toFindInList->Key = 42;
+                toFindInList->Key = KEY;
             } else
                 deleteFromList(toFindInList);
 
@@ -141,7 +143,7 @@ void memfree(void * p) {
     node_t * ptrToDelete;
 
     if (p == NULL || (byte *) p - allocMem < 0 || (byte *) p - allocMem > allocSize ||
-        ((node_t *) ((byte *) p - sizeof(node_t)))->Key != 42)
+        ((node_t *) ((byte *) p - sizeof(node_t)))->Key != KEY)
         return;
 
     ptrToDelete = (node_t *) ((byte *) p - sizeof(node_t));

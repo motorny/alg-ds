@@ -1,93 +1,92 @@
 #include "pch.h"
-#include"../Skip_List/Skip_List.c"
-#include"../Skip_List/Skip_List.h"
+#include"../MallocFree/MallocFree.c"
 
-TEST(CreateTest, TestСomparison)
+
+TEST(meminit, return1) 
 {
-    Node* node = Create(1, 7, 4);
-    ASSERT_TRUE(node != NULL);
-    EXPECT_EQ(7, node->key);
-    EXPECT_EQ(4, node->value);
-}
 
-
-void Init(SkipList* sl, int key, int value, int lvl) {
-    Node* update[2];
-    Node* p, * q;
-    p = sl->header;
-
-if (lvl > sl->level) {
-    for (int i = sl->level + 1; i <= lvl; i++)
-        update[i] = sl->header;
-    sl->level = lvl;
-}
-
-q = Create(lvl, key, value);
-for (int i = 0; i <= lvl; i++) {
-    q->forward[i] = update[i]->forward[i];
-    update[i]->forward[i] = q;
-}
+	EXPECT_EQ(1, meminit(NULL, 1));
 
 }
 
-SkipList* Get(){
-    SkipList* sl = (SkipList*)malloc(sizeof(SkipList));
-    int k = 0;
-    sl->level = 0;
-    sl->header = Create(2, 0, 0);
-    sl->tail = Create(0, 3, 0);
-    for (int i = 0; i <= 2; i++) {
-        sl->header->forward[i] = sl->tail;
-    }
-    for (int i = 1 ; i <= 3 ; i++ ,k++) {
-        Init(sl, i, i, k);
-    }
-    return sl;
-    /*      
-              (3:3)
-         (2:2)(3:3)  
-    (1:1)(2:2)(3:3)
-    */
-}
-
-
-TEST(SearchTest, TestСomparison)
+TEST(meminit, NegativeSizeReturn1)
 {
-    SkipList* sl = Get();
-    ASSERT_EQ(1, Search(sl, 1));
-    ASSERT_EQ(2, Search(sl, 2));
-    ASSERT_EQ(3, Search(sl, 3));
+	void* ptr = malloc(memgetminimumsize() + 1);
 
+	EXPECT_EQ(1, meminit(ptr, -1));
+	
+
+	free(ptr);
 }
 
-TEST(DeleteTest, TestСomparison)
+TEST(meminit, CorrectDataReturn1)
 {
-    SkipList* sl = Get();
-    Delete(sl, 1);
-    ASSERT_NE(1, sl->header->forward[1]->key);
-    EXPECT_EQ(2, sl->header->forward[1]->key);
+	void* ptr = malloc(memgetminimumsize() + 1);
+
+	EXPECT_EQ(1, meminit(ptr, memgetminimumsize() + 1));
+
+	free(ptr);
 }
 
-TEST(DeleteTest, deleteSingleItem_ReturnNULL)
+TEST(memalloc, return0) 
 {
-    SkipList* sl = Get();
-    Delete(sl, 1);
-    Delete(sl, 2);
-    Delete(sl, 3);
-    ASSERT_EQ(NULL, sl);
+	void* ptr = malloc(memgetminimumsize() + 1);
+	meminit(ptr, memgetminimumsize() + 1);
+
+	EXPECT_EQ(0, memalloc(-1));
+
+	free(ptr);
 }
 
-TEST(InsertTest, TestСomparison) 
+TEST(memalloc, returnValidPointer)
 {
-    SkipList* sl =Get();
-    Insert(sl, 4, 4);
-    ASSERT_NE(NULL, sl->header->forward[4]->key);
-    EXPECT_EQ(4, sl->header->forward[4]->key);
-    EXPECT_EQ(4, sl->header->forward[4]->value);
+	void* ptr = malloc(memgetminimumsize() + 1);
+	meminit(ptr, memgetminimumsize() + 1);
+
+	void* p1 = memalloc(1);
+	EXPECT_TRUE(p1 != NULL);
+
+	memfree(p1);
+	free(ptr);
+}
+
+TEST(memalloc, returnNULL)
+{
+	void* ptr = malloc(memgetminimumsize() + 1);
+	meminit(ptr, memgetminimumsize() + 1);
+	void* p1 = memalloc(2);
+	EXPECT_TRUE(p1 == NULL);
+	memfree(p1);
+	free(ptr);
+}
+
+TEST(memfree, freeNULL) 
+{
+    void* p = malloc(memgetminimumsize() + sizeof(int));
+    meminit(p, memgetminimumsize() + sizeof(int));
+    char* s = (char*)memalloc(memgetminimumsize());
+    memfree(s);
+    memdone();
+    free(p);
+}
+
+TEST(memfree, freeNotOurMemory) 
+{
+    char* p = (char*)malloc(memgetminimumsize() + sizeof(int));
+    meminit(p, memgetminimumsize() + sizeof(int));
+    memfree(p + 100);
+    memdone();
+    free(p);
+}
+
+TEST(memfree, freeNotOurAllocatedMemory)
+{
+    char* p = (char*)malloc(10 * memgetminimumsize());
+    meminit(p, 10 * memgetminimumsize());
+    char* s = (char*)memalloc(1);
+    memfree(p + 5 * memgetminimumsize() + sizeof(char));
+    memdone();
+    free(p);
 }
 
 
-
-
-
-    

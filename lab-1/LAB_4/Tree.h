@@ -19,7 +19,7 @@ void UpdateWidth(node_t* start, int value);
 
 node_t** PlaceToAdd(int key, node_t** start);
 
-node_t* Addnode(int key, int data);
+int Addnode(int key, int data);
 
 node_t** FindNode(int key);
 

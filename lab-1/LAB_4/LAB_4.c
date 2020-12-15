@@ -75,7 +75,7 @@ node_t** PlaceToAdd(int key, node_t** start)
     return current;
 }
 
-node_t* Addnode(int key, int data)
+int Addnode(int key, int data)
 {
     int width = WhatWidth(data);
     node_t** current = PlaceToAdd(key, &StartNode.node);
@@ -88,7 +88,7 @@ node_t* Addnode(int key, int data)
     (*current)->left = NULL;
     (*current)->right = NULL;
     UpdateWidth((*current)->parent, width);
-    return StartNode.node;
+    return 0;
 }
 
 node_t** FindNode(int key)

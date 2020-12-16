@@ -6,7 +6,8 @@
 typedef int Tree;
 struct tree {
   Tree value;
-  struct tree* left, * right;
+  struct tree* left;
+  struct tree* right;
 };
 struct tree* GetNewNode(Tree value) {
   struct tree* tmp = (struct tree*)malloc(sizeof(struct tree));

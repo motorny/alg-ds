@@ -1,9 +1,11 @@
 #include"list.h"
+#define OK 1
+#define NO_OK 0
 DblLinkedList* CreateList(void) {
     DblLinkedList* tmp = (DblLinkedList*)malloc(sizeof(DblLinkedList));
     if (tmp == NULL) { 
         printf("Error of memory");
-        return NULL; }
+        return NO_OK; }
     tmp->size = 0;
     tmp->head = tmp->tail = NULL;
 
@@ -26,7 +28,7 @@ void DeleteList(DblLinkedList* list) {
 int AddData(DblLinkedList* list, int data) {
     Node* tmp = (Node*)malloc(sizeof(Node));
     if (tmp == NULL||list==NULL) {
-        return !NULL;
+        return OK;
     }
     tmp->value = data;
     tmp->next = list->head;
@@ -40,7 +42,7 @@ int AddData(DblLinkedList* list, int data) {
         list->tail = tmp;
     }
     list->size++;
-    return NULL;
+    return OK;
 }
 
 //int popFront(DblLinkedList* list) {
@@ -69,7 +71,7 @@ int AddData(DblLinkedList* list, int data) {
 static void pushBack(DblLinkedList* list, int value) {
     Node* tmp = (Node*)malloc(sizeof(Node));
     if (tmp == NULL) {
-        exit(3);
+        return NO_OK;
     }
     tmp->value = value;
     tmp->next = NULL;
@@ -137,7 +139,7 @@ static int deleteNth(DblLinkedList* list, size_t index) {
     int tmp;
     elm = getNth(list, index);
     if (elm == NULL) {
-        return NULL;
+        return OK;
     }
     if (elm->prev) {
         elm->prev->next = elm->next;

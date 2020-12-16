@@ -1,6 +1,9 @@
 #include"list.h"
 DblLinkedList* CreateList(void) {
     DblLinkedList* tmp = (DblLinkedList*)malloc(sizeof(DblLinkedList));
+    if (tmp == NULL) { 
+        printf("Error of memory");
+        return NULL; }
     tmp->size = 0;
     tmp->head = tmp->tail = NULL;
 
@@ -134,7 +137,7 @@ static int deleteNth(DblLinkedList* list, size_t index) {
     int tmp;
     elm = getNth(list, index);
     if (elm == NULL) {
-        exit(5);
+        return NULL;
     }
     if (elm->prev) {
         elm->prev->next = elm->next;

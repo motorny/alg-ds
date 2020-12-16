@@ -1,145 +1,195 @@
 #include "pch.h"
-#include "..//LABC3_2/BFS.c"
+#include "..//LAB_E1/E1.c"
 
-TEST(init_queue, not_null_pointer_valid_size) {
-    queue_t q;
 
-    EXPECT_EQ(init_queue(&q, 1), true);
-    EXPECT_EQ(q.size, 1);
 
-    free(q.data);
+TEST(add, add_something) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 1);
+	tree = add_node(tree, 0);
+	tree = add_node(tree, 3);
+
+	ASSERT_TRUE(tree->data == 1);
+	ASSERT_TRUE(tree->left->data == 0);
+	ASSERT_TRUE(tree->right->data == 3);
+	ASSERT_TRUE(tree->parent == NULL);
+	ASSERT_TRUE(tree->left->parent == tree);
+	ASSERT_TRUE(tree->right->parent == tree);
+	ASSERT_TRUE(tree->left->left == NULL);
+	ASSERT_TRUE(tree->right->left == NULL);
+	ASSERT_TRUE(tree->left->right == NULL);
+	ASSERT_TRUE(tree->right->right == NULL);
+
+	delete_tree(tree);
+}
+TEST(delete, delete_something) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 1);
+	tree = delete_node(tree, 1);
+	ASSERT_TRUE(tree == NULL);
+
+	delete_tree(tree);
+}
+TEST(delete, delete_something_more_harder) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 5);
+	tree = add_node(tree, 4);
+	tree = add_node(tree, 3);
+	tree = delete_node(tree, 4);
+	ASSERT_TRUE(tree->right == NULL);
+	ASSERT_TRUE(tree->left->right == NULL);
+	ASSERT_TRUE(tree->left->parent == tree);
+	ASSERT_TRUE(tree->left->left == NULL);
+	ASSERT_TRUE(tree->left->right == NULL);
+	ASSERT_TRUE(tree->data == 5);
+	ASSERT_TRUE(tree->left->data == 3);
+
+	delete_tree(tree);
+}
+TEST(delete, delete_something_hard_like_prev) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 5);
+	tree = add_node(tree, 4);
+	tree = add_node(tree, 3);
+	tree = delete_node(tree, 3);
+	ASSERT_TRUE(tree->right == NULL);
+	ASSERT_TRUE(tree->left->right == NULL);
+	ASSERT_TRUE(tree->left->parent == tree);
+	ASSERT_TRUE(tree->left->left == NULL);
+	ASSERT_TRUE(tree->left->right == NULL);
+	ASSERT_TRUE(tree->data == 5);
+	ASSERT_TRUE(tree->left->data == 4);
+
+	delete_tree(tree);
 }
 
-TEST(init_queue, not_null_pointer_invalid_size_return_false) {
-    queue_t q;
-
-    EXPECT_NE(init_queue(&q, -1), true);
+TEST(delete, delete_hard) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 3);
+	tree = add_node(tree, 2);
+	tree = add_node(tree, 4);
+	tree = delete_node(tree, 3);
+	ASSERT_TRUE(tree->data == 2);
+	ASSERT_TRUE(tree->right->data == 4);
+	ASSERT_TRUE(tree->left == NULL);
+	ASSERT_TRUE(tree->right->parent == tree);
+	ASSERT_TRUE(tree->parent == NULL);
+	print_tree(tree, 0);
+	delete_tree(tree);
 }
 
-TEST(push_queue, not_null_pointer) {
-    queue_t q;
-    int a = 1;
+TEST(find_node, find_elements) {
+	node_t* tree = NULL;
+	ASSERT_TRUE(find(tree, 3) == FAIL);
+	tree = add_node(tree, 3);
+	tree = add_node(tree, 2);
+	tree = add_node(tree, 4);
+	tree = add_node(tree, 5);
+	tree = add_node(tree, 1);
+	tree = add_node(tree, 0);
+	ASSERT_TRUE(find(tree, 1) == SUCCESS);
+	ASSERT_TRUE(find(tree, 2) == SUCCESS);
+	ASSERT_TRUE(find(tree, 3) == SUCCESS);
+	ASSERT_TRUE(find(tree, 4) == SUCCESS);
+	ASSERT_TRUE(find(tree, 5) == SUCCESS);
+	ASSERT_TRUE(find(tree, 0) == SUCCESS);
+	tree = delete_node(tree, 3);
+	tree = delete_node(tree, 2);
+	tree = delete_node(tree, 4);
+	ASSERT_TRUE(find(tree, 6) == FAIL);
+	tree = delete_node(tree, 5);
+	tree = delete_node(tree, 1);
+	tree = delete_node(tree, 0);
+	ASSERT_TRUE(find(tree, 1) == FAIL);
+	ASSERT_TRUE(find(tree, 2) == FAIL);
+	ASSERT_TRUE(find(tree, 3) == FAIL);
+	ASSERT_TRUE(find(tree, 4) == FAIL);
+	ASSERT_TRUE(find(tree, 5) == FAIL);
+	ASSERT_TRUE(find(tree, 0) == FAIL);
 
-    q.size = 1;
-    q.data = (int*)malloc(q.size * sizeof(int));
-    q.head = 0;
-    q.tail = 0;
-
-    EXPECT_EQ(push_queue(a, &q), true);
-    EXPECT_EQ(q.data[0], a);
-
-    free(q.data);
+	delete_tree(tree);
 }
 
-TEST(push_queue, push_no_init) {
-    queue_t q;
-    int a = 1;
+TEST(fill, fill_first_one) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 1);
+	tree = fill_tree(tree);
+	ASSERT_TRUE(tree->data == 0);
+	ASSERT_TRUE(tree->parent == NULL);
+	ASSERT_TRUE(tree->left == NULL);
+	ASSERT_TRUE(tree->right == NULL);
 
-    EXPECT_NE(push_queue(a, &q), true);
-}
-TEST(push_queue, push_to_full_queue) {
-    queue_t q;
-    int a = 1, b = 2;
-
-    q.size = 1;
-    q.data = (int*)malloc(q.size * sizeof(int));
-    q.head = 0;
-    q.tail = 1;
-    q.data[0] = a;
-
-    EXPECT_NE(push_queue(b, &q), true);
-
-    free(q.data);
+	delete_tree(tree);
 }
 
-TEST(pop_queue, valid_arguments) {
-    queue_t q;
-    int a = 1, b;
+TEST(fill, fill_NULL) {
+	node_t* tree = NULL;
+	tree = fill_tree(tree);
+	ASSERT_TRUE(tree == NULL);
 
-    q.size = 1;
-    q.data = (int*)malloc(q.size * sizeof(int));
-    q.head = 0;
-    q.tail = 1;
-    q.data[0] = a;
-
-    EXPECT_EQ(pop_queue(&q, &b), true);
-    EXPECT_EQ(a, b);
-
-    free(q.data);
-}
-TEST(pop_queue, pop_from_emptyqueue) {
-    queue_t q;
-    int a;
-
-    q.size = 1;
-    q.data = (int*)malloc(q.size * sizeof(int));
-    q.head = 0;
-    q.tail = 0;
-
-    EXPECT_NE(pop_queue(&q, &a), true);
-
-    free(q.data);
+	delete_tree(tree);
 }
 
-TEST(delete_queue, valid_argument) {
-    queue_t q;
+TEST(fill, fill_anything) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 3);
+	tree = add_node(tree, 1);
+	tree = add_node(tree, 2);
+	tree = add_node(tree, 4);
+	tree = add_node(tree, 5);
+	tree = add_node(tree, 7);
+	tree = add_node(tree, 6);
+	tree = add_node(tree, 8);
+	tree = fill_tree(tree);
+	ASSERT_TRUE(tree->data == 2);
+	ASSERT_TRUE(tree->left->data == 1);
+	ASSERT_TRUE(tree->right->data == 3);
+	ASSERT_TRUE(tree->right->right->data == 2);
+	ASSERT_TRUE(tree->right->right->right->data == 0);
+	ASSERT_TRUE(tree->right->right->right->right->data == 0);
+	ASSERT_TRUE(tree->right->right->right->left->data == 0);
 
-    q.size = 1;
-    q.data = (int*)malloc(q.size * sizeof(int));
-    q.head = 0;
-    q.tail = 0;
-
-    EXPECT_EQ(delete_queue(&q), true);
+	delete_tree(tree);
 }
 
-TEST(bfs, valid_argument) {
-    adjacency_list_t  list;
-    int counter;
+TEST(fill, fill_right_trees) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 0);
+	tree = add_node(tree, 1);
+	tree = add_node(tree, 2);
+	tree = add_node(tree, 3);
+	tree = add_node(tree, 4);
+	tree = add_node(tree, 5);
+	tree = fill_tree(tree);
+	ASSERT_TRUE(tree->data == 5);
+	ASSERT_TRUE(tree->right->data == 4);
+	ASSERT_TRUE(tree->right->right->data == 3);
+	ASSERT_TRUE(tree->right->right->right->data == 2);
+	ASSERT_TRUE(tree->right->right->right->right->data == 1);
+	ASSERT_TRUE(tree->right->right->right->right->right->data == 0);
 
-    list.vertices_num = 3;
-    list.vertices = (node_t*)malloc(3 * sizeof(node_t));
-    for (counter = 0; counter < 3; counter++) {
-        list.vertices[counter].was_visited = 0;
-        list.vertices[counter].neighborhoods = (int*)malloc(3 * sizeof(int));
-    }
-    list.vertices[0].num_neighborhoods = 2;
-    list.vertices[0].neighborhoods[0] = 1;
-    list.vertices[0].neighborhoods[1] = 2;
-
-    list.vertices[1].num_neighborhoods = 1;
-    list.vertices[1].neighborhoods[0] = 0;
-
-    list.vertices[2].num_neighborhoods = 1;
-    list.vertices[2].neighborhoods[0] = 0;
-
-
-    EXPECT_EQ(bfs(&list), true);
-
-    for (counter = 0; counter < 3; counter++)
-        free(list.vertices[counter].neighborhoods);
-    free(list.vertices);
+	delete_tree(tree);
 }
 
-TEST(free_adjacency_list, valid_argument) {
-    adjacency_list_t  list;
-    int counter;
+TEST(length, length_zero) {
+	node_t* tree = NULL;
+	int a = length(tree, 0);
+	ASSERT_TRUE(a == 0);
 
-    list.vertices_num = 3;
-    list.vertices = (node_t*)malloc(3 * sizeof(node_t));
-    for (counter = 0; counter < 3; counter++) {
-        list.vertices[counter].was_visited = 0;
-        list.vertices[counter].neighborhoods = (int*)malloc(3 * sizeof(int));
-    }
-    list.vertices[0].num_neighborhoods = 2;
-    list.vertices[0].neighborhoods[0] = 1;
-    list.vertices[0].neighborhoods[1] = 2;
+	delete_tree(tree);
+}
 
-    list.vertices[1].num_neighborhoods = 1;
-    list.vertices[1].neighborhoods[0] = 0;
+TEST(length, length_of_seven) {
+	node_t* tree = NULL;
+	tree = add_node(tree, 4);
+	tree = add_node(tree, 2);
+	tree = add_node(tree, 6);
+	tree = add_node(tree, 1);
+	tree = add_node(tree, 3);
+	tree = add_node(tree, 5);
+	tree = add_node(tree, 7);
+	int a = length(tree, 0);
+	ASSERT_TRUE(a == 3);
 
-    list.vertices[2].num_neighborhoods = 1;
-    list.vertices[2].neighborhoods[0] = 0;
-
-
-    EXPECT_EQ(free_adjacency_list(&list), true);
+	delete_tree(tree);
 }

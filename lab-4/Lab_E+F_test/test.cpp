@@ -11,6 +11,9 @@ TEST(Function_Add, TreeNewElement_elementsInTree) {
   ASSERT_EQ(tree.root->key, key1);
   ASSERT_EQ(tree.root->left->key, key2);
   ASSERT_EQ(tree.root->right->key, key3);
+  free(tree.root->left);
+  free(tree.root->right);
+  free(tree.root);
 }
 
 TEST(Function_Find, findOneElement) {
@@ -28,15 +31,20 @@ TEST(Function_Find, findOneElement) {
 }
 TEST(Function_Delete, DeleteOneElement_elementNotInTree) {
   tree_t tree;
-  node_t node1 = {0, 1, 1, NULL, NULL, NULL};
-  node_t node2 = { 0, 1, 3, NULL, NULL, NULL};
-  node_t node3 = { 0, 3, 2, &node1, &node2, NULL};
-  node1.p = &node3;
-  node2.p = &node3;
-  tree.root = &node3;
+  node_t* node1 = (node_t*)malloc(sizeof(node_t));
+  node_t* node2 = (node_t*)malloc(sizeof(node_t));
+  node_t* node3 = (node_t*)malloc(sizeof(node_t));
+  *node1 = { 0, 1, 1, NULL, NULL, NULL };
+  *node2 = { 0, 1, 3, NULL, NULL, NULL };
+  *node3 = { 0, 3, 2, node1, node2, NULL };
+  node1->p = node3;
+  node2->p = node3;
+  tree.root = node3;
 
   Delete(&tree, 2);
   ASSERT_EQ(tree.root->right, (node_t*)NULL);
+  free(tree.root->left);
+  free(tree.root);
 }
 
 TEST(Function_CountLeaves, Tree_countingLevesInTree) {

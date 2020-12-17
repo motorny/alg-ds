@@ -39,6 +39,7 @@ int main(void) {
       break;
     };
   }
+  ClearTree(&tree);
   return 0;
 }
 

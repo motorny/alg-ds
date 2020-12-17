@@ -2,6 +2,23 @@
 #include <stdlib.h>
 #include "tree.h"
 
+void ClearTree(tree_t* tree) {
+  tree_t rightTree, leftTree;
+  tree->root->data = 0;
+
+  if (tree->root->left != NULL) {
+    leftTree.root = tree->root->left;
+    ClearTree(&leftTree);
+  }
+
+  if (tree->root->right != NULL) {
+    rightTree.root = tree->root->right;
+    ClearTree(&rightTree);
+  }
+
+  free(tree->root);
+}
+
 node_t* CreateNode(int key) {
   node_t* node;
   node = malloc(sizeof(node_t));
@@ -119,6 +136,7 @@ void Delete(tree_t* tree, int key) {
     parent->numOfNode--;
     parent = parent->p;
   }
+  free(node);
 }
 
 void CountLeaves(tree_t* tree) {

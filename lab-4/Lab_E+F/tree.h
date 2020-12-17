@@ -38,6 +38,8 @@ void Print(tree_t* tree);
 
 int FindShiftK(tree_t* tree, int k, int key);
 
+void ClearTree(tree_t* tree);
+
 #ifdef __cplusplus
 }
 #endif

@@ -146,26 +146,20 @@ int DeleteElementFromListByKey(xorList_t* list, char* key) {
   if (strlen(key) >= MAX_STR)
     return FALSE;
 
-  // если 0 элементов
   if (list->first == NULL)
     return FALSE;
-  // если 1 элемент
   else if (list->second == NULL)
     return DeleteElementFrom1ElemListByKey(list, key);
-  // если 2 элемент
   else if (list->first != NULL && list->second != NULL && (list->first->xorAddress == 0 && list->second->xorAddress == 0))
     return DeleteElementFrom2ElemListByKey(list, key);
-  // если 3 и более элемента
   else {
     prev = list->first;
     present = list->second;
     next = (list_t*)((int)prev ^ present->xorAddress);
 
-    // если 3 элемента
     if ((list_t*)((int)present ^ next->xorAddress) == list->first)
       return DeleteElementFrom3ElemListByKey(list, key);
 
-    // если больше 3х элементов
     if (!strcmp(list->first->str, key)) {
       prev = (list_t*)(list->first->xorAddress ^ (int)list->second);
       prev->xorAddress = (prev->xorAddress ^ (int)list->first) ^ (int)list->second;
@@ -229,7 +223,6 @@ static int DeleteElementFrom3ElemListByAddress(xorList_t *list, int address) {
 int DeleteElementFromListByAddress(xorList_t* list, int address) {
   list_t* prev, * present, * next, *afterNext;
 
-  // если у нас 0-2 элементов, то XOR список не сможет образоваться
   if (list->first == NULL || list->second == NULL || (list->first->xorAddress == 0 && list->second->xorAddress == 0))
     return FALSE;
   else {
@@ -237,11 +230,8 @@ int DeleteElementFromListByAddress(xorList_t* list, int address) {
     present = list->second;
     next = (list_t*)((int)prev ^ present->xorAddress);
 
-    // если 3 элемента
     if ((list_t *)((int)present ^ next->xorAddress) == list->first)
       return DeleteElementFrom3ElemListByAddress(list, address);
-
-    // если больше трех
     if (list->first->xorAddress == address) {
       prev = (list_t*)(list->first->xorAddress ^ (int)list->second);
       prev->xorAddress = (prev->xorAddress ^ (int)list->first) ^ (int)list->second;

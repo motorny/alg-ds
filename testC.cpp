@@ -84,7 +84,8 @@ TEST(QuickSortTest, QuickSortTest_Array_ReturnSuccess) {
     int array[3] = { 3, 1, 2 };
     int error;
 
-    QuickSort(array, 3);
+    QuickSort(array, 0, 2);
+
     error = IsNotSorted(array, 3);
 
     EXPECT_EQ(error, SUCCESS);

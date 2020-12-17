@@ -29,7 +29,7 @@ int GetFromQueue(queue_t* q, int* element);
 void DeleteQueue(queue_t* q);
 int Partition(int array[], int size);
 int IsNotSorted(int array[], int size);
-void QuickSort(int array[], int size);
+void QuickSort(int array[], int start, int end);
 int BFS(tree_t* graph, int n, queue_t* q);
 void ReadGraph(tree_t* graph, int n);
 int Function(void);

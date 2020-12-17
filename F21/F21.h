@@ -11,11 +11,6 @@ typedef struct tree_t {
   struct tree_t* father;
 } tree_t;
 
-typedef struct {
-  int data;
-  int flagFilled;
-} cell_t;
-
 void DestroyTree(tree_t* t);
 
 tree_t* AddNode(tree_t* t, int keyNew, int* flagDone);

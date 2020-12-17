@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "labC.h"
 #pragma warning(disable: 4996)
-#pragma once
 
 #define SUCCESS 0
 #define FAILING 1
@@ -67,68 +65,61 @@ void DeleteQueue(queue_t* q) {
 	q->tail = 0;
 }
 
-int Partition(int array[], int size) {
-	int pivot = array[size / 2], i = -1, j = size, t;
-
-	while (1) {
-		do {
-			i++;
-		} while (array[i] < pivot);
-
-		do {
-			j--;
-		} while (array[j] > pivot);
-
-		if (i >= j) {
-			return j;
-		}
-
-		t = array[i];
-		array[i] = array[j];
-		array[j] = t;
-
-	}
-
-}
-
 int IsNotSorted(int array[], int size) {
 	int i;
 	for (i = 1; i < size; i++) {
 		if (array[i] < array[i - 1]) {
-			return 1;
+			return FAILING;
 		}
 	}
 
-	return 0;
+	return SUCCESS;
 }
 
 
-void QuickSort(int array[], int size) {
-	int p = 0, i;
-	int* array1;
-	if (IsNotSorted(array, size)) {
-		p = Partition(array, size);
-
-		array1 = (int*)malloc(sizeof(int) * (size - p));
-
-		for (i = 1; i < (size - p); i++) {
-			array1[i - 1] = array[p + i];
+void QuickSort(int array[], int start, int end) {
+	int pivot;
+	int l_hold = start;
+	int r_hold = end;
+	pivot = array[start];
+	while (start < end) {
+		while ((array[end] >= pivot) && (start < end)) {
+			end--;
 		}
 
-		QuickSort(array, p + 1);
-		QuickSort(array1, size - p - 1);
+		if (start != end) {
+			array[start] = array[end];
+			start++;
+		}
 
-		for (i = 0; i < (size - p - 1); i++) {
-			array[p + i + 1] = array1[i];
+		while ((array[start] <= pivot) && (start < end)) {
+			start++;
+		}
+
+		if (start != end) {
+			array[end] = array[start];
+			end--;
 		}
 	}
+
+	array[start] = pivot;
+	pivot = start;
+	start = l_hold;
+	end = r_hold;
+	if (start < pivot) {
+		QuickSort(array, start, pivot - 1);
+	}
+	if (end > pivot) {
+		QuickSort(array, pivot + 1, end);
+	}
+
 }
 
 int BFS(tree_t* graph, int n, queue_t* q) {
 	int vertex, i;
 	int* nodes;
-	
-	nodes = (int*)malloc(sizeof(int) * n);
+
+	nodes = malloc(sizeof(int) * n);
 
 	for (i = 0; i < n; i++) {
 		nodes[i] = 0;
@@ -165,7 +156,7 @@ void ReadGraph(tree_t* graph, int n) {
 	}
 
 	for (i = 0; i < n; i++) {
-		QuickSort(graph->nodes[i].edges, graph->nodes[i].number);
+		QuickSort(graph->nodes[i].edges, 0, graph->nodes[i].number);
 	}
 }
 
@@ -179,10 +170,10 @@ int Function(void) {
 	scanf("%i", &n);
 
 	CreateQueue(&q, n);
-	graph.nodes = (node_t*)malloc(n * sizeof(node_t));
+	graph.nodes = malloc(n * sizeof(node_t));
 
 	for (i = 0; i < n; i++) {
-		graph.nodes[i].edges = (int*)malloc(n * sizeof(int));
+		graph.nodes[i].edges = malloc(n * sizeof(int));
 	}
 
 	for (i = 0; i < n; i++) {
@@ -206,9 +197,9 @@ int Function(void) {
 	for (i = 0; i < n; i++) {
 		free(graph.nodes[i].edges);
 	}
-	
+
 	free(graph.nodes);
 	DeleteQueue(&q);
-   
-    return 0;
-}      
+
+	return 0;
+}

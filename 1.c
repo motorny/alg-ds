@@ -131,7 +131,6 @@ void Delete(struct tree* tree) {
   }
 }
 void Input(struct tree** tree, char action, int value, int** output, int* sizeOfout) {
-  int* tmp;
   struct tree* buf;
   switch (action){
   case 'a':
@@ -141,13 +140,12 @@ void Input(struct tree** tree, char action, int value, int** output, int* sizeOf
     RemoveByValue(tree, value);
     break;
   case 'f':
-    (*output)[(*sizeOfout) - 1] = FindByValue(*tree, value, &buf);
-    tmp = (int*)realloc((*output), (++(*sizeOfout)) * sizeof(int));
-    if (tmp == NULL) {
-      free(*output);
-      return;
+    if (FindByValue(*tree, value, &buf)) {
+      printf("Y");
     }
-    *output = tmp;
+    else {
+      printf("N");
+    }
     break;
   default:
     break;

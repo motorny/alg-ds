@@ -3,106 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include "BFS.h"
-//#include "queue.h"
+#include "BFS.h"
+#include "queue.h"
 
 
 #define SUCCESS 1
 #define FAIL 0
-
-typedef struct {
-  int* array;
-  int size;
-  int head;
-  int tail;
-} queue_t;
-
-typedef struct {
-  int numOfAdj;
-  int* adjacency;
-} node_t;
-
-typedef struct {
-  int numOfVert;
-  node_t* nodes;
-} adjlist_t;
-
-
-
-int InitialisationOfQueue(queue_t* queue, int size) {
-  queue->array = NULL;
-
-  if (size > 0) {
-    queue->array = (int*)calloc(size, sizeof(int));
-  }
-
-  if (queue->array) {
-    queue->size = size;
-    queue->head = 0;
-    queue->tail = 0;
-
-    return SUCCESS;
-  }
-
-  return FAIL;
-}
-
-int Push(queue_t* queue, int newElem) {
-  if (queue->array != NULL && queue->size > queue->tail) {
-    queue->array[queue->tail++] = newElem;
-
-    return SUCCESS;
-  }
-
-  return FAIL;
-}
-
-int Pop(queue_t* queue, int* oldElem) {
-  if (queue != NULL && queue->head != queue->tail) {
-    *oldElem = queue->array[queue->head++];
-
-    return SUCCESS;
-  }
-
-  return FAIL;
-}
-
-void DeletQueue(queue_t* queue) {
-  free(queue->array);
-
-  queue->array = NULL;
-  queue->size = 0;
-  queue->head = 0;
-  queue->tail = 0;
-}
-
-
-int BFS(adjlist_t* list, queue_t* queue) {
-  int i, curVert;
-  int* visited = (int*)calloc(list->numOfVert, sizeof(int));
-
-  if (list->numOfVert != 0 && list->nodes != NULL && queue->array != NULL && list->numOfVert <= queue->size && visited != NULL) {
-    Push(queue, 0);
-    visited[0] = 1;
-
-    while (Pop(queue, &curVert)) {
-      for (i = 0; i < list->nodes[curVert].numOfAdj; i++) {
-
-        if (!visited[list->nodes[curVert].adjacency[i]]) {
-          Push(queue, list->nodes[curVert].adjacency[i]);
-          visited[list->nodes[curVert].adjacency[i]] = 1;
-        }
-      }
-    }
-
-    free(visited);
-    return SUCCESS;
-  }
-
-  free(visited);
-  return FAIL;
-}
-
 
 
 int main(void) {

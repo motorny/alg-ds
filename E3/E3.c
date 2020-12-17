@@ -29,6 +29,8 @@ tree_t* AddNode(tree_t* t, int keyNew, int* flagDone) {
 
   if (t == NULL) {
     t = (tree_t*)malloc(sizeof(tree_t));
+    if (t == NULL)
+      return NULL;
     t->key = keyNew;
     t->lH = t->rH = 0;
     t->minH = t->maxH = 0;
@@ -171,6 +173,9 @@ void PrintTree(tree_t* t) {
   int m = _countNodes(t);
   cell_t* a = (cell_t*)malloc(sizeof(cell_t) * n * m);
   int x = 0, y = 0;
+
+  if (a == NULL)
+    return;
 
   FillCells(t, a, m, &x, y);
 

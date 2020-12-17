@@ -17,6 +17,8 @@ tree_t* AddNode(tree_t* t, int keyNew, int* flagDone) {
 
   if (t == NULL) {
     t = (tree_t*)malloc(sizeof(tree_t));
+    if (t == NULL)
+      return NULL;
     t->key = keyNew;
     t->subnodesQ = 1;
     t->left = t->right = NULL;

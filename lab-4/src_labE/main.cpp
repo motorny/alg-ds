@@ -7,8 +7,7 @@
 int main(int argc, char **argv) {
     int lenN, res;
     FILE *file;
-//    const char *fName = argv[1];
-    const char *fName = "/home/ikuzin/study/algo_and_struct/alg-ds/lab-4/word'stree";
+    const char *fName = argv[1];
     file = fopen(fName, "r");
     if (file != nullptr) {
         fseek(file, 0, SEEK_END);

@@ -5,6 +5,9 @@
 #include "Queue.h"
 
 #pragma warning (disable:4996)
+#define ERROR -1 
+#define VISITED 1
+#define NOT_VISITED 0
 
 struct vertex
 {
@@ -75,7 +78,7 @@ int main()
 
     appendQueueItem(Q, 0);
     
-    graph->adjLists[0]->visited = 1;
+    graph->adjLists[0]->visited = VISITED;
     printf("%d", graph->adjLists[0]->vertex_id);
 
 //    while (Q->current != NULL) {
@@ -89,14 +92,14 @@ int main()
         {
             if (!graph->adjLists[temp->vertex_id]->visited) {
                 appendQueueItem(Q, temp->vertex_id);
-                graph->adjLists[temp->vertex_id]->visited = 1;
+                graph->adjLists[temp->vertex_id]->visited = VISITED;
                 printf(" %d", temp->vertex_id);
 
             }
 
             //if (!graph->adjLists[vertex_id]->visited) {
             //    appendQueueItem(Q, temp->vertex_id);
-            //    graph->adjLists[temp->vertex_id]->visited = 1;
+            //    graph->adjLists[temp->vertex_id]->visited = VISITED;
             //}
             temp = temp->next;
         }
@@ -116,8 +119,12 @@ int main()
 struct vertex* createVertex(int v)
 {
     struct vertex* newVertex = (struct vertex*) malloc(sizeof(struct vertex));
+    if(!newVertex)
+    {
+        return NULL;
+    }
     newVertex->vertex_id = v;
-    newVertex->visited = 0;
+    newVertex->visited = NOT_VISITED;
     newVertex->next = NULL;
     return newVertex;
 }
@@ -125,6 +132,10 @@ struct vertex* createVertex(int v)
 struct Graph* createGraph(int vertex_count)
 {
     struct Graph* graph = (struct Graph*) malloc(sizeof(struct Graph));
+    if(!graph)
+    {
+        return NULL;
+    }
     graph->vertex_count = vertex_count;
 
     graph->adjLists = malloc(vertex_count * sizeof(struct vertex*));

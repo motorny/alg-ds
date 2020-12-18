@@ -15,6 +15,10 @@ LIST* list;
 LIST* add_block(LIST* parent, int data)
 {
     LIST* NEW = (LIST*)malloc(sizeof(LIST));
+    if(NEW == NULL)
+    {
+        return NULL;
+    }
     NEW->left = NEW->right = NULL;
     NEW->data = data;
     NEW->parent = parent;

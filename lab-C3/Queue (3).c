@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Queue.h"
-
+#define ERROR -1
 
 
 struct queue* initQueue()
 {
 	struct queue* q = malloc(sizeof(struct queue));
+	if(!q)
+   	 {
+       		return NULL;
+   	 }
 	q->count = 0;
 	q->head = NULL;
 	q->current = NULL;
@@ -17,6 +21,10 @@ struct queue* initQueue()
 int appendQueueItem(struct queue* q, int v)
 {
 	struct queueitem* newvertex = (struct queueitem*) malloc(sizeof(struct queueitem));
+	if(!newvertex)
+   	 {
+      		return ERROR;
+  	  }
 	newvertex->vertex = v;
 	newvertex->next = NULL;
 	if (q->head == NULL) {

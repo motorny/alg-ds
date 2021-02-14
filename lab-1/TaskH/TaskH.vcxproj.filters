@@ -13,21 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\Binary search tree">
-      <UniqueIdentifier>{7587e1c2-cda4-49a1-b3fb-5d21a9d459a7}</UniqueIdentifier>
+    <Filter Include="Исходные файлы\Random search tree">
+      <UniqueIdentifier>{9bcd80f1-2ca8-46a4-9385-2dda45e71de5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bst.h">
-      <Filter>Исходные файлы\Binary search tree</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="bst.c">
-      <Filter>Исходные файлы\Binary search tree</Filter>
-    </ClCompile>
     <ClCompile Include="main.c">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="rst.c">
+      <Filter>Исходные файлы\Random search tree</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="rst.h">
+      <Filter>Исходные файлы\Random search tree</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

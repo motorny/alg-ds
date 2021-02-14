@@ -1,10 +1,11 @@
 #include <stdio.h>
-#include "bst.h"
+
+#include "rst.h"
 
 int main(void) {
   char c = ' ';
   int key;
-  tree_t *tree = GetTree();
+  rst_t *tree = GetTree();
 
   while (1) {
     c = getchar();
@@ -19,7 +20,7 @@ int main(void) {
         Delete(tree, key);
         break;
       case 'f':
-        if (Find(tree, key) == BST_NODE_FINDED)
+        if (Find(tree, key) == RST_FIND_NODE_EXIST)
           printf("yes\n");
         else
           printf("no\n");

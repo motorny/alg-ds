@@ -2,18 +2,20 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+const int addSize = 8;
+
 char* readString() {
 	char* str = NULL, * ptr = NULL;
 	int i = 0;
-	int k = 2;
-	str = (char*)malloc(2 * sizeof(char));
+	int countSize = 2;
+	str = (char*)malloc(countSize * sizeof(char));
 	if (!str)
 		return NULL;
 	while ((str[i] = fgetc(stdin)) != EOF) {
 		i++;
-		if (i >= k) {
-			k += 8;
-			ptr = realloc(str, (k) * sizeof(char));
+		if (i >= countSize) {
+			countSize += addSize;
+			ptr = realloc(str, (countSize) * sizeof(char));
 			if (ptr)
 				str = ptr;
 			else

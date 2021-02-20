@@ -5,20 +5,26 @@
 char* readString() {
 	char* str = NULL, * ptr = NULL;
 	int i = 0;
+	int k = 2;
 	str = (char*)malloc(2 * sizeof(char));
 	if (!str)
 		return NULL;
 	while ((str[i] = fgetc(stdin)) != EOF) {
 		i++;
-		ptr = realloc(str, (i + 1) * sizeof(char));
-		if (ptr)
-			str = ptr;
-		else
-			return NULL;
+		if (i >= k) {
+			k += 8;
+			ptr = realloc(str, (k) * sizeof(char));
+			if (ptr)
+				str = ptr;
+			else
+				return NULL;
+		}
+
 	}
 	str[i] = 0;
 	return str;
 }
+
 
 treap* merge(treap* l, treap* r) {
 	if (!l || !r)

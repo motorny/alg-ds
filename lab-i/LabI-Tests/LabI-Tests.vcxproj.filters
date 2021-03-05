@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="test.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="addToTree.c">
+      <Filter>ttTree</Filter>
+    </ClCompile>
+    <ClCompile Include="delete.c">
+      <Filter>ttTree</Filter>
+    </ClCompile>
+    <ClCompile Include="search.c">
+      <Filter>ttTree</Filter>
+    </ClCompile>
+    <ClCompile Include="split.c">
+      <Filter>ttTree</Filter>
+    </ClCompile>
+    <ClCompile Include="union.c">
+      <Filter>ttTree</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="23plus_trees.h">
+      <Filter>ttTree</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ttTree">
+      <UniqueIdentifier>{4863df0b-c22c-45e3-9d9c-9e5812554114}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

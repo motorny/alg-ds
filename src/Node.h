@@ -17,9 +17,9 @@ Node_t *Add(Node_t *, int);
 
 Node_t *Find(Node_t *, int);
 
-Node_t *MaxNodeByKey(Node_t *);
+Node_t *MinNodeByKey(Node_t *);
 
-void Del(Node_t **, int);
+Node_t *Del(Node_t *, int);
 
 void DestroyTree(Node_t *);
 

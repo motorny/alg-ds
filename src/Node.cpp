@@ -31,10 +31,8 @@ Node_t *Add(Node_t *t, int key) {
 
 Node_t *Find(Node_t *t, int key) {
     Node_t *temp = NULL;
-
     if (t == NULL)
         return NULL;
-
     if (t->key == key)
         return t;
     else {
@@ -46,37 +44,34 @@ Node_t *Find(Node_t *t, int key) {
     return temp;
 }
 
-Node_t *MaxNodeByKey(Node_t *t) {
-    while (t->right != NULL)
-        t = t->right;
+Node_t *MinNodeByKey(Node_t *t) {
+    while (t->left != NULL)
+        t = t->left;
     return t;
 }
 
-void Del(Node_t **t, int key) {
-    if ((*t) == NULL)
-        return;
-
-    Node_t *max = NULL;
-
-    if (key < (*t)->key)
-        Del(&((*t)->left), key);
-    else {
-        if (key > (*t)->key)
-            Del(&((*t)->right), key);
-        else {
-            if ((*t)->right == NULL)
-                (*t) = (*t)->left;
-            else {
-                if ((*t)->left == NULL)
-                    (*t) = (*t)->right;
-                else {
-                    max = MaxNodeByKey((*t)->left);
-                    (*t)->key = max->key;
-                    Del(&((*t)->left), max->key);
-                }
-            }
-        }
+Node_t *Del(Node_t *t, int key) {
+    if (t == NULL)
+        return t;
+    if (key < t->key)
+        t->left = Del(t->left, key);
+    else if (key > t->key)
+        t->right = Del(t->right, key);
+    else if (t->left != NULL && t->right != NULL) {
+        t->key = MinNodeByKey(t->right)->key;
+        t->right = Del(t->right, t->key);
+    } else {
+        Node_t *pPtr = t->parent;
+        if (t->left != NULL) {
+            t = t->left;
+            t->parent = pPtr;
+        } else if (t->right != NULL) {
+            t = t->right;
+            t->parent = pPtr;
+        } else
+            t = NULL;
     }
+    return t;
 }
 
 void DestroyTree(Node_t *t) {

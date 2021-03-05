@@ -28,7 +28,7 @@ int ReadAction(FILE *fp, int *key) {
 
 int main() {
     int mode = 0, num = 0;
-    Node_t *tree = NULL;
+    Node_t *treeHead = NULL;
 
     mode = ReadAction(stdin, &num);
     if (mode == 0)
@@ -37,16 +37,16 @@ int main() {
     do {
         switch (mode) {
             case 1:
-                tree = Add(tree, num);
+                treeHead = Add(treeHead, num);
                 break;
             case 2:
-                Del(&tree, num);
+                treeHead = Del(treeHead, num);
                 break;
             case 3: {
-                Node_t *tmp = Find(tree, num);
+                Node_t *tmp = Find(treeHead, num);
                 if (tmp != NULL) {
                     printf("yes\n");
-                    tree = Splay(tree);
+                    treeHead = Splay(tmp);
                 } else
                     printf("no\n");
                 break;
@@ -57,7 +57,7 @@ int main() {
         mode = ReadAction(stdin, &num);
 
     } while (mode != 0);
-
+    DestroyTree(treeHead);
     return 0;
 }
 

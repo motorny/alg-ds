@@ -19,8 +19,8 @@ Node_t* findNode(Node_t* node, int val);
 int getBalance(Node_t* node);
 Node_t* insertNode(Node_t* node, int val);
 Node_t* minNodeValue(Node_t* node);
-Node_t* deleteNode(Node_t* root, int val);
-void printPreOrder(Node_t* root);
+Node_t* deleteNode(Node_t* node, int val);
+void printPreOrder(Node_t* node);
 void freeTree(Node_t* node);
 
 #endif // AVL_H

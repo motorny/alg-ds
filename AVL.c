@@ -6,6 +6,8 @@ int height(Node_t* node) { return node == NULL ? 0 : node->height; }
 
 int max(int a, int b) { return a > b ? a : b; }
 
+int fixHeight(Node_t* node) { return 1 + max(height(node->left), height(node->right)); }
+
 Node_t* newNode(int val) {
     Node_t* node = (Node_t*) malloc(sizeof(Node_t));
     if (node) {
@@ -25,8 +27,8 @@ Node_t* rightRotate(Node_t* y) {
     x->right = y;
     y->left = beta;
 
-    y->height = 1 + max(height(y->left), height(y->right));
-    x->height = 1 + max(height(x->left), height(x->right));
+    y->height = fixHeight(y);
+    x->height = fixHeight(x);
 
     return x;
 }
@@ -38,8 +40,8 @@ Node_t* leftRotate(Node_t* y) {
     x->left = y;
     y->right = beta;
 
-    y->height = 1 + max(height(y->left), height(y->right));
-    x->height = 1 + max(height(x->left), height(x->right));
+    y->height = fixHeight(y);
+    x->height = fixHeight(x);
 
     return x;
 }
@@ -57,6 +59,23 @@ Node_t* findNode(Node_t* node, int val) {
 
 int getBalance(Node_t* node) { return (node == NULL) ? 0 : height(node->left) - height(node->right); }
 
+Node_t* balance(Node_t* node) {
+    node->height = fixHeight(node);
+    int balance = getBalance(node);
+
+    if (balance > 1){
+        if (getBalance(node->left) < 0)
+            node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+    if (balance < -1){
+        if (getBalance(node->right) > 0)
+            node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+    return node;
+}
+
 Node_t* insertNode(Node_t* node, int val) {
     if (node == NULL)
         return newNode(val);
@@ -67,24 +86,7 @@ Node_t* insertNode(Node_t* node, int val) {
         node->right = insertNode(node->right, val);
     else
         return node;
-
-    node->height = 1 + max(height(node->left), height(node->right));
-
-    int balance = getBalance(node);
-
-    if (balance > 1 && val < node->left->value)
-        return rightRotate(node);
-    if (balance < -1 && val > node->right->value)
-        return leftRotate(node);
-    if (balance > 1 && val > node->left->value) {
-        node->left = leftRotate(node->left);
-        return rightRotate(node);
-    }
-    if (balance < -1 && val < node->right->value) {
-        node->right = rightRotate(node->right);
-        return leftRotate(node);
-    }
-    return node;
+    return balance(node);
 }
 
 Node_t* minNodeValue(Node_t* node) {
@@ -94,55 +96,39 @@ Node_t* minNodeValue(Node_t* node) {
     return curr;
 }
 
-Node_t* deleteNode(Node_t* root, int val) {
-    if (root == NULL)
-        return root;
+Node_t* deleteNode(Node_t* node, int val) {
+    if (node == NULL)
+        return node;
 
-    if (val < root->value)
-        root->left = deleteNode(root->left, val);
-    else if (val > root->value)
-        root->right = deleteNode(root->right, val);
+    if (val < node->value)
+        node->left = deleteNode(node->left, val);
+    else if (val > node->value)
+        node->right = deleteNode(node->right, val);
     else {
-        if ((root->left == NULL) || (root->right == NULL)) {
-            Node_t* tmp = root->left ? root->left : root->right;
+        if ((node->left == NULL) || (node->right == NULL)) {
+            Node_t* tmp = node->left ? node->left : node->right;
             if (tmp == NULL) {
-                tmp = root;
-                root = NULL;
+                tmp = node;
+                node = NULL;
             } else
-                *root = *tmp;
+                *node = *tmp;
             free(tmp);
         } else {
-            root->value = minNodeValue(root->right)->value;
-            root->right = deleteNode(root->right, root->value);
+            node->value = minNodeValue(node->right)->value;
+            node->right = deleteNode(node->right, node->value);
         }
     }
-
-    if (root == NULL)
+    if (node == NULL)
         return NULL;
 
-    root->height = 1 + max(height(root->left), height(root->right));
-
-    int balance = getBalance(root);
-    if (balance > 1 && getBalance(root->left) >= 0)
-        return rightRotate(root);
-    if (balance > 1 && getBalance(root->left) < 0) {
-        root->left = leftRotate(root->left);
-        return rightRotate(root);
-    }
-    if (balance < -1 && getBalance(root->right) <= 0)
-        return leftRotate(root);
-    if (balance < -1 && getBalance(root->left) <= 0) {
-        root->right = rightRotate(root->right);
-        return leftRotate(root);
-    }
-    return root;
+    return balance(node);
 }
 
-void printPreOrder(Node_t* root) {
-    if (root != NULL) {
-        printPreOrder(root->left);
-        printf("%d ", root->value);
-        printPreOrder(root->right);
+void printPreOrder(Node_t* node) {
+    if (node != NULL) {
+        printPreOrder(node->left);
+        printf("%d ", node->value);
+        printPreOrder(node->right);
     }
     printf("\n");
 }

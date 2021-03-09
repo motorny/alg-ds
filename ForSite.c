@@ -88,14 +88,6 @@ void FreeTreap(treap* t) {
 	}
 }
 
-void FreeTreap(treap* t) {
-	if (t) {
-		FreeTreap(t->left);
-		FreeTreap(t->right);
-		free(t);
-	}
-}
-
 int main(void) {
 	char command = 1;
 	int key;

@@ -3,10 +3,6 @@
 
 #define BLOCK 8
 
-#include <stdlib.h>
-
-#include "Array.h"
-
 int* append(int* arr, int* size, int value);
 
 int* popleft(int* arr, int* size);

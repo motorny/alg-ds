@@ -38,7 +38,7 @@ TEST_F(ArrayPop, OneElem) {
     ASSERT_EQ(size, 0);
 }
 
-TEST_F(ArrayPop, OneElemOnePop) {
+TEST_F(ArrayPop, TwoElemOnePop) {
     array = insertArray({1, 2});
 
     ASSERT_EQ(array[0], 1);
@@ -50,7 +50,7 @@ TEST_F(ArrayPop, OneElemOnePop) {
     ASSERT_EQ(size, 1);
 }
 
-TEST_F(ArrayPop, TwoElemOnePop) {
+TEST_F(ArrayPop, TwoElemTwoPop) {
     array = insertArray({1, 2});
 
     ASSERT_EQ(array[0], 1);

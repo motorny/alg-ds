@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
 
-// if .h -> linker issues
-
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

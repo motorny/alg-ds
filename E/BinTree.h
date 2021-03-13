@@ -15,6 +15,6 @@ Node_t* insertNode(Node_t* node, int val);
 Node_t* deleteNode(Node_t* node, int val);
 Node_t* findNode(Node_t* node, int val);
 void freeTree(Node_t* node);
-void printPreOrder(Node_t* node);
+void printInOrder(Node_t* node);
 
 #endif // BINTREE_H

@@ -46,19 +46,40 @@ Node_t* insertNode(Node_t* node, int val) {
     return node;
 }
 
-Node_t* deleteNode(Node_t* node, int val) {
-
+Node_t* findMin(Node_t* node) {
+    while (node != NULL && node->left != NULL)
+        node = node->left;
+    return node;
 }
 
-Node_t* findNode(Node_t* node, int val) {
+Node_t* deleteNode(Node_t* node, int val) {
     if (node == NULL)
         return NULL;
 
     if (val > node->val)
-        return findNode(node->right, val);
+        node->right = deleteNode(node->right, val);
     else if (val < node->val)
-        return findNode(node->left, val);
+        node->left = deleteNode(node->left, val);
+    else {
+        if (node->left == NULL || node->right == NULL) {
+            Node_t* tmp = node->right == NULL ? node->left : node->right;
+            free(node);
+            return tmp;
+        }
+        Node_t* tmp = findMin(node->right);
+        node->val = tmp->val;
+        node->right = deleteNode(node->right, tmp->val);
+    }
+    fixLen(node);
     return node;
+}
+
+Node_t* findNode(Node_t* node, int val) {
+    if (node == NULL || node->val == val)
+        return node;
+    else if (val > node->val)
+        return findNode(node->right, val);
+    return findNode(node->left, val);
 }
 
 void freeTree(Node_t* node) {
@@ -69,6 +90,6 @@ void freeTree(Node_t* node) {
     }
 }
 
-void printPreOrder(Node_t* node) {
+void printInOrder(Node_t* node) {
 
 }

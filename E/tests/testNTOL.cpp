@@ -3,7 +3,7 @@
 #include "../BinTree.h"
 
 TEST(NTOL, 0) {
-    ASSERT_EQ(ntol(1), 1);
+    ASSERT_EQ(ntol(0), 1);
 }
 
 TEST(NTOL, 1) {

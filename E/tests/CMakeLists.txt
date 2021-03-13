@@ -4,5 +4,5 @@ include_directories(../../googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(../)
 
-add_executable(tests_E_run main.cpp ../BinTree.c testNTOL.cpp testInsertion.cpp)
+add_executable(tests_E_run main.cpp ../BinTree.c testNTOL.cpp testInsertion.cpp testFixHeight.cpp testFindNode.cpp)
 target_link_libraries(tests_E_run gtest gtest_main)

@@ -5,7 +5,7 @@
 
 int ntol(int number) {
     int len;
-    if (len = (number < 0))
+    if (len = (number <= 0))
         number = ~number + 1;
 
     while (number) {
@@ -21,7 +21,7 @@ Node_t* newNode(Node_t* node, int val) {
     node->left = NULL;
     node->right = NULL;
     node->val = val;
-    node->len = ntol(0);
+    node->len = 0;
     return node;
 }
 
@@ -38,13 +38,11 @@ Node_t* insertNode(Node_t* node, int val) {
     if (node == NULL)
         return newNode(node, val);
 
-    if (val > node->val) {
+    if (val > node->val)
         node->right = insertNode(node->right, val);
-        fixLen(node->right);
-    } else if (val < node->val) {
+    else if (val < node->val)
         node->left = insertNode(node->left, val);
-        fixLen(node->left);
-    }
+    fixLen(node);
     return node;
 }
 
@@ -53,11 +51,22 @@ Node_t* deleteNode(Node_t* node, int val) {
 }
 
 Node_t* findNode(Node_t* node, int val) {
+    if (node == NULL)
+        return NULL;
 
+    if (val > node->val)
+        return findNode(node->right, val);
+    else if (val < node->val)
+        return findNode(node->left, val);
+    return node;
 }
 
 void freeTree(Node_t* node) {
-
+    if (node != NULL) {
+        freeTree(node->left);
+        freeTree(node->right);
+        free(node);
+    }
 }
 
 void printPreOrder(Node_t* node) {

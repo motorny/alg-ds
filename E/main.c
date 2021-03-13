@@ -7,9 +7,9 @@ int main() {
     Node_t* root = NULL;
     int c = getchar(), number;
 
-    while (c != EOF){
+    while (c != EOF) {
         scanf("%d", &number);
-        switch(c){
+        switch (c) {
             case 'a':
                 root = insertNode(root, number);
                 break;
@@ -24,7 +24,7 @@ int main() {
                 return 0;
         }
 
-        if((c = getchar()) == '\n')
+        if ((c = getchar()) == '\n')
             c = getchar();
     }
     freeTree(root);

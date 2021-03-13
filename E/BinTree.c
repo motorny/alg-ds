@@ -90,6 +90,10 @@ void freeTree(Node_t* node) {
     }
 }
 
-void printInOrder(Node_t* node) {
-
+void printInOrder(Node_t* node, int depth) {
+    if (node != NULL) {
+        printInOrder(node->left, depth + 4);
+        printf("%*d\n%*d\n", depth, node->val, depth, node->len);
+        printInOrder(node->right, depth + 4);
+    }
 }

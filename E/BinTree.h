@@ -9,12 +9,19 @@ typedef struct Node {
 } Node_t;
 
 int ntol(int number);
+
 Node_t* newNode(Node_t* node, int val);
+
 void fixLen(Node_t* node);
+
 Node_t* insertNode(Node_t* node, int val);
+
 Node_t* deleteNode(Node_t* node, int val);
+
 Node_t* findNode(Node_t* node, int val);
+
 void freeTree(Node_t* node);
-void printInOrder(Node_t* node);
+
+void printInOrder(Node_t* node, int depth);
 
 #endif // BINTREE_H

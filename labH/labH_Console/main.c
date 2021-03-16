@@ -9,7 +9,7 @@
 #else
 
 #include <stdlib.h>
-#define DumpLeaks() (void*)
+#define DumpLeaks()
 
 #endif // _DEBUG
 

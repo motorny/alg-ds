@@ -3,6 +3,11 @@
 
 #include "BinTree.h"
 
+/* function counts the number of digits in the passed number,
+   the sign counts as a part of the number
+ 
+   return: number of digits in the number
+ */
 int ntol(int number) {
     int len;
     if (len = (number <= 0))
@@ -17,11 +22,12 @@ int ntol(int number) {
 
 Node_t* newNode(Node_t* node, int val) {
     node = (Node_t*) malloc(sizeof(Node_t));
-//    *node = (Node_t) {.left = NULL, .right = NULL, .val = val, .len = ntol(0)};
-    node->left = NULL;
-    node->right = NULL;
-    node->val = val;
-    node->len = 0;
+    if (node != NULL) {
+        node->left = NULL;
+        node->right = NULL;
+        node->val = val;
+        node->len = 0;
+    }
     return node;
 }
 

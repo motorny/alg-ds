@@ -198,6 +198,35 @@ TEST_F(MemAlloc, 4BlockE1B1B) {
     ASSERT_EQ(memBlock.curr, first);
 }
 
+// init for 3 blocks, delete the left one (by hand),
+// place the 4th block instead
+TEST_F(MemAlloc, 4Block1B1BE) {
+    init(BYTE * 3);
+    int size = 1;
+    char* dummy = (char*) memalloc(size), * dummy_1 = (char*) memalloc(size),
+            * dummy_2 = (char*) memalloc(size);
+
+    // checking everything lies as planned
+    ASSERT_NE(memBlock.block->next->next, nullptr);
+    ASSERT_EQ((char*) memBlock.block->next->next + BYTE,
+              (char*) memBlock.begin + memBlock.size);
+
+    // delete the last block
+    Block_t* first = memBlock.block, * middle = first->next, * last = middle->next;
+    middle->next = nullptr;
+    memBlock.curr = (void*)middle;
+
+    // get new partition
+    char* dummy_3 = (char*) memalloc(size);
+
+    // check whether the new block is first
+    ASSERT_EQ((char*) memBlock.block + memBlock.size - size, dummy_3);
+    last = (Block_t*) (dummy_3 - memgetblocksize());
+    ASSERT_EQ(middle->next, last);
+    ASSERT_EQ(last->next, nullptr);
+    ASSERT_EQ(memBlock.curr, last);
+}
+
 // 0, 1, 4, 6, 7, 8, 9 are freed, 2, 3, 5, 10 remains
 // first insertion - 3 bytes (6, 7, 8)
 // second insertion - 2 bytes (0, 1)

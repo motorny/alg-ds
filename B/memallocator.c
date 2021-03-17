@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 
 #include "memallocator.h"
 
@@ -9,7 +10,7 @@ int memgetblocksize() {
 }
 
 int memgetminimumsize() {
-    return memgetblocksize() + 1;
+    return memgetblocksize();
 }
 
 int meminit(void* ptr, int size) {
@@ -24,11 +25,12 @@ int meminit(void* ptr, int size) {
     return MEM_INIT_SUCCESS;
 }
 
-void memdone() {
+void memdone() { // apparently, the testing system doesn't like output :'(
     if (memBlock.block == NULL || memBlock.size - memgetblocksize() == memBlock.block->size)
         printf(NO_LEAK);
     else
         printf(LEAK);
+    memBlock = (memBlock_t){NULL, NULL, 0, NULL};
 }
 
 char* newBlock(void* place, Block_t* before, int size, Block_t* after) {
@@ -36,7 +38,7 @@ char* newBlock(void* place, Block_t* before, int size, Block_t* after) {
     next->size = new_block_size(size);
     next->next = after;
     // block should be the leftmost partition
-    if (memBlock.block > next)
+    if (memBlock.block == NULL || memBlock.block > next)
         memBlock.block = next;
     else
         // if the insert is to the head, ptr points to the head, hence circular pointers
@@ -56,16 +58,9 @@ void* memalloc(int size) {
     if (memBlock.block == NULL) {
         if (memBlock.size - memgetblocksize() < size || size < 0)
             return NULL;
-        Block_t* block = (Block_t*) memBlock.begin;
-        block->next = NULL;
-        block->size = new_block_size(size);
-
-        memBlock.block = block;
-        memBlock.curr = (void*) block;
-
-        return mem_offset(block);
+        return newBlock(memBlock.begin, NULL, size, NULL);
     }
-    Block_t* curr = (Block_t*) memBlock.curr, *ptr = curr;
+    Block_t* curr = (Block_t*) memBlock.curr, * ptr = curr;
 
     do {
         if (ptr->next == NULL) {
@@ -73,15 +68,15 @@ void* memalloc(int size) {
             if (memBlock.size - (block_end(ptr) - (char*) memBlock.begin) < (new_block_size(size))) {
                 // if there is enough space between the beginning of the initialized memory
                 // and the first block, let's fit in
-                if ((char*)memBlock.block - (char*)memBlock.begin >= (new_block_size(size)))
+                if ((char*) memBlock.block - (char*) memBlock.begin >= (new_block_size(size)))
                     return newBlock(memBlock.begin, NULL, size, memBlock.block);
                 else
                     // gosh, have to find the place from the first block
                     ptr = memBlock.block;
             } else
                 return newBlock(block_end(ptr), ptr, size, NULL);
-        // if the ptr became the first block and the first block is curr, ptr has to go through the comparison
-        // before it would be able to enter this branch
+            // if the ptr became the first block and the first block is curr, ptr has to go through the comparison
+            // before it would be able to enter this branch
         } else {
             // if the new block can be fit in-between the beginning of the next one and
             // the end of the current one, let's place it!
@@ -98,22 +93,21 @@ void* memalloc(int size) {
 
 // Free memory previously allocated by memalloc
 void memfree(void* p) {
-    if (memBlock.begin == NULL || memBlock.block == NULL || p == NULL)
+    if (memBlock.begin == NULL || memBlock.block == NULL || p == NULL ||
+        (char*) p - (char*) memBlock.begin < 0 || (char*) p - (char*) memBlock.begin > memBlock.size)
         return;
 
-    Block_t* ptr = memBlock.block, *next = ptr->next;
+    Block_t* ptr = memBlock.block, * next = ptr->next;
 
     // leftmost partition
-    if (p == (void*)mem_offset(ptr)) {
-        if (ptr->next == NULL) {
+    if (p == (void*) mem_offset(ptr)) {
+        if (next == NULL) {
             memBlock.block = NULL;
-            memBlock.size = 0;
-            memBlock.begin = NULL;
             memBlock.curr = NULL;
         } else {
-            memBlock.block = ptr->next;
-            if (memBlock.curr == (void*)mem_offset(ptr))
-                memBlock.curr = ptr->next;
+            memBlock.block = next;
+            if (memBlock.curr == (void*)ptr)
+                memBlock.curr = next;
         }
         return;
     }
@@ -122,7 +116,9 @@ void memfree(void* p) {
     // next cannot be NULL on the first iteration, because in this case,
     // it would mean, that ptr is the leftmost partition, which was the previous step
     while (next != NULL) {
-        if (p == (void*)mem_offset(next)) {
+        if (p == (void*) mem_offset(next)) {
+            if (memBlock.curr == (void*)next)
+                memBlock.curr = ptr;
             ptr->next = next->next;
             return;
         }

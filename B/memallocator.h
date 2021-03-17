@@ -12,9 +12,10 @@ extern "C" {
 #define block_end(block) ((char*)(block) + (block->size))
 #define max(a, b) ((a) > (b) ? a : b)
 #define new_block_size(size) (max((size) + memgetblocksize(), memgetminimumsize()))
+#define BYTE (memgetminimumsize() + 1)
 
 typedef struct Block {
-    int size;
+    int size; // full block size (header + data)
     struct Block* next;
 } Block_t;
 

@@ -44,7 +44,7 @@ TEST_F(MemFree, EmptyInit) {
 }
 
 TEST_F(MemFree, 1Block) {
-    init(memgetminimumsize());
+    init(BYTE);
     char* c = (char*) memalloc(0);
     memfree(c);
 
@@ -56,7 +56,7 @@ TEST_F(MemFree, 1Block) {
 }
 
 TEST_F(MemFree, 2BlockRight) {
-    init(memgetminimumsize() * 2);
+    init(BYTE * 2);
     int size = 1;
     char* d0 = (char*) memalloc(size), * d1 = (char*) memalloc(size);
     memfree(d1);
@@ -67,7 +67,7 @@ TEST_F(MemFree, 2BlockRight) {
 }
 
 TEST_F(MemFree, 2BlockLeft) {
-    init(memgetminimumsize() * 2);
+    init(BYTE * 2);
     int size = 1;
     char* d0 = (char*) memalloc(size), * d1 = (char*) memalloc(size);
     memfree(d0);
@@ -80,7 +80,7 @@ TEST_F(MemFree, 2BlockLeft) {
 }
 
 TEST_F(MemFree, 3BlockMiddle) {
-    init(memgetminimumsize() * 3);
+    init(BYTE * 3);
     int size = 1;
     char* d0 = (char*) memalloc(size), * d1 = (char*) memalloc(size),
             * d2 = (char*) memalloc(size);
@@ -95,7 +95,7 @@ TEST_F(MemFree, 3BlockMiddle) {
 }
 
 TEST_F(MemFree, 3BlockLeft) {
-    init(memgetminimumsize() * 3);
+    init(BYTE * 3);
     int size = 1;
     char* d0 = (char*) memalloc(size), * d1 = (char*) memalloc(size),
             * d2 = (char*) memalloc(size);
@@ -110,7 +110,7 @@ TEST_F(MemFree, 3BlockLeft) {
 }
 
 TEST_F(MemFree, 3BlockRight) {
-    init(memgetminimumsize() * 3);
+    init(BYTE * 3);
     int size = 1;
     char* d0 = (char*) memalloc(size), * d1 = (char*) memalloc(size),
             * d2 = (char*) memalloc(size);

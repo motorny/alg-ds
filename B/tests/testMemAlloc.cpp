@@ -7,6 +7,7 @@ extern memBlock_t memBlock;
 
 #define SMALL memgetblocksize() * 2
 
+
 class MemAlloc : public ::testing::Test {
 private:
     int _size{};
@@ -33,14 +34,14 @@ protected:
 };
 
 TEST_F(MemAlloc, 1Block0Bytes) {
-    init(memgetminimumsize());
+    init(BYTE);
     int size = 0;
     char* dummy = (char*) memalloc(size);
 
     ASSERT_EQ(memBlock.begin, this->c);
 
     ASSERT_EQ((char*) memBlock.block, this->c);
-    ASSERT_EQ(memBlock.block->size, 1 + memgetblocksize());
+    ASSERT_EQ(memBlock.block->size, memgetblocksize());
     ASSERT_EQ(memBlock.block->next, nullptr);
 
     ASSERT_EQ(dummy, (char*) memBlock.begin + memgetblocksize());
@@ -49,7 +50,7 @@ TEST_F(MemAlloc, 1Block0Bytes) {
 }
 
 TEST_F(MemAlloc, 1BlockNegMemory) {
-    init(memgetminimumsize());
+    init(BYTE);
     int size = -1;
     char* dummy = (char*) memalloc(size);
 
@@ -57,7 +58,7 @@ TEST_F(MemAlloc, 1BlockNegMemory) {
 }
 
 TEST_F(MemAlloc, 1Block1Byte) {
-    init(memgetminimumsize());
+    init(BYTE);
     int size = 1;
     char* dummy = (char*) memalloc(size);
 
@@ -74,7 +75,7 @@ TEST_F(MemAlloc, 1Block1Byte) {
 }
 
 TEST_F(MemAlloc, 1BlockSMALLBytes) {
-    init(memgetminimumsize());
+    init(BYTE);
     int size = SMALL;
     char* dummy = (char*) memalloc(size);
 
@@ -93,7 +94,7 @@ TEST_F(MemAlloc, 1BlockNotEnoughInitMem) {
 }
 
 TEST_F(MemAlloc, 2Block1Bytes) {
-    init(memgetminimumsize() * 2);
+    init(BYTE * 2);
     int size = 1;
     char* dummy = (char*) memalloc(size);
     *dummy = 'a';
@@ -116,7 +117,7 @@ TEST_F(MemAlloc, 2Block1Bytes) {
 
 // 1B = 1Byte, NE = Not Enough memory in the init for allocation
 TEST_F(MemAlloc, 3Block1B1BNE) {
-    init(memgetminimumsize() * 2 + memgetminimumsize() / 2);
+    init(BYTE * 2 + BYTE / 2);
     int size = 1;
     char* dummy = (char*) memalloc(size), * dummy_1 = (char*) memalloc(size),
             * dummy_2 = (char*) memalloc(size);
@@ -137,14 +138,14 @@ TEST_F(MemAlloc, 3Block1B1BNE) {
 // init for 3 blocks, delete in the middle (by hand),
 // place the 4th block in between
 TEST_F(MemAlloc, 4Block1BE1B) {
-    init(memgetminimumsize() * 3);
+    init(BYTE * 3);
     int size = 1;
     char* dummy = (char*) memalloc(size), * dummy_1 = (char*) memalloc(size),
             * dummy_2 = (char*) memalloc(size);
 
     // checking everything lies as planned
     ASSERT_NE(memBlock.block->next->next, nullptr);
-    ASSERT_EQ((char*) memBlock.block->next->next + memgetminimumsize(),
+    ASSERT_EQ((char*) memBlock.block->next->next + BYTE,
               (char*) memBlock.begin + memBlock.size);
 
     // delete the middle block
@@ -168,14 +169,14 @@ TEST_F(MemAlloc, 4Block1BE1B) {
 // init for 3 blocks, delete the left one (by hand),
 // place the 4th block instead
 TEST_F(MemAlloc, 4BlockE1B1B) {
-    init(memgetminimumsize() * 3);
+    init(BYTE * 3);
     int size = 1;
     char* dummy = (char*) memalloc(size), * dummy_1 = (char*) memalloc(size),
             * dummy_2 = (char*) memalloc(size);
 
     // checking everything lies as planned
     ASSERT_NE(memBlock.block->next->next, nullptr);
-    ASSERT_EQ((char*) memBlock.block->next->next + memgetminimumsize(),
+    ASSERT_EQ((char*) memBlock.block->next->next + BYTE,
               (char*) memBlock.begin + memBlock.size);
 
     // delete the first block
@@ -203,7 +204,7 @@ TEST_F(MemAlloc, 4BlockE1B1B) {
 // third insertion - 2 bytes (NULL)
 // forth insertion - 1 byte (4)
 TEST_F(MemAlloc, 11BlockEE1B1BE1BEEEE1B) {
-    init(memgetminimumsize() * 11);
+    init(BYTE * 11);
     int size = 1;
     char* d0 = (char*) memalloc(size), * d1 = (char*) memalloc(size),
             * d2 = (char*) memalloc(size), * d3 = (char*) memalloc(size),
@@ -229,7 +230,7 @@ TEST_F(MemAlloc, 11BlockEE1B1BE1BEEEE1B) {
     b8 = nullptr;
     b9 = nullptr;
 
-    char* b_3 = (char*) memalloc(memgetminimumsize() * 2);
+    char* b_3 = (char*) memalloc(BYTE * 2);
     ASSERT_NE(b5->next, b10);
     Block_t* blockB_3 = b5->next;
     // -2 is since the memory was occupied by 17*4, now 16+17*2, the diff 17+1
@@ -237,14 +238,14 @@ TEST_F(MemAlloc, 11BlockEE1B1BE1BEEEE1B) {
     ASSERT_EQ((char*) blockB_3 + blockB_3->size, (char*) b10 - memgetblocksize() - 2);
     ASSERT_EQ(memBlock.curr, (void*) blockB_3);
 
-    char* b_2 = (char*) memalloc(memgetminimumsize());
+    char* b_2 = (char*) memalloc(BYTE);
     ASSERT_EQ((void*) memBlock.block, memBlock.begin);
     Block_t* blockB_2 = memBlock.block;
     ASSERT_EQ(blockB_2->next, b2);
     ASSERT_EQ(memBlock.curr, (void*) blockB_2);
     ASSERT_EQ((char*) blockB_2 + blockB_2->size, (char*) b2 - 1);
 
-    char* b_2_1 = (char*) memalloc(memgetminimumsize());
+    char* b_2_1 = (char*) memalloc(BYTE);
     ASSERT_EQ(b_2_1, nullptr);
     ASSERT_EQ(memBlock.curr, (void*)blockB_2);
 

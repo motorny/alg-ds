@@ -12,7 +12,7 @@ TEST(MemInit, NULLPtr) {
 }
 
 TEST(MemInit, NotEnoughSize) {
-    int size = sizeof(Block_t);
+    int size = sizeof(Block_t) - 1;
     char dummy[size];
     ASSERT_EQ(meminit(dummy, size), SMALL_MEM_ALLOC);
 }

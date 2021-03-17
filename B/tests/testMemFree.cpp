@@ -48,9 +48,9 @@ TEST_F(MemFree, 1Block) {
     char* c = (char*) memalloc(0);
     memfree(c);
 
-    ASSERT_EQ(memBlock.begin, nullptr);
+    ASSERT_NE(memBlock.begin, nullptr);
     ASSERT_EQ(memBlock.block, nullptr);
-    ASSERT_EQ(memBlock.size, 0);
+    ASSERT_NE(memBlock.size, 0);
     ASSERT_EQ(memBlock.curr, nullptr);
     _checkMemory = true;
 }
@@ -86,7 +86,7 @@ TEST_F(MemFree, 3BlockMiddle) {
             * d2 = (char*) memalloc(size);
     memfree(d1);
 
-    ASSERT_EQ((char*)memBlock.block, (char*)memBlock.begin);
+    ASSERT_EQ((char*) memBlock.block, (char*) memBlock.begin);
     ASSERT_EQ((char*) memBlock.block, d0 - memgetblocksize());
     Block_t* b0 = memBlock.block;
     ASSERT_EQ((char*) b0->next, d2 - memgetblocksize());
@@ -101,7 +101,7 @@ TEST_F(MemFree, 3BlockLeft) {
             * d2 = (char*) memalloc(size);
     memfree(d0);
 
-    ASSERT_NE((char*)memBlock.block, (char*)memBlock.begin);
+    ASSERT_NE((char*) memBlock.block, (char*) memBlock.begin);
     ASSERT_EQ((char*) memBlock.block, d1 - memgetblocksize());
     Block_t* b1 = memBlock.block;
     ASSERT_EQ((char*) b1->next, d2 - memgetblocksize());
@@ -116,10 +116,27 @@ TEST_F(MemFree, 3BlockRight) {
             * d2 = (char*) memalloc(size);
     memfree(d2);
 
-    ASSERT_EQ((char*)memBlock.block, (char*)memBlock.begin);
+    ASSERT_EQ((char*) memBlock.block, (char*) memBlock.begin);
     ASSERT_EQ((char*) memBlock.block, d0 - memgetblocksize());
     Block_t* b0 = memBlock.block;
     ASSERT_EQ((char*) b0->next, d1 - memgetblocksize());
     Block_t* b1 = b0->next;
     ASSERT_EQ(b1->next, nullptr);
+}
+
+TEST_F(MemFree, 3BlockMiddleInMiddle) {
+    init(BYTE * 3);
+    int size = 1;
+    char* d0 = (char*) memalloc(size), * d1 = (char*) memalloc(size),
+            * d2 = (char*) memalloc(size);
+    memfree((char*)memBlock.block->next + memgetblocksize() / 2);
+
+    ASSERT_EQ((char*) memBlock.block, (char*) memBlock.begin);
+    ASSERT_EQ((char*) memBlock.block, d0 - memgetblocksize());
+    Block_t* b0 = memBlock.block;
+    ASSERT_EQ((char*) b0->next, d1 - memgetblocksize());
+    Block_t* b1 = b0->next;
+    ASSERT_EQ((char*) b1->next, d2 - memgetblocksize());
+    Block_t* b2 = b1->next;
+    ASSERT_EQ(b2->next, nullptr);
 }

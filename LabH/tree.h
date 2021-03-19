@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define FOUND_ELEMENT 1
-#define NO_ELEMENT 0
-
 typedef struct splaytree_t {
 	struct splaytree_t* left;
 	struct splaytree_t* right;

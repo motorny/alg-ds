@@ -1,34 +1,30 @@
 #include "pch.h"
 
-TEST(Find_ElemNotfound, returnNULL) {
-	tree* tree = NULL;
-	Add(&tree, 1);
-	EXPECT_TRUE(Find(tree, 2) == NULL);
-	freeTree(tree);
+
+TEST(Btree, ins_returnInsertIt) {
+
+	int key = 1;
+	node* newnode;
+	node root;
+	int upKey;
+	KeyStatus value;
+	value = ins(root, key, &upKey, &newnode);
+	EXPECT_EQ(value, InsertIt);
 }
 
-
-
-TEST(Find_Elemfound, returnPointer) {
-	tree* tree = NULL;
-	Add(&tree, 1);
-	EXPECT_TRUE(Find(tree, 1) != NULL);
-	freeTree(tree);
+TEST(Btree, searchPos_return0) {
+	int pos, i, n, key=1;
+	node ptr;
+	n = ptr->n;
+	pos = searchPos(key, ptr.keys, n);
+	EXPECT_EQ(pos, 0);
+	
 }
 
-
-
-TEST(Add_addElem, return1) {
-	tree* tree = NULL;
-	EXPECT_EQ(Add(&tree, 1), 1);
-	freeTree(tree);
-}
-
-
-
-TEST(Add_addSameElem, return0) {
-	tree* tree = NULL;
-	Add(&tree, 1);
-	EXPECT_EQ(Add(&tree, 1), 0);
-	freeTree(tree);
+TEST(Btree, del_returnSearchFailure) {
+	node root;
+	node* uproot;
+	KeyStatus value;
+	value = del(root, key);
+	EXPECT_EQ(value, SearchFailure);
 }

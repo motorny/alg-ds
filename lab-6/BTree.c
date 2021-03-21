@@ -1,6 +1,6 @@
 #include "BTree.h"
 
-BNode * CreateNode(int BTreeDegree)
+static BNode * CreateNode(int BTreeDegree)
 {
   BNode *tmp = malloc(sizeof(BNode));
   tmp->n = 0;
@@ -8,6 +8,35 @@ BNode * CreateNode(int BTreeDegree)
   tmp->child = malloc(sizeof(BNode *) * (BTreeDegree));
   return tmp;
 }
+
+int BTreeSearch(BTree Tree, int Key)
+{
+  int pos, n;
+  BNode* ptr = Tree.root;
+  while (ptr)
+  {
+    n = ptr->n;
+    pos = GetPosition(Key, ptr->keys, n);
+    if (pos < n && Key == ptr->keys[pos])
+      return 1;
+    ptr = ptr->child[pos];
+  }
+  return 0;
+}
+
+void BTreeDisplay(BNode* ptr) {
+  if (ptr) {
+    int i;
+    for (i = 0; i < ptr->n; i++)
+    {
+      printf("%d(", ptr->keys[i]);
+      if (ptr->child[i])
+        BTreeDisplay(ptr->child[i]);
+      printf("),");
+    }
+  }
+}
+
 // return key position between elements if exists Overwise return n
 int GetPosition(int key, int* key_arr, int n) 
 {
@@ -15,6 +44,22 @@ int GetPosition(int key, int* key_arr, int n)
   for (pos = 0; pos < n && key > key_arr[pos]; pos++)
     ;
   return pos;
+}
+
+void BTreeClearInternal(BNode* Node)
+{
+  int i = 0;
+  if (!Node)
+    return;
+  for (i = 0; i <= Node->n && Node->child[i] != 0; i++)
+    BTreeClearInternal(Node->child[i]);
+  free(Node);
+}
+
+void BTreeClear(BTree* Tree)
+{
+  BTreeClearInternal(Tree->root);
+  Tree->root = NULL;
 }
 
 // return -1 if we must insert in root, 0 if dublicate and 1 if sucess
@@ -45,7 +90,7 @@ int BTreeInsertInternal(BNode* Ptr, int Key, int* SplitKey, BNode** SplitNode, i
   // 2) if we found between our child, it is duplicate. So return falure
   pos = GetPosition(Key, Ptr->keys, Ptr->n);
   if (pos < Ptr->n && Key == Ptr->keys[pos])
-    return 0;
+    return FALSE;
 
   // 3) try to insert in our child. If success - return from recursion
   value = BTreeInsertInternal(Ptr->child[pos], Key, &newKey, &newPtr, M);
@@ -71,7 +116,7 @@ int BTreeInsertInternal(BNode* Ptr, int Key, int* SplitKey, BNode** SplitNode, i
     Ptr->keys[pos] = newKey;
     Ptr->child[pos + 1] = newPtr;
     Ptr->n++;
-    return 1;
+    return TRUE;
   }
 
   // 4.2) if we have just right amount - add it and split
@@ -107,9 +152,11 @@ int BTreeInsertInternal(BNode* Ptr, int Key, int* SplitKey, BNode** SplitNode, i
   return -1;
 }
 
-void BTreeInsert(BTree* Tree, int Key) {
+int BTreeInsert(BTree* Tree, int Key) {
   BNode* tmp;
   int tmpKey;
+  if (!Tree)
+    return FALSE;
   int rez = BTreeInsertInternal(Tree->root, Key, &tmpKey, &tmp, Tree->M);
   if (rez == -1) // we must add element here
   {
@@ -119,35 +166,9 @@ void BTreeInsert(BTree* Tree, int Key) {
     Tree->root->keys[0] = tmpKey;
     Tree->root->child[0] = tmproot;
     Tree->root->child[1] = tmp;
+    rez = TRUE;
   }
-}
-
-int BTreeSearch(BTree* Tree, int Key)
-{
-  int pos, n;
-  BNode* ptr = Tree->root;
-  while (ptr) 
-  {
-    n = ptr->n;
-    pos = GetPosition(Key, ptr->keys, n);
-    if (pos < n && Key == ptr->keys[pos])
-      return 1;
-    ptr = ptr->child[pos];
-  }
-  return 0;
-}
-
-void BTreeDisplay(BNode* ptr) {
-  if (ptr) {
-    int i;
-    for (i = 0; i < ptr->n; i++)
-    {
-      printf("%d(", ptr->keys[i]);
-      if (ptr->child[i])
-        BTreeDisplay(ptr->child[i]);
-      printf("),");
-    }
-  }
+  return rez;
 }
 
 int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot) 
@@ -158,7 +179,7 @@ int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot)
 
   // if key not found
   if (Ptr == NULL)
-    return 0;
+    return FALSE;
 
   // Minimum number of keys in this node
   min = (M - 1) / 2;
@@ -170,7 +191,7 @@ int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot)
   if (Ptr->child[0] == NULL) 
   {
     if (pos == Ptr->n || Key < Ptr->keys[pos])
-      return 0;
+      return FALSE;
 
     // Shift keys and pointers left
     for (i = pos + 1; i < Ptr->n; i++)
@@ -179,11 +200,12 @@ int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot)
       Ptr->child[i] = Ptr->child[i + 1];
     }
     // and just decrement our value
-    return --Ptr->n >= min ? 1 : -1;
+    return --Ptr->n >= min ? TRUE : -1;
   }
 
   // if found key but p is not a leaf - swap it this most right child element. It is still should be valid
-  if (pos < Ptr->n && Key == Ptr->keys[pos]) {
+  if (pos < Ptr->n && Key == Ptr->keys[pos]) 
+  {
     BNode* qp = Ptr->child[pos], *qp1;
     int nkey;
     while (TRUE) 
@@ -203,7 +225,8 @@ int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot)
     return value;
 
   // maybe ehough just move some elements? please?
-  if (pos > 0 && Ptr->child[pos - 1]->n > min) {
+  if (pos > 0 && Ptr->child[pos - 1]->n > min) 
+  {
     pivot = pos - 1;
     lptr = Ptr->child[pivot];
     rptr = Ptr->child[pos];
@@ -217,10 +240,11 @@ int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot)
     rptr->keys[0] = Ptr->keys[pivot];
     rptr->child[0] = lptr->child[lptr->n];
     Ptr->keys[pivot] = lptr->keys[--lptr->n];
-    return 1;
+    return TRUE;
   }
 
-  if (pos < Ptr->n && Ptr->child[pos + 1]->n > min) {
+  if (pos < Ptr->n && Ptr->child[pos + 1]->n > min) 
+  {
     pivot = pos;
     lptr = Ptr->child[pivot];
     rptr = Ptr->child[pivot + 1];
@@ -229,12 +253,13 @@ int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot)
     Ptr->keys[pivot] = rptr->keys[0];
     lptr->n++;
     rptr->n--;
-    for (i = 0; i < rptr->n; i++) {
+    for (i = 0; i < rptr->n; i++) 
+    {
       rptr->keys[i] = rptr->keys[i + 1];
       rptr->child[i] = rptr->child[i + 1];
     }
     rptr->child[rptr->n] = rptr->child[rptr->n + 1];
-    return 1;
+    return TRUE;
   }
 
   // We must concatinate... what am I doing with my life...
@@ -261,18 +286,20 @@ int BTreeDeleteInternal(BNode* Ptr, int Key, int M, int IsRoot)
     Ptr->keys[i - 1] = Ptr->keys[i];
     Ptr->child[i] = Ptr->child[i + 1];
   }
-  return --Ptr->n >= min ? 1 : -1;
+  return --Ptr->n >= min ? TRUE : -1;
 }
 
 int BTreeDelete(BTree* Tree, int Key) {
   BNode* tmp;
+  if (!Tree)
+    return 0;
   int rez = BTreeDeleteInternal(Tree->root, Key, Tree->M, TRUE);
   if (rez == -1)
   {
     tmp = Tree->root;
     Tree->root = Tree->root->child[0];
     free(tmp);
-    rez = 1;
+    rez = TRUE;
   }
   return rez;
 }

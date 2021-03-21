@@ -22,7 +22,8 @@ typedef struct
   BNode *root;   // Array of pointers to children.  
 } BTree;
 
-void BTreeInsert(BTree* Tree, int Key);
-int BTreeSearch(BTree* Tree, int Key);
+int BTreeSearch(BTree Tree, int Key);
 void BTreeDisplay(BNode* ptr);
+void BTreeClear(BTree* Tree);
+int BTreeInsert(BTree* Tree, int Key);
 int BTreeDelete(BTree* Tree, int Key);

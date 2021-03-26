@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -140,10 +140,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DataStructureConsole.c" />
+    <ClCompile Include="DataStructureLibWrapper.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DataStructureConsole.h" />
+    <ClInclude Include="DataStructureLibWrapper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\B_Tree\B_Tree.vcxproj">
+      <Project>{e335c257-c8fc-46dc-88d3-ae6488f32a46}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

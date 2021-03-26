@@ -14,7 +14,7 @@
 #endif // _DEBUG
 
 #include "DataStructureConsole.h"
-#include /*DataStructure Header*/
+#include "DataStructureLibWrapper.h"
 #include <stdio.h>
 
 #pragma warning(disable:4996)
@@ -22,7 +22,7 @@
 int main(void)
 {
   int r;
-  SetDataStructure(/*Get, Free, Find, Add, Remove*/);
+  SetDataStructure(WrapperGet, WrapperFree, WrapperFind, WrapperAdd, WrapperRemove);
   r = StartConsole();
   DumpLeaks();
   return r;

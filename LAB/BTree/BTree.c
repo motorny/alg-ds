@@ -164,53 +164,63 @@ static void BTNodeInsertSplitedKey(BTNode_t* node, keyItem_t keyItem, int index,
 
 static int BTNodeAdd(BTNode_t* parentNode, int parentIndex, BTNode_t* node, int t, int key, int value)
 {
-  int index;
-  if (node->count == 2 * t - 1)
+  int r = 0;
+  while (r == 0)
   {
-    keyItem_t mid = node->keyItems[t - 1];
-    BTNode_t* newNode;
-    if (mid.key == key)
+    int index;
+    if (node->count == 2 * t - 1)
     {
-      return -1;
+      keyItem_t mid = node->keyItems[t - 1];
+      BTNode_t* newNode;
+      if (mid.key == key)
+      {
+        r = -1;
+        continue;
+      }
+      newNode = BTNodeGet(t);
+      if (!newNode)
+      {
+        r = -2;
+        continue;
+      }
+      BTNodeInsertSplitedKey(parentNode, mid, parentIndex, node, newNode);
+      memcpy(newNode->keyItems, node->keyItems + t, t * sizeof(keyItem_t));
+      newNode->count = t - 1;
+      node->count = t - 1;
+      if (key > mid.key)
+      {
+        node = newNode;
+      }
     }
-    newNode = BTNodeGet(t);
-    if (!newNode)
-    {
-      return -2;
-    }
-    BTNodeInsertSplitedKey(parentNode, mid, parentIndex, node, newNode);
-    memcpy(newNode->keyItems, node->keyItems + t, t * sizeof(keyItem_t));
-    newNode->count = t - 1;
-    node->count = t - 1;
-    if (key > mid.key)
-    {
-      node = newNode;
-    }
-  }
-  keyItem_t* keyItems = node->keyItems;
-  int count = node->count;
-  for (index = 0; index < count && keyItems[index].key < key; index++);
+    keyItem_t* keyItems = node->keyItems;
+    int count = node->count;
+    for (index = 0; index < count && keyItems[index].key < key; index++);
 
-  if (index != count && keyItems[index].key == key)
-  {
-    return -1;
-  }
-  else
-  {
-    if (IsLeaf(node))
+    if (index != count && keyItems[index].key == key)
     {
-      memmove(keyItems + index + 1, keyItems + index, (count + 1 - index) * sizeof(keyItem_t));
-      node->count++;
-      keyItems[index].key = key;
-      keyItems[index].value = value;
-      keyItems[index].L = NULL;
-      return 1;
+      r = -1;
+      continue;
     }
     else
     {
-      return BTNodeAdd(node, index, keyItems[index].L, t, key, value);
+      if (IsLeaf(node))
+      {
+        memmove(keyItems + index + 1, keyItems + index, (count + 1 - index) * sizeof(keyItem_t));
+        node->count++;
+        keyItems[index].key = key;
+        keyItems[index].value = value;
+        keyItems[index].L = NULL;
+        r = 1;
+        continue;
+      }
+      else
+      {
+        parentNode = node; parentIndex = index; node = keyItems[index].L;
+        continue;
+      }
     }
   }
+  return r;
 }
 
 int BTreeAdd(BTree_t* tree, int key, int value)
@@ -334,72 +344,83 @@ static BTNode_t* BTNodeComplete(BTNode_t* parentNode, int parentIndex, BTNode_t*
 }
 static int BTNodeRemove(BTNode_t* node, int t, int key, int* value)
 {
-  int index;
-  keyItem_t* keyItems = node->keyItems;
-  int count = node->count;
-  for (index = 0; index < count && keyItems[index].key < key; index++);
-  if (index != count && keyItems[index].key == key)
+  int r = 0;
+  while (r == 0)
   {
-    if (value) *value = keyItems[index].value;
-    if (IsLeaf(node))
+    int index;
+    keyItem_t* keyItems = node->keyItems;
+    int count = node->count;
+    for (index = 0; index < count && keyItems[index].key < key; index++);
+    if (index != count && keyItems[index].key == key)
     {
-      memmove(keyItems + index, keyItems + index + 1, (count - index) * sizeof(keyItem_t));
-      node->count--;
-      return 1;
-    }
-    else
-    {
-      BTNode_t* L = keyItems[index].L;
-      BTNode_t* R = keyItems[index + 1].L;
-      if (L->count > t - 1)
+      if (value) *value = keyItems[index].value;
+      if (IsLeaf(node))
       {
-        BTNode_t* maxNode = L;
-        int maxKey;
-        while (!IsLeaf(maxNode))
-        {
-          maxNode = maxNode->keyItems[maxNode->count].L;
-        }
-        maxKey = maxNode->keyItems[maxNode->count - 1].key;
-        keyItems[index].key = maxKey;
-        keyItems[index].value = maxNode->keyItems[maxNode->count - 1].value;
-        return BTNodeRemove(L, t, maxKey, NULL);
-      }
-      else if (R->count > t - 1)
-      {
-        BTNode_t* minNode = R;
-        int minKey;
-        while (!IsLeaf(minNode))
-        {
-          minNode = minNode->keyItems[0].L;
-        }
-        minKey = minNode->keyItems[0].key;
-        keyItems[index].key = minKey;
-        keyItems[index].value = minNode->keyItems[0].value;
-        return BTNodeRemove(R, t, minKey, NULL);
+        memmove(keyItems + index, keyItems + index + 1, (count - index) * sizeof(keyItem_t));
+        node->count--;
+        r = 1;
+        continue;
       }
       else
       {
-        L = BTNodeMerge(node, index, t);
-        return BTNodeRemove(L, t, key, value);
+        BTNode_t* L = keyItems[index].L;
+        BTNode_t* R = keyItems[index + 1].L;
+        if (L->count > t - 1)
+        {
+          BTNode_t* maxNode = L;
+          int maxKey;
+          while (!IsLeaf(maxNode))
+          {
+            maxNode = maxNode->keyItems[maxNode->count].L;
+          }
+          maxKey = maxNode->keyItems[maxNode->count - 1].key;
+          keyItems[index].key = maxKey;
+          keyItems[index].value = maxNode->keyItems[maxNode->count - 1].value;
+          node = L; t; key = maxKey; value = NULL;
+          continue;
+        }
+        else if (R->count > t - 1)
+        {
+          BTNode_t* minNode = R;
+          int minKey;
+          while (!IsLeaf(minNode))
+          {
+            minNode = minNode->keyItems[0].L;
+          }
+          minKey = minNode->keyItems[0].key;
+          keyItems[index].key = minKey;
+          keyItems[index].value = minNode->keyItems[0].value;
+          node = R; key = minKey; value = NULL;
+          continue;
+        }
+        else
+        {
+          L = BTNodeMerge(node, index, t);
+          node = L;
+          continue;
+        }
       }
-    }
-  }
-  else
-  {
-    if (IsLeaf(node))
-    {
-      return -1;
     }
     else
     {
-      BTNode_t* nextNode = keyItems[index].L;
-      if (nextNode->count == t - 1)
+      if (IsLeaf(node))
       {
-        nextNode = BTNodeComplete(node, index, nextNode, t);
+        r = -1;
+        continue;
       }
-      return BTNodeRemove(nextNode, t, key, value);
+      else
+      {
+        BTNode_t* nextNode = keyItems[index].L;
+        if (nextNode->count == t - 1)
+        {
+          nextNode = BTNodeComplete(node, index, nextNode, t);
+        }
+        node = nextNode;
+        continue;
+      }
     }
   }
+  return r;
 }
 
 int BTreeRemove(BTree_t* tree, int key, int* value)

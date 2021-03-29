@@ -5,6 +5,15 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataStructureConsole", "DataStructureConsole\DataStructureConsole.vcxproj", "{01F75A97-291E-4F41-A93D-73F930405AEA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BTree", "BTree\BTree.vcxproj", "{C7112073-34B6-477D-9F50-83D3B02A0352}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnitTests", "UnitTests\UnitTests.vcxproj", "{482EC186-1296-42E4-BDD1-EEA3BB592936}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7958CB25-7E0F-45CD-9EAA-AEB8EE3F1A14}"
+	ProjectSection(SolutionItems) = preProject
+		LAB_I.c = LAB_I.c
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,6 +38,14 @@ Global
 		{C7112073-34B6-477D-9F50-83D3B02A0352}.Release|x64.Build.0 = Release|x64
 		{C7112073-34B6-477D-9F50-83D3B02A0352}.Release|x86.ActiveCfg = Release|Win32
 		{C7112073-34B6-477D-9F50-83D3B02A0352}.Release|x86.Build.0 = Release|Win32
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Debug|x64.ActiveCfg = Debug|x64
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Debug|x64.Build.0 = Debug|x64
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Debug|x86.ActiveCfg = Debug|Win32
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Debug|x86.Build.0 = Debug|Win32
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Release|x64.ActiveCfg = Release|x64
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Release|x64.Build.0 = Release|x64
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Release|x86.ActiveCfg = Release|Win32
+		{482EC186-1296-42E4-BDD1-EEA3BB592936}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

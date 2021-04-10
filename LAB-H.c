@@ -54,6 +54,7 @@ treap *merge(treap *t1, treap *t2){
 
 treap *insertKey(treap *t, treap *k){
     if(t == NULL) return k;
+    if(k == NULL) return t;
     
     treap *t1 = NULL, *t2 = NULL;
     split(t, k->x, &t1, &t2);
@@ -83,7 +84,7 @@ treap *removeKey(treap *t, int x){
 
 treap *creatNode(int k){
     static int priority = 1;
-    treap *t = malloc(sizeof(treap));
+    treap *t = (treap*)malloc(sizeof(treap));
     if (t)
     {
         t->x = k;
@@ -102,6 +103,9 @@ treap *search(treap *t, int k){
 
     return cur;    
 }
+
+
+#ifndef GTEST
 
 int main(void){
     treap *tree = NULL;
@@ -136,3 +140,5 @@ int main(void){
 
     return 0;
 }
+
+#endif // !GTEST

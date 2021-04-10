@@ -12,24 +12,24 @@ typedef struct node
 } node;
 
 node *InitNode(int k, node *c1, node *c2, node *c3, node *p){
-    node *node;
+    node *Node;
 
     if(k < 0) return NULL;
 
-    node = malloc(sizeof(node));
-    if(node != NULL){
-        node->key[0] = k;
-        node->key[1] = -1;
-        node->key[2] = -1;
-        node->size = 1;
-        node->child[0] = c1;
-        node->child[1] = c2;
-        node->child[2] = c3;
-        node->child[3] = NULL;
-        node->parent = p;
+    Node = (node *)malloc(sizeof(node));
+    if(Node != NULL){
+        Node->key[0] = k;
+        Node->key[1] = -1;
+        Node->key[2] = -1;
+        Node->size = 1;
+        Node->child[0] = c1;
+        Node->child[1] = c2;
+        Node->child[2] = c3;
+        Node->child[3] = NULL;
+        Node->parent = p;
     }
     
-    return node;
+    return Node;
 }
 
 static void swap(int *x, int *y) {
@@ -54,19 +54,19 @@ static void sort(node *node) {
     if (node->size == 3) sort3(&(node->key[0]), &(node->key[1]), &(node->key[2]));
 }
 
-bool find(node *node, int k) {
+static bool find(node *node, int k) {
     for (int i = 0; i < node->size; ++i)
         if (node->key[i] == k) return true;
     return false;
 }
 
-void insertNode(node *node, int k) {
+static void insertNode(node *node, int k) {
     node->key[node->size] = k;
     node->size++;
     sort(node);
 }
 
-void removeNode(node *node, int k) {
+static void removeNode(node *node, int k) {
     if (node->size >= 1 && node->key[0] == k) {
         node->key[0] = node->key[1];
         node->key[1] = node->key[2];
@@ -77,7 +77,7 @@ void removeNode(node *node, int k) {
     }
 }
 
-node *split(node *item) {
+static node *split(node *item) {
     if (item->size < 3) return item;
 
     node *x = InitNode(item->key[0], item->child[0], item->child[1], NULL, item->parent);
@@ -352,6 +352,8 @@ node *search(node *p, int k) {
     else if (k < p->key[0]) return search(p->child[0], k);
     else if ((p->size == 2) && (k < p->key[1]) || (p->size == 1)) return search(p->child[1], k);
     else if (p->size == 2) return search(p->child[2], k);
+
+    return NULL;
 }
 
 node *addElem(node *p, int k) { 
@@ -383,6 +385,8 @@ node *removElem(node *p, int k) {
     removeNode(item, k); // И удаляем требуемый ключ из листа
     return fix(item); // Вызываем функцию для восстановления свойств дерева.
 }
+
+#ifndef GTEST
 
 int main(void){
     node *tree = NULL;
@@ -417,3 +421,5 @@ int main(void){
 
     return 0;
 }
+
+#endif // !GTEST

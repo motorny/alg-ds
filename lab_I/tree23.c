@@ -73,7 +73,7 @@ node* createNode(int key, node* firstSon, node* secondSon, node* thirdSon, node*
 int split(node** tree)
 {
 	if ((*tree)->countKey < 3)
-		return 1;
+		return SUCCESS;
 
 	node* x = createNode((*tree)->key[0], (*tree)->son[0], (*tree)->son[1], NULL, NULL, (*tree)->parent);
 	if (x == NULL)
@@ -142,6 +142,7 @@ int split(node** tree)
 		(*tree)->son[2] = NULL;
 		(*tree)->son[3] = NULL;
 	}
+	return SUCCESS;
 }
 
 int insert(node** tree, int elem)

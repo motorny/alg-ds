@@ -36,50 +36,29 @@ Node_t* insertTerminate(Node_t* root, int val) {
             root->max_child = root->rval;
             return root;
         } else { // two values in node
-            Node_t* v = newNode(val), *X = newNode(root->lval), *Y = newNode(root->rval);
-            if (val <= root->lval) { // v <= X
-                X->left = v;
-                X->right = Y;
-
-                X->max_child = Y->lval;
-
-                v->parent = X;
-                Y->parent = X;
-
-                v->rsib = Y;
-                Y->lsib = v;
-
-                free(root);
-                return X;
-            } else if (val > root->lval && val <= root->rval) { // X < v <= Y
-                v->left = X;
-                v->right = Y;
-
-                v->max_child = Y->lval;
-
-                Y->parent = v;
-                X->parent = v;
-
-                X->rsib = Y;
-                Y->lsib = X;
-                free(root);
-                return v;
-            } else {
-                Y->left = X;
-                Y->right = v;
-
-                Y->max_child = v->lval;
-
-                v->parent = Y;
-                X->parent = Y;
-
-                X->rsib = v;
-                v->lsib = X;
-                free(root);
-                return Y;
+            int root_val = val, left_val = root->lval, right_val = root->rval; // X v Y
+            if (val < root->lval) { // v X Y
+                root_val = root->lval;
+                left_val = val;
+            } else if (val > root->rval) { // X Y v
+                root_val = root->rval;
+                right_val = val;
             }
+            Node_t* v = newNode(root_val), *X = newNode(left_val), *Y = newNode(right_val);
+            v->parent = root->parent;
+            v->left = X;
+            v->right = Y;
+            v->max_child = Y->lval;
+
+            Y->parent = v;
+            X->parent = v;
+
+            X->rsib = Y;
+            Y->lsib = X;
+
+            free(root);
+            return v;
         }
-    }
-    else
+    } else // apparently, not terminal node
         return root;
 }

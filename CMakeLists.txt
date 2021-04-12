@@ -6,8 +6,8 @@ set(CMAKE_C_STANDARD 99)
 enable_testing()
 add_subdirectory(googletest)
 
-# change `LAB` to the actual lab name
-option(build_LAB "Enable building LAB" ON)
-if (build_LAB)
-    add_subdirectory(LAB)
+# change `I` to the actual lab name
+option(build_I "Enable building I" ON)
+if (build_I)
+    add_subdirectory(I)
 endif()

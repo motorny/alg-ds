@@ -1,0 +1,19 @@
+﻿################################################################################
+# Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/ProjectSettings.json
+/.vs/slnx.sqlite
+/.vs/VSWorkspaceState.json
+/lab-1/BTest/BTest.vcxproj
+/lab-1/BTest/packages.config
+/lab-1/BTest/pch.cpp
+/lab-1/BTest/pch.h
+/lab-1/B_tree/B_tree.vcxproj
+/lab-1/B_tree/B_tree.vcxproj.filters
+/lab-1/B_tree/framework.h
+/lab-1/B_tree/pch.cpp
+/lab-1/B_tree/pch.h
+/lab-1/.gitattributes
+/lab-1/.gitignore
+/lab-1/B_tree.sln

@@ -8,7 +8,7 @@ protected:
 
     InsertTerminate() = default;
 
-    ~InsertTerminate() override = default;
+    ~InsertTerminate() override = default; // TODO replace with actual freeing
 
     bool isTerminate(Node_t* node) {
         return node != nullptr && node->left == nullptr && node->middle == nullptr && node->right == nullptr;

@@ -19,6 +19,7 @@ typedef struct Node {
 //Node_t* insert(Node_t* root, int val);
 Node_t* newNode(int val);
 Node_t* insertTerminate(Node_t* root, int val);
+Node_t* insertNode(Node_t* root, int val);
 
 
 #endif //ALG_DS_23TREE_H

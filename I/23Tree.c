@@ -38,7 +38,6 @@ Node_t* insertTerminate(Node_t* root, int val) {
         Node_t* node = newNode(val), * leaf = newNode(val);
         node->left = leaf;
         leaf->parent = node;
-        node->max_child = leaf->lval; // redundant
         return node;
     } else if (isTerminal(root)) {
         if (root->rval == EMPTY && root->rval <= root->lval) { // one value
@@ -193,8 +192,7 @@ Node_t* insertNode(Node_t* root, int val) {
     if (isTerminal(root))
         return insertTerminate(root, val);
     else {
-        Node_t* node;
-        Node_t* X = newNode(root->lval), * Y = newNode(root->rval);
+        Node_t* node, * X = newNode(root->lval), * Y = newNode(root->rval);
         if (val <= root->lval) { // left regardless node being one or two valued
             node = insertNode(root->left, val);
             if (node->rval == EMPTY && root->rval == EMPTY) { // 1 in 1
@@ -204,7 +202,7 @@ Node_t* insertNode(Node_t* root, int val) {
                 node->right->parent = root;
                 root->lval = root->left->max_child;
                 root->rval = root->middle->max_child;
-                free(node); // in was merged into two valued node
+                free(node); // it was merged into two valued node
                 return root;
             } else if (node->rval == EMPTY && root->rval != EMPTY) { // 1 in 2
                 X->parent = root->parent;
@@ -220,21 +218,13 @@ Node_t* insertNode(Node_t* root, int val) {
                 X->max_child = Y->max_child;
                 free(root);
                 return X;
-//            } else if (node->rval != EMPTY && root->rval == EMPTY){ // 2 in 1
-//                root->left = node;
-//                node->parent = node;
-//
             } else { // 2 in 2 or 1
-                root->left = node; // TODO redundant
-                node->parent = root; // TODO redundant
                 root->lval = node->max_child;
                 return root;
             }
         } else if (root->rval != EMPTY && val <= root->rval && val > root->lval) { // middle
             node = insertNode(root->middle, val);
             if (node->rval != EMPTY) { // 2 in 2
-                root->middle = node; // TODO redundant
-                node->parent = root; // TODO redundant
                 root->rval = node->max_child;
                 return root;
             } else { // 1 in 2
@@ -283,80 +273,9 @@ Node_t* insertNode(Node_t* root, int val) {
                 free(root);
                 return Y;
             } else { // 2 in 2 or 1
-                root->right = node; // TODO redundant
-                node->parent = root; // TODO redundant
                 root->max_child = node->max_child;
                 return root;
             }
         }
     }
 }
-//        if (root->rval == EMPTY && root->rval <= root->lval) { // one value node
-//            if (val <= root->lval) {
-////                Node_t* node = insertNode(val <= root->lval ? root->left : root->right, val);
-//                root->rval = root->lval;
-//                root->lval = node->lval;
-//                root->max_child = node->max_child;
-//
-//                root->left = node->left;
-//                root->middle = node->right;
-//
-//                node->parent = root;
-//            } else {
-////                Node_t* node = insertNode(val <= root->lval ? root->left : root->right, val);
-//                root->rval = node->lval;
-//
-//                root->middle = node->left;
-//                root->right = node->right;
-//
-//                node->parent = root;
-//            }
-//            return root;
-//        } else { // two values node
-//            Node_t* X = newNode(root->lval), * Y = newNode(root->rval);
-//            if (val < root->lval) {
-////                Node_t* node = insertNode(root->left, val);
-//                X->parent = root->parent;
-//                X->left = node;
-//                X->right = Y;
-//                Y->parent = X;
-//                node->parent = X;
-//                Y->left = root->middle;
-//                Y->right = root->right;
-//                X->max_child = node->max_child;
-//                Y->max_child = Y->left->max_child;
-//                free(root);
-//                return X;
-//            } else if (val <= root->rval && val > root->lval) {
-////                Node_t* node = insertNode(root->middle, val);
-//                node->parent = root->parent;
-//                X->right = node->left;
-//                X->left = root->left;
-//                X->max_child = X->left->max_child;
-//                Y->left = node->right;
-//                Y->right = root->right;
-//                Y->max_child = Y->left->max_child;
-//                node->left = X;
-//                node->right = Y;
-//                X->parent = node;
-//                Y->parent = node;
-//                node->max_child = X->max_child;
-//                free(root);
-//                return node;
-//            } else {
-////                Node_t* node = insertNode(root->right, val);
-//                Y->parent = root->parent;
-//                X->left = root->left;
-//                X->right = root->middle;
-//                X->max_child = X->left->max_child;
-//                Y->left = X;
-//                X->parent = Y;
-//                Y->max_child = Y->left->max_child;
-//                Y->right = node;
-//                node->parent = Y;
-//                free(root);
-//                return Y;
-//            }
-//        }
-//    }
-//}

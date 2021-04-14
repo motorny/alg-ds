@@ -1,22 +1,21 @@
-#include <stdio.h>
-#include "rbtree.h"
+#include "tree23plus.h"
 #pragma warning(disable:4996)
 
+
 int main(void) {
-    Node* tree = NIL;
+    tree_t* tree = NULL;
     int value;
     char c = getchar();
     while (c != EOF) {
-        scanf("%d", &value);
+        scanf("%i", &value);
         if (c == 'a') {
-            insert(value, &tree);
+            Insert(&tree, value);
         }
         else if (c == 'r') {
-            deleteD(value, &tree);
+            Delete(&tree, value);
         }
         else if (c == 'f') {
-            Node* check = findNode(value, tree);
-            if (check != NULL)
+            if (Find(tree, value))
                 printf("yes\n");
             else
                 printf("no\n");
@@ -26,9 +25,7 @@ int main(void) {
             continue;
         }
         c = getchar();
-        if (c == '\r')
-            c = getchar();
-        else if (c == '\n')
+        if (c == '\r' || c == '\n')
             c = getchar();
     }
     return 0;

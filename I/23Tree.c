@@ -188,6 +188,34 @@ Node_t* insertTerminate(Node_t* root, int val) {
         return root;
 }
 
+Node_t* splitNode(Node_t* X, Node_t* node, Node_t* Y, Node_t* root, Node_t* a, Node_t* b, Node_t* c, Node_t* d) {
+    node->parent = root->parent;
+    node->lval = b->max_child;
+    node->max_child = d->max_child;
+
+    node->left = X;
+    node->right = Y;
+    X->parent = node;
+    Y->parent = node;
+
+    X->left = a;
+    X->right = b;
+    X->lval = a->max_child;
+    X->max_child = b->max_child;
+    a->parent = X;
+    b->parent = X;
+
+    Y->left = c;
+    Y->right = d;
+    Y->lval = c->max_child;
+    Y->max_child = d->max_child;
+    c->parent = Y;
+    d->parent = Y;
+
+    free(root);
+    return node;
+}
+
 Node_t* insertNode(Node_t* root, int val) {
     if (isTerminal(root))
         return insertTerminate(root, val);
@@ -205,19 +233,7 @@ Node_t* insertNode(Node_t* root, int val) {
                 free(node); // it was merged into two valued node
                 return root;
             } else if (node->rval == EMPTY && root->rval != EMPTY) { // 1 in 2
-                X->parent = root->parent;
-                X->left = node;
-                X->right = Y;
-                Y->parent = X;
-                node->parent = X;
-                Y->left = root->middle;
-                Y->right = root->right;
-                root->middle->parent = Y;
-                root->right->parent = Y;
-                Y->max_child = Y->right->max_child;
-                X->max_child = Y->max_child;
-                free(root);
-                return X;
+                return splitNode(node, X, Y, root, node->left, node->right, root->middle, root->right);
             } else { // 2 in 2 or 1
                 root->lval = node->max_child;
                 return root;
@@ -228,24 +244,7 @@ Node_t* insertNode(Node_t* root, int val) {
                 root->rval = node->max_child;
                 return root;
             } else { // 1 in 2
-                node->parent = root->parent;
-                X->right = node->left;
-                X->left = root->left;
-                X->max_child = X->right->max_child;
-                node->left->parent = X;
-                root->left->parent = X;
-                Y->left = node->right;
-                Y->right = root->right;
-                Y->max_child = Y->right->max_child;
-                node->right->parent = Y;
-                root->right->parent = Y;
-                node->left = X;
-                node->right = Y;
-                X->parent = node;
-                Y->parent = node;
-                node->max_child = Y->max_child;
-                free(root);
-                return node;
+                return splitNode(X, node, Y, root, root->left, node->left, node->right, root->right);
             }
         } else { // right regardless node being one or two valued
             node = insertNode(root->right, val);
@@ -259,19 +258,7 @@ Node_t* insertNode(Node_t* root, int val) {
                 free(node); // merged into 2 valued node
                 return root;
             } else if (node->rval == EMPTY && root->rval != EMPTY) { // 1 in 2
-                Y->parent = root->parent;
-                X->left = root->left;
-                X->right = root->middle;
-                X->max_child = X->right->max_child;
-                root->left->parent = X;
-                root->middle->parent = X;
-                Y->left = X;
-                Y->right = node;
-                Y->max_child = Y->right->max_child;
-                X->parent = Y;
-                node->parent = Y;
-                free(root);
-                return Y;
+                return splitNode(X, Y, node, root, root->left, root->middle, node->left, node->right);
             } else { // 2 in 2 or 1
                 root->max_child = node->max_child;
                 return root;

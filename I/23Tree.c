@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "23Tree.h"
 
 int isTerminal(Node_t* node) { // only left is considered, since without it there won't be middle and right
@@ -215,40 +216,26 @@ Node_t* deleteTerminal(Node_t* root, int val) {
     if (root == NULL || root->right == NULL && root->lval == val) { // null or one leaf
         freeTree(root);
         return NULL;
-    } else if (isTerminal(root)) {
-        if (root->rval == EMPTY && root->rval <= root->lval) { // 1-valued node
-            if (val == root->lval) { // left leaf
-                disconnectSiblings(root->left->lsib, root->left, root->right);
-                freeNode(root->left);
-                root->left = root->right;
-                root->right = NULL;
-                root->lval = root->left->lval;
-                root->max_child = root->left->max_child;
-            } else if (val == root->max_child) { // right leaf
-                disconnectSiblings(root->left, root->right, root->right->rsib);
-                freeNode(root->right);
-                root->right = NULL;
-                root->max_child = root->left->max_child;
-            } // else unmodified root is returned
-        } else { // 2-valued node
-            if (val == root->lval || val == root->rval || val == root->max_child) {
-                // leaves, which order is determined in the branches
-                Node_t* a = root->left, * b = root->right; // middle node case
-                // sibling, node to delete, sibling
-                Node_t* lsib = root->left, * node = root->middle, * rsib = root->right; // middle node case
-                if (val == root->lval) { // left
-                    lsib = root->left->lsib, node = root->left, rsib = root->middle;
-                    a = root->middle, b = root->right;
-                } else if (val == root->max_child) { // right
-                    lsib = root->middle, node = root->right, rsib = root->right->rsib;
-                    a = root->left, b = root->middle;
-                } // middle is default
-                disconnectSiblings(lsib, node, rsib);
-                freeNode(node);
-                root->left = a, root->right = b, root->middle = NULL;
-                root->lval = a->lval, root->max_child = b->max_child, root->rval = EMPTY;
-            } // else unmodified root is returned
+    // terminal and value among leaves
+    } else if (isTerminal(root) && (val == root->lval || val == root->rval || val == root->max_child)) {
+        int isOneValued = root->rval == EMPTY && root->rval <= root->lval;
+        // leaves, which order is determined in the branches
+        Node_t* a = root->left, * b = isOneValued ? NULL : root->middle; // right case
+        // sibling, node to delete, sibling
+        // right case
+        Node_t* lsib = isOneValued ? root->left : root->middle, * node = root->right, * rsib = root->right->rsib;
+
+        if (val == root->lval) {
+            a = isOneValued ? root->right : root->middle, b = isOneValued ? NULL : root->right;
+            lsib = root->left->lsib, node = root->left, rsib = isOneValued ? root->right : root->middle;
+        } else if (!isOneValued && val == root->rval) {
+            a = root->left, b = root->right;
+            lsib = root->left, node = root->middle, rsib = root->right;
         }
+        disconnectSiblings(lsib, node, rsib);
+        freeNode(node);
+        root->left = a, root->right = b, root->middle = NULL;
+        root->lval = a->lval, root->max_child = (b == NULL ? a->max_child : b->max_child), root->rval = EMPTY;
     } // no value among the leaves or node is not terminal
     return root;
 }

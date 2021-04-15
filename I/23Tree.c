@@ -33,6 +33,48 @@ Node_t* newNode(int val) {
     return node;
 }
 
+Node_t* splitNode(Node_t* X, Node_t* node, Node_t* Y, Node_t* root, Node_t* a, Node_t* b, Node_t* c, Node_t* d) {
+    node->parent = root->parent;
+    node->lval = b->max_child;
+    node->max_child = d->max_child;
+
+    node->left = X;
+    node->right = Y;
+    X->parent = node;
+    Y->parent = node;
+
+    X->left = a;
+    X->right = b;
+    X->lval = a->max_child;
+    X->max_child = b->max_child;
+    a->parent = X;
+    b->parent = X;
+
+    Y->left = c;
+    Y->right = d;
+    Y->lval = c->max_child;
+    Y->max_child = d->max_child;
+    c->parent = Y;
+    d->parent = Y;
+
+    free(root);
+    return node;
+}
+
+Node_t* mergeNode(Node_t* root, Node_t* left, Node_t* middle, Node_t* right) {
+    root->left = left;
+    root->middle = middle;
+    root->right = right;
+    left->parent = root;
+    middle->parent = root;
+    right->parent = root;
+    root->lval = left->max_child;
+    root->rval = middle->max_child;
+    root->max_child = right->max_child;
+
+    return root;
+}
+
 Node_t* insertTerminate(Node_t* root, int val) {
     if (root == NULL) {
         Node_t* node = newNode(val), * leaf = newNode(val);
@@ -90,6 +132,9 @@ Node_t* insertTerminate(Node_t* root, int val) {
                 L = newNode(val);
                 R = newNode(root->rval);
                 connectSiblings(root->left->lsib, node, root->left);
+
+//                return splitNode(newNode(EMPTY), newNode(EMPTY), newNode(EMPTY), root, node, root->left, root->middle, root->right);
+
                 L->left = node;
                 L->right = root->left;
                 node->parent = L;
@@ -188,34 +233,6 @@ Node_t* insertTerminate(Node_t* root, int val) {
         return root;
 }
 
-Node_t* splitNode(Node_t* X, Node_t* node, Node_t* Y, Node_t* root, Node_t* a, Node_t* b, Node_t* c, Node_t* d) {
-    node->parent = root->parent;
-    node->lval = b->max_child;
-    node->max_child = d->max_child;
-
-    node->left = X;
-    node->right = Y;
-    X->parent = node;
-    Y->parent = node;
-
-    X->left = a;
-    X->right = b;
-    X->lval = a->max_child;
-    X->max_child = b->max_child;
-    a->parent = X;
-    b->parent = X;
-
-    Y->left = c;
-    Y->right = d;
-    Y->lval = c->max_child;
-    Y->max_child = d->max_child;
-    c->parent = Y;
-    d->parent = Y;
-
-    free(root);
-    return node;
-}
-
 Node_t* insertNode(Node_t* root, int val) {
     if (isTerminal(root))
         return insertTerminate(root, val);
@@ -224,12 +241,7 @@ Node_t* insertNode(Node_t* root, int val) {
         if (val <= root->lval) { // left regardless node being one or two valued
             node = insertNode(root->left, val);
             if (node->rval == EMPTY && root->rval == EMPTY) { // 1 in 1
-                root->left = node->left;
-                root->middle = node->right;
-                node->left->parent = root;
-                node->right->parent = root;
-                root->lval = root->left->max_child;
-                root->rval = root->middle->max_child;
+                root = mergeNode(root, node->left, node->right, root->right);
                 free(node); // it was merged into two valued node
                 return root;
             } else if (node->rval == EMPTY && root->rval != EMPTY) { // 1 in 2
@@ -249,12 +261,7 @@ Node_t* insertNode(Node_t* root, int val) {
         } else { // right regardless node being one or two valued
             node = insertNode(root->right, val);
             if (node->rval == EMPTY && root->rval == EMPTY) { // 1 in 1
-                root->middle = node->left;
-                root->right = node->right;
-                root->rval = node->left->max_child;
-                root->max_child = node->max_child;
-                node->left->parent = root;
-                node->right->parent = root;
+                root = mergeNode(root, root->left, node->left, node->right);
                 free(node); // merged into 2 valued node
                 return root;
             } else if (node->rval == EMPTY && root->rval != EMPTY) { // 1 in 2

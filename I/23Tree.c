@@ -82,154 +82,59 @@ Node_t* insertTerminate(Node_t* root, int val) {
         leaf->parent = node;
         return node;
     } else if (isTerminal(root)) {
+        Node_t* node = newNode(val);
         if (root->rval == EMPTY && root->rval <= root->lval) { // one value
             if (root->right == NULL) { // one value, one leaf
-                Node_t* node = newNode(val);
-                node->parent = root;
+                // leaves, which order is determined in the branches
+                Node_t* a = root->left, *b = node; // last branch case (else)
+                // siblings
+                Node_t* lsib = root->left, *rsib = root->left->rsib; // last branch case (else)
+
                 if (val <= root->lval) {
-                    connectSiblings(root->left->lsib, node, root->left);
-
-                    root->right = root->left;
-                    root->left = node;
-                    root->lval = node->lval;
-                    root->max_child = root->right->max_child;
-                } else {
-                    connectSiblings(root->left, node, root->left->rsib);
-
-                    root->right = node;
-                    root->max_child = root->right->max_child;
+                    a = node, b = root->left;
+                    lsib = root->left->lsib, rsib = root->left;
                 }
+                connectSiblings(lsib, node, rsib);
+                root->left = a, root->right = b;
+                root->lval = a->lval, root->max_child = b->max_child;
+                a->parent = root, b->parent = root;
                 return root;
             } else { // one value, two leaves
-                Node_t* node = newNode(val);
-                node->parent = root;
-                if (val <= root->left->lval) {
-                    connectSiblings(root->left->lsib, node, root->left);
-                    root->middle = root->left;
-                    root->left = node;
-                    root->max_child = root->right->max_child;
-                    root->lval = node->lval;
-                    root->rval = root->middle->max_child;
-                } else if (val <= root->right->lval && val > root->left->lval) {
-                    connectSiblings(root->left, node, root->right);
-                    root->middle = node;
-                    root->lval = root->left->lval;
-                    root->rval = node->max_child;
-                    root->max_child = root->right->max_child;
-                } else {
-                    connectSiblings(root->right, node, root->right->rsib);
-                    root->middle = root->right;
-                    root->right = node;
-                    root->rval = root->middle->max_child;
-                    root->max_child = root->right->max_child;
+                // leaves, which order is determined in the branches
+                Node_t* a = root->left, * b = root->right, * c = node; // last branch case (else)
+                // siblings
+                Node_t* lsib = root->right, * rsib = root->right->rsib; // last branch case (else)
+                if (val <= root->lval) {
+                    lsib = root->left->lsib, rsib = root->left;
+                    a = node, b = root->left, c = root->right;
+                } else if (val <= root->max_child && val > root->lval) {
+                    lsib = root->left, rsib = root->right;
+                    a = root->left, b = node, c = root->right;
                 }
-                return root;
+                connectSiblings(lsib, node, rsib);
+                return mergeNode(root, a, b, c);
             }
         } else { // two values, three leaves
-            Node_t* node = newNode(val);
-            Node_t* L, * M, * R;
+            // three nodes after splitting 2-valued, from left to right
+            Node_t* X = newNode(EMPTY), * w = newNode(EMPTY), * Y = newNode(EMPTY);
+            // leaves, which order is determined in the branches
+            Node_t* a = root->left, * b = root->middle, * c = root->right, * d = node; // last branch case (else)
+            // siblings
+            Node_t* lsib = root->right, * rsib = root->right->rsib; // last branch case (else)
             if (val <= root->lval) {
-                L = newNode(val);
-                R = newNode(root->rval);
-                connectSiblings(root->left->lsib, node, root->left);
-
-//                return splitNode(newNode(EMPTY), newNode(EMPTY), newNode(EMPTY), root, node, root->left, root->middle, root->right);
-
-                L->left = node;
-                L->right = root->left;
-                node->parent = L;
-                root->left->parent = L;
-                L->max_child = L->right->max_child;
-
-                R->left = root->middle;
-                R->right = root->right;
-                root->middle->parent = R;
-                root->right->parent = R;
-                R->max_child = R->right->max_child;
-
-                M = newNode(L->max_child);
-                M->max_child = R->max_child;
-                L->parent = M;
-                R->parent = M;
-                M->left = L;
-                M->right = R;
-                free(root);
-                return M;
+                lsib = root->left->lsib, rsib = root->left;
+                a = node, b = root->left, c = root->middle, d = root->right;
             } else if (val <= root->rval && val > root->lval) {
-                L = newNode(root->lval);
-                R = newNode(root->rval);
-                connectSiblings(root->left, node, root->middle);
-                L->left = root->left;
-                L->right = node;
-                node->parent = L;
-                root->left->parent = L;
-                L->max_child = L->right->max_child;
-
-                R->left = root->middle;
-                R->right = root->right;
-                root->middle->parent = R;
-                root->right->parent = R;
-                R->max_child = R->right->max_child;
-
-                M = newNode(L->max_child);
-                M->max_child = R->max_child;
-                L->parent = M;
-                R->parent = M;
-                M->left = L;
-                M->right = R;
-                free(root);
-                return M;
+                lsib = root->left, rsib = root->middle;
+                a = root->left, b = node, c = root->middle, d = root->right;
             } else if (val <= root->right->lval && val > root->rval) {
-                L = newNode(root->lval);
-                R = newNode(val);
-                connectSiblings(root->middle, node, root->right);
-                L->left = root->left;
-                L->right = root->middle;
-                root->middle->parent = L;
-                root->left->parent = L;
-                L->max_child = L->right->max_child;
-
-                R->left = node;
-                R->right = root->right;
-                node->parent = R;
-                root->right->parent = R;
-                R->max_child = R->right->max_child;
-
-                M = newNode(L->max_child);
-                M->max_child = R->max_child;
-                L->parent = M;
-                R->parent = M;
-                M->left = L;
-                M->right = R;
-                free(root);
-                return M;
-            } else {
-                L = newNode(root->lval);
-                R = newNode(root->max_child);
-                connectSiblings(root->right, node, root->right->rsib);
-                L->left = root->left;
-                L->right = root->middle;
-                root->middle->parent = L;
-                root->left->parent = L;
-                L->max_child = L->right->max_child;
-
-                R->left = root->right;
-                R->right = node;
-                node->parent = R;
-                root->right->parent = R;
-                R->max_child = R->right->max_child;
-
-                M = newNode(L->max_child);
-                M->max_child = R->max_child;
-                L->parent = M;
-                R->parent = M;
-                M->left = L;
-                M->right = R;
-                free(root);
-                return M;
+                lsib = root->middle, rsib = root->right;
+                a = root->left, b = root->middle, c = node, d = root->right;
             }
+            connectSiblings(lsib, node, rsib);
+            return splitNode(X, w, Y, root, a, b, c, d);
         }
-    } else
+    } else // the node is not terminal
         return root;
 }
 

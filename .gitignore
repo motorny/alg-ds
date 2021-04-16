@@ -21,13 +21,7 @@ lab-3
 lab-1
 lab-2
 .git
-lab-6/Debug
-lab-6/packages
-lab-6/*.sln
-lab-6/treap_test/Debug
-lab-6/treap_test/*.config
-lab-6/lab-6/Debug
-lab-6/lab-6/treap.c
+lab-6
 
 
 

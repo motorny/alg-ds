@@ -15,6 +15,7 @@ int main() {
 	while ((command = getchar()) != EOF) {
 		scanf("%i", &key);
 		ParseCommand(command, key, &root);
+		PrintLinearly(root);
 	}
 	FreeTree(root);
 	return 0;

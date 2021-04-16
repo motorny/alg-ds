@@ -113,6 +113,13 @@ Node_t* insertTerminate(Node_t* root, int val) {
                     a = root->left, b = node, c = root->right;
                 }
                 connectSiblings(lsib, node, rsib);
+//                root->left = a;
+//                root->middle = b;
+//                root->right = c;
+//                root->lval = a->max_child;
+//                root->rval = b->max_child;
+//                root->max_child = c->max_child;
+//                return root;
                 return mergeNode(root, a, b, c);
             }
         } else { // two values, three leaves
@@ -148,19 +155,16 @@ Node_t* insertNode(Node_t* root, int val) {
             node = insertNode(root->left, val);
             if (node->rval == EMPTY && root->rval == EMPTY) { // 1 in 1
                 root = mergeNode(root, node->left, node->right, root->right);
-                free(node); // it was merged into two valued node
-                return root;
+                freeNode(node); // it was merged into two valued node
             } else if (node->rval == EMPTY && root->rval != EMPTY) { // 1 in 2
                 return splitNode(node, X, Y, root, node->left, node->right, root->middle, root->right);
             } else { // 2 in 2 or 1
                 root->lval = node->max_child;
-                return root;
             }
         } else if (root->rval != EMPTY && val <= root->rval && val > root->lval) { // middle
             node = insertNode(root->middle, val);
             if (node->rval != EMPTY) { // 2 in 2
                 root->rval = node->max_child;
-                return root;
             } else { // 1 in 2
                 return splitNode(X, node, Y, root, root->left, node->left, node->right, root->right);
             }
@@ -168,15 +172,16 @@ Node_t* insertNode(Node_t* root, int val) {
             node = insertNode(root->right, val);
             if (node->rval == EMPTY && root->rval == EMPTY) { // 1 in 1
                 root = mergeNode(root, root->left, node->left, node->right);
-                free(node); // merged into 2 valued node
-                return root;
+                freeNode(node); // merged into 2 valued node
             } else if (node->rval == EMPTY && root->rval != EMPTY) { // 1 in 2
                 return splitNode(X, Y, node, root, root->left, root->middle, node->left, node->right);
             } else { // 2 in 2 or 1
                 root->max_child = node->max_child;
-                return root;
             }
         }
+        freeNode(X);
+        freeNode(Y);
+        return root;
     }
 }
 
@@ -191,13 +196,13 @@ void freeNode(Node_t* node) {
         node->rval = EMPTY;
         node->max_child = EMPTY;
         free(node);
-        printf("h ");
     }
 }
 
 void freeTree(Node_t* root) {
     if (root != NULL) {
         freeTree(root->left);
+        freeTree(root->middle);
         freeTree(root->right);
         freeNode(root);
     }
@@ -287,68 +292,3 @@ Node_t* deleteNode(Node_t* root, int val) {
     }
     return root;
 }
-
-
-//            if (isOneValued(root)) { // 1-valued root
-//                if (val <= root->lval) {
-//                    node = deleteNode(root->left, val);
-//                    if (node->right == NULL) { // one leaf
-//                        Node_t* toDelete = root->right;
-//                        root = mergeNode(root, node->left, root->right->left, root->right->right);
-//                        freeNode(node);
-//                        freeNode(toDelete);
-//                    } else { // two leaves
-//                        root->lval = node->max_child;
-//                    }
-//                } else {
-//                    node = deleteNode(root->right, val);
-//                    if (node->right == NULL) { // one leaf
-//                        Node_t* toDelete = root->left;
-//                        root = mergeNode(root, root->left->left, root->left->right, node->left);
-//                        freeNode(node);
-//                        freeNode(toDelete);
-//                    } else { // two leaves
-//                        root->max_child = node->max_child;
-//                    }
-//                }
-//            } else { // 2-valued root
-//                if (val <= root->lval) {
-//                    node = deleteNode(root->left, val);
-//                    if (node->right == NULL) { // one leaf
-//                        Node_t* toDelete = root->middle;
-//                        node = mergeNode(node, node->left, root->middle->left, root->middle->right);
-//                        freeNode(toDelete);
-//                        root->left = node;
-//                        root->middle = NULL;
-//                        root->rval = EMPTY;
-//                    } // whether two leaves or not, this needs to be done
-//                    root->lval = node->max_child;
-//                } else if (val <= root->rval && val > root->lval) {
-//                    node = deleteNode(root->middle, val);
-//                    if (node->right == NULL) {
-//                        Node_t* toDelete = root->left;
-//                        node = mergeNode(node, root->left->left, root->left->right, node->left);
-//                        freeNode(toDelete);
-//                        root->left = node;
-//                        root->middle = NULL;
-//                        root->rval = EMPTY;
-//                        root->lval = node->max_child;
-//                    } else { // two leaves
-//                        root->rval = node->max_child;
-//                    }
-//                } else {
-//                    node = deleteNode(root->right, val);
-//                    if (node->right == NULL) {
-//                        Node_t* toDelete = root->middle;
-//                        node = mergeNode(node, root->middle->left, root->middle->right, node->left);
-//                        freeNode(toDelete);
-//                        root->right = node;
-//                        root->middle = NULL;
-//                        root->rval = EMPTY;
-//                    } // whether two leaves or not, this needs to be done
-//                    root->max_child = node->max_child;
-//                }
-//            }
-//        }
-//    return root;
-//}

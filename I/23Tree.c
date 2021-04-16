@@ -33,7 +33,6 @@ Node_t* newNode(int val) {
         node->left = NULL;
         node->right = NULL;
         node->middle = NULL;
-        node->parent = NULL;
         node->lval = val;
         node->rval = EMPTY;
         node->lsib = NULL;
@@ -44,28 +43,21 @@ Node_t* newNode(int val) {
 }
 
 Node_t* splitNode(Node_t* X, Node_t* node, Node_t* Y, Node_t* root, Node_t* a, Node_t* b, Node_t* c, Node_t* d) {
-    node->parent = root->parent;
     node->lval = b->max_child;
     node->max_child = d->max_child;
 
     node->left = X;
     node->right = Y;
-    X->parent = node;
-    Y->parent = node;
 
     X->left = a;
     X->right = b;
     X->lval = a->max_child;
     X->max_child = b->max_child;
-    a->parent = X;
-    b->parent = X;
 
     Y->left = c;
     Y->right = d;
     Y->lval = c->max_child;
     Y->max_child = d->max_child;
-    c->parent = Y;
-    d->parent = Y;
 
     free(root);
     return node;
@@ -75,9 +67,6 @@ Node_t* mergeNode(Node_t* root, Node_t* left, Node_t* middle, Node_t* right) {
     root->left = left;
     root->middle = middle;
     root->right = right;
-    left->parent = root;
-    middle->parent = root;
-    right->parent = root;
     root->lval = left->max_child;
     root->rval = middle->max_child;
     root->max_child = right->max_child;
@@ -89,7 +78,6 @@ Node_t* insertTerminate(Node_t* root, int val) {
     if (root == NULL) {
         Node_t* node = newNode(val), * leaf = newNode(val);
         node->left = leaf;
-        leaf->parent = node;
         return node;
     } else if (isTerminal(root)) {
         Node_t* node = newNode(val);
@@ -107,7 +95,6 @@ Node_t* insertTerminate(Node_t* root, int val) {
                 connectSiblings(lsib, node, rsib);
                 root->left = a, root->right = b;
                 root->lval = a->lval, root->max_child = b->max_child;
-                a->parent = root, b->parent = root;
                 return root;
             } else { // one value, two leaves
                 // leaves, which order is determined in the branches
@@ -191,7 +178,6 @@ Node_t* insertNode(Node_t* root, int val) {
 
 void freeNode(Node_t* node) {
     if (node != NULL) {
-        node->parent = NULL;
         node->lsib = NULL;
         node->rsib = NULL;
         node->left = NULL;
@@ -253,10 +239,8 @@ Node_t* deleteNode(Node_t* root, int val) {
                     root = mergeNode(root, node->left, root->right->left, root->right->right);
                     freeNode(node);
                     freeNode(toDelete);
-                    return root;
                 } else { // two leaves
-                    root->lval = root->left->max_child;
-                    return root;
+                    root->lval = node->max_child;
                 }
             } else {
                 node = deleteNode(root->right, val);
@@ -265,10 +249,8 @@ Node_t* deleteNode(Node_t* root, int val) {
                     root = mergeNode(root, root->left->left, root->left->right, node->left);
                     freeNode(node);
                     freeNode(toDelete);
-                    return root;
                 } else { // two leaves
-                    root->max_child = root->right->max_child;
-                    return root;
+                    root->max_child = node->max_child;
                 }
             }
         } else { // 2-valued root
@@ -279,14 +261,11 @@ Node_t* deleteNode(Node_t* root, int val) {
                     node = mergeNode(node, node->left, root->middle->left, root->middle->right);
                     freeNode(toDelete);
                     root->left = node;
-                    node->parent = root;
                     root->middle = NULL;
                     root->rval = EMPTY;
                     root->lval = node->max_child;
-                    return root;
                 } else { // two leaves
                     root->lval = node->max_child;
-                    return root;
                 }
             } else if (val <= root->rval && val > root->lval) {
                 node = deleteNode(root->middle, val);
@@ -295,14 +274,11 @@ Node_t* deleteNode(Node_t* root, int val) {
                     node = mergeNode(node, root->left->left, root->left->right, node->left);
                     freeNode(toDelete);
                     root->left = node;
-                    node->parent = root;
                     root->middle = NULL;
                     root->rval = EMPTY;
                     root->lval = node->max_child;
-                    return root;
                 } else { // two leaves
                     root->rval = node->max_child;
-                    return root;
                 }
             } else {
                 node = deleteNode(root->right, val);
@@ -311,14 +287,11 @@ Node_t* deleteNode(Node_t* root, int val) {
                     node = mergeNode(node, root->middle->left, root->middle->right, node->left);
                     freeNode(toDelete);
                     root->right = node;
-                    node->parent = root;
                     root->middle = NULL;
                     root->rval = EMPTY;
                     root->max_child = node->max_child;
-                    return root;
                 } else { // two leaves
                     root->max_child = node->max_child;
-                    return root;
                 }
             }
         }

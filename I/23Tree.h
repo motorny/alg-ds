@@ -2,8 +2,6 @@
 #define ALG_DS_23TREE_H
 
 typedef struct Node {
-    struct Node* parent;
-
     struct Node* left, *middle, *right; // children
 
     int lval, rval; // values in the node

@@ -34,14 +34,12 @@ TEST_F(InsertNode, 4Values_LeftLeft) {
     ASSERT_NE(root->left, nullptr);
     ASSERT_EQ(root->middle, nullptr);
     ASSERT_NE(root->right, nullptr);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 7);
 
     Node_t* left = root->left, * middle = root->middle, * right = root->right;
 
     ASSERT_EQ(left->lval, 0);
     ASSERT_EQ(left->rval, 1);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->max_child, 3);
     ASSERT_EQ(left->left->lval, 0);
     ASSERT_EQ(left->middle->lval, 1);
@@ -55,7 +53,6 @@ TEST_F(InsertNode, 4Values_LeftLeft) {
 
     ASSERT_EQ(right->lval, 5);
     ASSERT_EQ(right->rval, EMPTY);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->max_child, 7);
     ASSERT_EQ(right->left->lval, 5);
     ASSERT_EQ(right->right->lval, 7);
@@ -74,14 +71,12 @@ TEST_F(InsertNode, 4Values_LeftRight) {
     ASSERT_NE(root->left, nullptr);
     ASSERT_EQ(root->middle, nullptr);
     ASSERT_NE(root->right, nullptr);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 7);
 
     Node_t* left = root->left, * middle = root->middle, * right = root->right;
 
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, 2);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->max_child, 3);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->middle->lval, 2);
@@ -95,7 +90,6 @@ TEST_F(InsertNode, 4Values_LeftRight) {
 
     ASSERT_EQ(right->lval, 5);
     ASSERT_EQ(right->rval, EMPTY);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->max_child, 7);
     ASSERT_EQ(right->left->lval, 5);
     ASSERT_EQ(right->right->lval, 7);
@@ -114,7 +108,6 @@ TEST_F(InsertNode, 4Values_Middle) {
     ASSERT_NE(root->left, nullptr);
     ASSERT_EQ(root->middle, nullptr);
     ASSERT_NE(root->right, nullptr);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 7);
 
     Node_t* left = root->left, * middle = root->middle, * right = root->right;
@@ -122,7 +115,6 @@ TEST_F(InsertNode, 4Values_Middle) {
 
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->max_child, 3);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->right->lval, 3);
@@ -135,7 +127,6 @@ TEST_F(InsertNode, 4Values_Middle) {
 
     ASSERT_EQ(right->lval, 4);
     ASSERT_EQ(right->rval, 5);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->max_child, 7);
     ASSERT_EQ(right->left->lval, 4);
     ASSERT_EQ(right->middle->lval, 5);
@@ -156,14 +147,12 @@ TEST_F(InsertNode, 4Values_RightLeft) {
     ASSERT_NE(root->left, nullptr);
     ASSERT_EQ(root->middle, nullptr);
     ASSERT_NE(root->right, nullptr);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 7);
 
     Node_t* left = root->left, * middle = root->middle, * right = root->right;
 
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->max_child, 3);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->right->lval, 3);
@@ -176,7 +165,6 @@ TEST_F(InsertNode, 4Values_RightLeft) {
 
     ASSERT_EQ(right->lval, 5);
     ASSERT_EQ(right->rval, 6);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->max_child, 7);
     ASSERT_EQ(right->left->lval, 5);
     ASSERT_EQ(right->middle->lval, 6);
@@ -197,14 +185,12 @@ TEST_F(InsertNode, 4Values_RightRight) {
     ASSERT_NE(root->left, nullptr);
     ASSERT_EQ(root->middle, nullptr);
     ASSERT_NE(root->right, nullptr);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 8);
 
     Node_t* left = root->left, * middle = root->middle, * right = root->right;
 
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->max_child, 3);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->right->lval, 3);
@@ -217,7 +203,6 @@ TEST_F(InsertNode, 4Values_RightRight) {
 
     ASSERT_EQ(right->lval, 5);
     ASSERT_EQ(right->rval, 7);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->max_child, 8);
     ASSERT_EQ(right->left->lval, 5);
     ASSERT_EQ(right->middle->lval, 7);
@@ -240,14 +225,12 @@ TEST_F(InsertNode, 6Nodes_Left1to1) {
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->middle, nullptr);
     ASSERT_NE(root->right, nullptr);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 6);
 
     Node_t* left = root->left, * middle = root->middle, * right = root->right;
 
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->max_child, 2);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->right->lval, 2);
@@ -258,7 +241,6 @@ TEST_F(InsertNode, 6Nodes_Left1to1) {
 
     ASSERT_EQ(middle->lval, 3);
     ASSERT_EQ(middle->rval, EMPTY);
-    ASSERT_EQ(middle->parent, root);
     ASSERT_EQ(middle->max_child, 4);
     ASSERT_EQ(middle->left->lval, 3);
     ASSERT_EQ(middle->right->lval, 4);
@@ -270,7 +252,6 @@ TEST_F(InsertNode, 6Nodes_Left1to1) {
 
     ASSERT_EQ(right->lval, 5);
     ASSERT_EQ(right->rval, EMPTY);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->max_child, 6);
     ASSERT_EQ(right->left->lval, 5);
     ASSERT_EQ(right->right->lval, 6);
@@ -290,14 +271,12 @@ TEST_F(InsertNode, 6Nodes_Right1to1) {
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->middle, nullptr);
     ASSERT_NE(root->right, nullptr);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 7);
 
     Node_t* left = root->left, * middle = root->middle, * right = root->right;
 
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->max_child, 2);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->right->lval, 2);
@@ -308,7 +287,6 @@ TEST_F(InsertNode, 6Nodes_Right1to1) {
 
     ASSERT_EQ(middle->lval, 3);
     ASSERT_EQ(middle->rval, EMPTY);
-    ASSERT_EQ(middle->parent, root);
     ASSERT_EQ(middle->max_child, 5);
     ASSERT_EQ(middle->left->lval, 3);
     ASSERT_EQ(middle->right->lval, 5);
@@ -320,7 +298,6 @@ TEST_F(InsertNode, 6Nodes_Right1to1) {
 
     ASSERT_EQ(right->lval, 6);
     ASSERT_EQ(right->rval, EMPTY);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->max_child, 7);
     ASSERT_EQ(right->left->lval, 6);
     ASSERT_EQ(right->right->lval, 7);
@@ -339,7 +316,6 @@ TEST_F(InsertNode, 7Nodes_Left2to2) {
 
     ASSERT_EQ(root->lval, 3);
     ASSERT_EQ(root->rval, 6);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 9);
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->middle, nullptr);
@@ -350,7 +326,6 @@ TEST_F(InsertNode, 7Nodes_Left2to2) {
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, 2);
     ASSERT_EQ(left->max_child, 3);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->middle->lval, 2);
     ASSERT_EQ(left->right->lval, 3);
@@ -364,7 +339,6 @@ TEST_F(InsertNode, 7Nodes_Left2to2) {
     ASSERT_EQ(middle->lval, 4);
     ASSERT_EQ(middle->rval, EMPTY);
     ASSERT_EQ(middle->max_child, 6);
-    ASSERT_EQ(middle->parent, root);
     ASSERT_EQ(middle->left->lval, 4);
     ASSERT_EQ(middle->middle, nullptr);
     ASSERT_EQ(middle->right->lval, 6);
@@ -376,7 +350,6 @@ TEST_F(InsertNode, 7Nodes_Left2to2) {
     ASSERT_EQ(right->lval, 7);
     ASSERT_EQ(right->rval, EMPTY);
     ASSERT_EQ(right->max_child, 9);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->left->lval, 7);
     ASSERT_EQ(right->middle, nullptr);
     ASSERT_EQ(right->right->lval, 9);
@@ -394,7 +367,6 @@ TEST_F(InsertNode, 7Nodes_Middle2to2) {
 
     ASSERT_EQ(root->lval, 3);
     ASSERT_EQ(root->rval, 6);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 9);
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->middle, nullptr);
@@ -405,7 +377,6 @@ TEST_F(InsertNode, 7Nodes_Middle2to2) {
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, EMPTY);
     ASSERT_EQ(left->max_child, 3);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->middle, nullptr);
     ASSERT_EQ(left->right->lval, 3);
@@ -417,7 +388,6 @@ TEST_F(InsertNode, 7Nodes_Middle2to2) {
     ASSERT_EQ(middle->lval, 4);
     ASSERT_EQ(middle->rval, 5);
     ASSERT_EQ(middle->max_child, 6);
-    ASSERT_EQ(middle->parent, root);
     ASSERT_EQ(middle->left->lval, 4);
     ASSERT_EQ(middle->middle->lval, 5);
     ASSERT_EQ(middle->right->lval, 6);
@@ -431,7 +401,6 @@ TEST_F(InsertNode, 7Nodes_Middle2to2) {
     ASSERT_EQ(right->lval, 7);
     ASSERT_EQ(right->rval, EMPTY);
     ASSERT_EQ(right->max_child, 9);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->left->lval, 7);
     ASSERT_EQ(right->middle, nullptr);
     ASSERT_EQ(right->right->lval, 9);
@@ -449,7 +418,6 @@ TEST_F(InsertNode, 7Nodes_Right2to2) {
 
     ASSERT_EQ(root->lval, 3);
     ASSERT_EQ(root->rval, 6);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 9);
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->middle, nullptr);
@@ -460,7 +428,6 @@ TEST_F(InsertNode, 7Nodes_Right2to2) {
     ASSERT_EQ(left->lval, 1);
     ASSERT_EQ(left->rval, EMPTY);
     ASSERT_EQ(left->max_child, 3);
-    ASSERT_EQ(left->parent, root);
     ASSERT_EQ(left->left->lval, 1);
     ASSERT_EQ(left->middle, nullptr);
     ASSERT_EQ(left->right->lval, 3);
@@ -472,7 +439,6 @@ TEST_F(InsertNode, 7Nodes_Right2to2) {
     ASSERT_EQ(middle->lval, 4);
     ASSERT_EQ(middle->rval, EMPTY);
     ASSERT_EQ(middle->max_child, 6);
-    ASSERT_EQ(middle->parent, root);
     ASSERT_EQ(middle->left->lval, 4);
     ASSERT_EQ(middle->middle, nullptr);
     ASSERT_EQ(middle->right->lval, 6);
@@ -484,7 +450,6 @@ TEST_F(InsertNode, 7Nodes_Right2to2) {
     ASSERT_EQ(right->lval, 7);
     ASSERT_EQ(right->rval, 8);
     ASSERT_EQ(right->max_child, 9);
-    ASSERT_EQ(right->parent, root);
     ASSERT_EQ(right->left->lval, 7);
     ASSERT_EQ(right->middle->lval, 8);
     ASSERT_EQ(right->right->lval, 9);
@@ -506,7 +471,6 @@ TEST_F(InsertNode, 8Nodes_Left1to2) {
 
     ASSERT_EQ(root->lval, 4);
     ASSERT_EQ(root->rval, EMPTY);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 12);
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->right, nullptr);
@@ -516,7 +480,6 @@ TEST_F(InsertNode, 8Nodes_Left1to2) {
 
     ASSERT_EQ(left->lval, 2);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_NE(left->left, nullptr);
     ASSERT_NE(left->right, nullptr);
     ASSERT_EQ(left->middle, nullptr);
@@ -524,7 +487,6 @@ TEST_F(InsertNode, 8Nodes_Left1to2) {
 
     ASSERT_EQ(right->lval, 8);
     ASSERT_EQ(right->rval, EMPTY);
-    ASSERT_EQ(right->parent, root);
     ASSERT_NE(right->left, nullptr);
     ASSERT_NE(right->right, nullptr);
     ASSERT_EQ(right->middle, nullptr);
@@ -534,7 +496,6 @@ TEST_F(InsertNode, 8Nodes_Left1to2) {
 
     ASSERT_EQ(lleft->lval, 1);
     ASSERT_EQ(lleft->rval, EMPTY);
-    ASSERT_EQ(lleft->parent, left);
     ASSERT_EQ(lleft->max_child, 2);
     ASSERT_EQ(lleft->left->lval, 1);
     ASSERT_EQ(lleft->right->lval, 2);
@@ -545,7 +506,6 @@ TEST_F(InsertNode, 8Nodes_Left1to2) {
 
     ASSERT_EQ(lright->lval, 3);
     ASSERT_EQ(lright->rval, EMPTY);
-    ASSERT_EQ(lright->parent, left);
     ASSERT_EQ(lright->max_child, 4);
     ASSERT_EQ(lright->left->lval, 3);
     ASSERT_EQ(lright->right->lval, 4);
@@ -556,7 +516,6 @@ TEST_F(InsertNode, 8Nodes_Left1to2) {
 
     ASSERT_EQ(rleft->lval, 5);
     ASSERT_EQ(rleft->rval, EMPTY);
-    ASSERT_EQ(rleft->parent, right);
     ASSERT_EQ(rleft->max_child, 8);
     ASSERT_EQ(rleft->left->lval, 5);
     ASSERT_EQ(rleft->right->lval, 8);
@@ -567,7 +526,6 @@ TEST_F(InsertNode, 8Nodes_Left1to2) {
 
     ASSERT_EQ(rright->lval, 9);
     ASSERT_EQ(rright->rval, EMPTY);
-    ASSERT_EQ(rright->parent, right);
     ASSERT_EQ(rright->max_child, 12);
     ASSERT_EQ(rright->left->lval, 9);
     ASSERT_EQ(rright->right->lval, 12);
@@ -586,7 +544,6 @@ TEST_F(InsertNode, 8Nodes_Middle1to2) {
 
     ASSERT_EQ(root->lval, 6);
     ASSERT_EQ(root->rval, EMPTY);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 12);
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->right, nullptr);
@@ -596,7 +553,6 @@ TEST_F(InsertNode, 8Nodes_Middle1to2) {
 
     ASSERT_EQ(left->lval, 4);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_NE(left->left, nullptr);
     ASSERT_NE(left->right, nullptr);
     ASSERT_EQ(left->middle, nullptr);
@@ -604,7 +560,6 @@ TEST_F(InsertNode, 8Nodes_Middle1to2) {
 
     ASSERT_EQ(right->lval, 8);
     ASSERT_EQ(right->rval, EMPTY);
-    ASSERT_EQ(right->parent, root);
     ASSERT_NE(right->left, nullptr);
     ASSERT_NE(right->right, nullptr);
     ASSERT_EQ(right->middle, nullptr);
@@ -614,7 +569,6 @@ TEST_F(InsertNode, 8Nodes_Middle1to2) {
 
     ASSERT_EQ(lleft->lval, 1);
     ASSERT_EQ(lleft->rval, EMPTY);
-    ASSERT_EQ(lleft->parent, left);
     ASSERT_EQ(lleft->max_child, 4);
     ASSERT_EQ(lleft->left->lval, 1);
     ASSERT_EQ(lleft->right->lval, 4);
@@ -625,7 +579,6 @@ TEST_F(InsertNode, 8Nodes_Middle1to2) {
 
     ASSERT_EQ(lright->lval, 5);
     ASSERT_EQ(lright->rval, EMPTY);
-    ASSERT_EQ(lright->parent, left);
     ASSERT_EQ(lright->max_child, 6);
     ASSERT_EQ(lright->left->lval, 5);
     ASSERT_EQ(lright->right->lval, 6);
@@ -636,7 +589,6 @@ TEST_F(InsertNode, 8Nodes_Middle1to2) {
 
     ASSERT_EQ(rleft->lval, 7);
     ASSERT_EQ(rleft->rval, EMPTY);
-    ASSERT_EQ(rleft->parent, right);
     ASSERT_EQ(rleft->max_child, 8);
     ASSERT_EQ(rleft->left->lval, 7);
     ASSERT_EQ(rleft->right->lval, 8);
@@ -647,7 +599,6 @@ TEST_F(InsertNode, 8Nodes_Middle1to2) {
 
     ASSERT_EQ(rright->lval, 9);
     ASSERT_EQ(rright->rval, EMPTY);
-    ASSERT_EQ(rright->parent, right);
     ASSERT_EQ(rright->max_child, 12);
     ASSERT_EQ(rright->left->lval, 9);
     ASSERT_EQ(rright->right->lval, 12);
@@ -666,7 +617,6 @@ TEST_F(InsertNode, 8Nodes_Right1to2) {
 
     ASSERT_EQ(root->lval, 8);
     ASSERT_EQ(root->rval, EMPTY);
-    ASSERT_EQ(root->parent, nullptr);
     ASSERT_EQ(root->max_child, 12);
     ASSERT_NE(root->left, nullptr);
     ASSERT_NE(root->right, nullptr);
@@ -676,7 +626,6 @@ TEST_F(InsertNode, 8Nodes_Right1to2) {
 
     ASSERT_EQ(left->lval, 4);
     ASSERT_EQ(left->rval, EMPTY);
-    ASSERT_EQ(left->parent, root);
     ASSERT_NE(left->left, nullptr);
     ASSERT_NE(left->right, nullptr);
     ASSERT_EQ(left->middle, nullptr);
@@ -684,7 +633,6 @@ TEST_F(InsertNode, 8Nodes_Right1to2) {
 
     ASSERT_EQ(right->lval, 10);
     ASSERT_EQ(right->rval, EMPTY);
-    ASSERT_EQ(right->parent, root);
     ASSERT_NE(right->left, nullptr);
     ASSERT_NE(right->right, nullptr);
     ASSERT_EQ(right->middle, nullptr);
@@ -694,7 +642,6 @@ TEST_F(InsertNode, 8Nodes_Right1to2) {
 
     ASSERT_EQ(lleft->lval, 1);
     ASSERT_EQ(lleft->rval, EMPTY);
-    ASSERT_EQ(lleft->parent, left);
     ASSERT_EQ(lleft->max_child, 4);
     ASSERT_EQ(lleft->left->lval, 1);
     ASSERT_EQ(lleft->right->lval, 4);
@@ -705,7 +652,6 @@ TEST_F(InsertNode, 8Nodes_Right1to2) {
 
     ASSERT_EQ(lright->lval, 5);
     ASSERT_EQ(lright->rval, EMPTY);
-    ASSERT_EQ(lright->parent, left);
     ASSERT_EQ(lright->max_child, 8);
     ASSERT_EQ(lright->left->lval, 5);
     ASSERT_EQ(lright->right->lval, 8);
@@ -716,7 +662,6 @@ TEST_F(InsertNode, 8Nodes_Right1to2) {
 
     ASSERT_EQ(rleft->lval, 9);
     ASSERT_EQ(rleft->rval, EMPTY);
-    ASSERT_EQ(rleft->parent, right);
     ASSERT_EQ(rleft->max_child, 10);
     ASSERT_EQ(rleft->left->lval, 9);
     ASSERT_EQ(rleft->right->lval, 10);
@@ -727,7 +672,6 @@ TEST_F(InsertNode, 8Nodes_Right1to2) {
 
     ASSERT_EQ(rright->lval, 11);
     ASSERT_EQ(rright->rval, EMPTY);
-    ASSERT_EQ(rright->parent, right);
     ASSERT_EQ(rright->max_child, 12);
     ASSERT_EQ(rright->left->lval, 11);
     ASSERT_EQ(rright->right->lval, 12);

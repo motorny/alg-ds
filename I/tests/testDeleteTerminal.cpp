@@ -10,9 +10,9 @@ protected:
 
     DeleteTerminal() = default;
 
-    ~DeleteTerminal() override = default;
+    ~DeleteTerminal() override { freeTree(root); }
 
-    Node_t* insertNodes(const std::vector<int>& vals) {
+    Node_t* insertNodes(const std::vector<int> &vals) {
         for (auto i : vals) {
             root = insertNode(root, i);
         }

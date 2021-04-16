@@ -9,6 +9,10 @@ int isTerminal(Node_t* node) { // only left is considered, since without it ther
                             node->middle != NULL && node->middle->left == NULL) || node == NULL;
 }
 
+int isOneValued(Node_t* node) {
+    return node != NULL && node->middle == NULL;
+}
+
 void connectSiblings(Node_t* left, Node_t* middle, Node_t* right) {
     if (left != NULL)
         left->rsib = middle;
@@ -81,7 +85,7 @@ Node_t* insertTerminate(Node_t* root, int val) {
         return node;
     } else if (isTerminal(root)) {
         Node_t* node = newNode(val);
-        if (root->rval == EMPTY && root->rval <= root->lval) { // one value
+        if (isOneValued(root)) { // one value
             if (root->right == NULL) { // one value, one leaf
                 // leaves, which order is determined in the branches
                 Node_t* a = root->left, * b = node; // last branch case (else)
@@ -187,6 +191,7 @@ void freeNode(Node_t* node) {
         node->rval = EMPTY;
         node->max_child = EMPTY;
         free(node);
+        printf("h ");
     }
 }
 
@@ -204,17 +209,17 @@ Node_t* deleteTerminal(Node_t* root, int val) {
         return NULL;
         // terminal and value among leaves
     } else if (isTerminal(root) && (val == root->lval || val == root->rval || val == root->max_child)) {
-        int isOneValued = root->rval == EMPTY && root->rval <= root->lval;
+        int isOneValue = isOneValued(root);
         // leaves, which order is determined in the branches
-        Node_t* a = root->left, * b = isOneValued ? NULL : root->middle; // right case
+        Node_t* a = root->left, * b = isOneValue ? NULL : root->middle; // right case
         // sibling, node to delete, sibling
         // right case
-        Node_t* lsib = isOneValued ? root->left : root->middle, * node = root->right, * rsib = root->right->rsib;
+        Node_t* lsib = isOneValue ? root->left : root->middle, * node = root->right, * rsib = root->right->rsib;
 
         if (val == root->lval) {
-            a = isOneValued ? root->right : root->middle, b = isOneValued ? NULL : root->right;
-            lsib = root->left->lsib, node = root->left, rsib = isOneValued ? root->right : root->middle;
-        } else if (!isOneValued && val == root->rval) {
+            a = isOneValue ? root->right : root->middle, b = isOneValue ? NULL : root->right;
+            lsib = root->left->lsib, node = root->left, rsib = isOneValue ? root->right : root->middle;
+        } else if (!isOneValue && val == root->rval) {
             a = root->left, b = root->right;
             lsib = root->left, node = root->middle, rsib = root->right;
         }
@@ -231,70 +236,119 @@ Node_t* deleteNode(Node_t* root, int val) {
         return deleteTerminal(root, val);
     else {
         Node_t* node;
-        if (root->rval == EMPTY && root->rval <= root->lval) { // 1-valued root
-            if (val <= root->lval) {
-                node = deleteNode(root->left, val);
-                if (node->right == NULL) { // one leaf
-                    Node_t* toDelete = root->right;
+        if (val <= root->lval) {
+            node = deleteNode(root->left, val);
+            if (node->right == NULL) { // one leaf
+                Node_t* toDelete = root->right;
+                if (root->middle == NULL) { // 1-valued root
                     root = mergeNode(root, node->left, root->right->left, root->right->right);
                     freeNode(node);
-                    freeNode(toDelete);
-                } else { // two leaves
-                    root->lval = node->max_child;
+                } else { // 2-valued root
+                    toDelete = root->middle;
+                    node = mergeNode(node, node->left, root->middle->left, root->middle->right);
+                    root->left = node;
+                    root->middle = NULL;
+                    root->rval = EMPTY;
                 }
-            } else {
-                node = deleteNode(root->right, val);
-                if (node->right == NULL) { // one leaf
+                freeNode(toDelete);
+            } // whether two leaves or not, this needs to be done
+            root->lval = root->left->max_child;
+        } else if (!isOneValued(root) && val <= root->rval && val > root->lval) {
+            node = deleteNode(root->middle, val);
+            if (node->right == NULL) {
+                Node_t* toDelete = root->left;
+                node = mergeNode(node, root->left->left, root->left->right, node->left);
+                freeNode(toDelete);
+                root->left = node;
+                root->middle = NULL;
+                root->rval = EMPTY;
+                root->lval = node->max_child;
+            } else // two leaves
+                root->rval = node->max_child;
+        } else {
+            node = deleteNode(root->right, val);
+            if (node->right == NULL) { // one leaf
+                if (root->middle == NULL) {
                     Node_t* toDelete = root->left;
                     root = mergeNode(root, root->left->left, root->left->right, node->left);
                     freeNode(node);
                     freeNode(toDelete);
-                } else { // two leaves
-                    root->max_child = node->max_child;
-                }
-            }
-        } else { // 2-valued root
-            if (val <= root->lval) {
-                node = deleteNode(root->left, val);
-                if (node->right == NULL) { // one leaf
-                    Node_t* toDelete = root->middle;
-                    node = mergeNode(node, node->left, root->middle->left, root->middle->right);
-                    freeNode(toDelete);
-                    root->left = node;
-                    root->middle = NULL;
-                    root->rval = EMPTY;
-                    root->lval = node->max_child;
-                } else { // two leaves
-                    root->lval = node->max_child;
-                }
-            } else if (val <= root->rval && val > root->lval) {
-                node = deleteNode(root->middle, val);
-                if (node->right == NULL) {
-                    Node_t* toDelete = root->left;
-                    node = mergeNode(node, root->left->left, root->left->right, node->left);
-                    freeNode(toDelete);
-                    root->left = node;
-                    root->middle = NULL;
-                    root->rval = EMPTY;
-                    root->lval = node->max_child;
-                } else { // two leaves
-                    root->rval = node->max_child;
-                }
-            } else {
-                node = deleteNode(root->right, val);
-                if (node->right == NULL) {
+                } else {
                     Node_t* toDelete = root->middle;
                     node = mergeNode(node, root->middle->left, root->middle->right, node->left);
                     freeNode(toDelete);
                     root->right = node;
                     root->middle = NULL;
                     root->rval = EMPTY;
-                    root->max_child = node->max_child;
-                } else { // two leaves
-                    root->max_child = node->max_child;
-                }
+                } // whether two leaves or not, this needs to be done
             }
+            root->max_child = root->right->max_child;
         }
     }
     return root;
 }
+
+
+//            if (isOneValued(root)) { // 1-valued root
+//                if (val <= root->lval) {
+//                    node = deleteNode(root->left, val);
+//                    if (node->right == NULL) { // one leaf
+//                        Node_t* toDelete = root->right;
+//                        root = mergeNode(root, node->left, root->right->left, root->right->right);
+//                        freeNode(node);
+//                        freeNode(toDelete);
+//                    } else { // two leaves
+//                        root->lval = node->max_child;
+//                    }
+//                } else {
+//                    node = deleteNode(root->right, val);
+//                    if (node->right == NULL) { // one leaf
+//                        Node_t* toDelete = root->left;
+//                        root = mergeNode(root, root->left->left, root->left->right, node->left);
+//                        freeNode(node);
+//                        freeNode(toDelete);
+//                    } else { // two leaves
+//                        root->max_child = node->max_child;
+//                    }
+//                }
+//            } else { // 2-valued root
+//                if (val <= root->lval) {
+//                    node = deleteNode(root->left, val);
+//                    if (node->right == NULL) { // one leaf
+//                        Node_t* toDelete = root->middle;
+//                        node = mergeNode(node, node->left, root->middle->left, root->middle->right);
+//                        freeNode(toDelete);
+//                        root->left = node;
+//                        root->middle = NULL;
+//                        root->rval = EMPTY;
+//                    } // whether two leaves or not, this needs to be done
+//                    root->lval = node->max_child;
+//                } else if (val <= root->rval && val > root->lval) {
+//                    node = deleteNode(root->middle, val);
+//                    if (node->right == NULL) {
+//                        Node_t* toDelete = root->left;
+//                        node = mergeNode(node, root->left->left, root->left->right, node->left);
+//                        freeNode(toDelete);
+//                        root->left = node;
+//                        root->middle = NULL;
+//                        root->rval = EMPTY;
+//                        root->lval = node->max_child;
+//                    } else { // two leaves
+//                        root->rval = node->max_child;
+//                    }
+//                } else {
+//                    node = deleteNode(root->right, val);
+//                    if (node->right == NULL) {
+//                        Node_t* toDelete = root->middle;
+//                        node = mergeNode(node, root->middle->left, root->middle->right, node->left);
+//                        freeNode(toDelete);
+//                        root->right = node;
+//                        root->middle = NULL;
+//                        root->rval = EMPTY;
+//                    } // whether two leaves or not, this needs to be done
+//                    root->max_child = node->max_child;
+//                }
+//            }
+//        }
+//    return root;
+//}

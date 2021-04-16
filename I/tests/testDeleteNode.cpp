@@ -9,7 +9,7 @@ protected:
 
     DeleteNode() = default;
 
-    ~DeleteNode() override = default; //{freeTree(root);}
+    ~DeleteNode() override  { freeTree(root); }
 
     Node_t* insertNodes(const std::vector<int> &vals) {
         for (auto i: vals)

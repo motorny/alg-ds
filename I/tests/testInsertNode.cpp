@@ -11,7 +11,7 @@ protected:
 
     InsertNode() = default;
 
-    ~InsertNode() override = default; // TODO replace with actual freeing
+    ~InsertNode() override { freeTree(root); }
 
     Node_t* prepareTerminal(const std::vector<int> &vals) {
         if (vals.size() <= 4) {

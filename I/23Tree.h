@@ -20,6 +20,7 @@ typedef struct Node {
 Node_t* newNode(int val);
 Node_t* insertTerminate(Node_t* root, int val);
 Node_t* insertNode(Node_t* root, int val);
+void freeTree(Node_t* root);
 Node_t* deleteTerminal(Node_t* root, int val);
 Node_t* deleteNode(Node_t* root, int val);
 

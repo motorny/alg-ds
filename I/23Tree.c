@@ -216,7 +216,7 @@ Node_t* deleteTerminal(Node_t* root, int val) {
     if (root == NULL || root->right == NULL && root->lval == val) { // null or one leaf
         freeTree(root);
         return NULL;
-    // terminal and value among leaves
+        // terminal and value among leaves
     } else if (isTerminal(root) && (val == root->lval || val == root->rval || val == root->max_child)) {
         int isOneValued = root->rval == EMPTY && root->rval <= root->lval;
         // leaves, which order is determined in the branches
@@ -241,5 +241,45 @@ Node_t* deleteTerminal(Node_t* root, int val) {
 }
 
 Node_t* deleteNode(Node_t* root, int val) {
+    if (isTerminal(root))
+        return deleteTerminal(root, val);
+    else {
+        Node_t* node;
+        if (root->rval == EMPTY && root->rval <= root->lval) { // 1-valued root
+            if (val <= root->lval) {
+                node = deleteNode(root->left, val);
+                if (node->right == NULL) { // one leaf
+                    Node_t* toDelete = root->right;
+                    root = mergeNode(root, node->left, root->right->left, root->right->right);
+                    freeNode(node);
+                    freeNode(toDelete);
+                    return root;
+                } else { // two leaves
+                    root->lval = root->left->max_child;
+                    return root;
+                }
+            } else {
+                node = deleteNode(root->right, val);
+                if (node->right == NULL) { // one leaf
+                    Node_t* toDelete = root->left;
+                    root = mergeNode(root, root->left->left, root->left->right, node->left);
+                    freeNode(node);
+                    freeNode(toDelete);
+                    return root;
+                } else { // two leaves
+                    root->max_child = root->right->max_child;
+                    return root;
+                }
+            }
+        } else { // 2-valued root
+            if (val <= root->lval) {
+                node = deleteNode(root->left, val);
+            } else if (val <= root->rval && val > root->lval) {
+                node = deleteNode(root->middle, val);
+            } else {
+                node = deleteNode(root->right, val);
+            }
+        }
+    }
     return root;
 }

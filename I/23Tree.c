@@ -274,10 +274,52 @@ Node_t* deleteNode(Node_t* root, int val) {
         } else { // 2-valued root
             if (val <= root->lval) {
                 node = deleteNode(root->left, val);
+                if (node->right == NULL) { // one leaf
+                    Node_t* toDelete = root->middle;
+                    node = mergeNode(node, node->left, root->middle->left, root->middle->right);
+                    freeNode(toDelete);
+                    root->left = node;
+                    node->parent = root;
+                    root->middle = NULL;
+                    root->rval = EMPTY;
+                    root->lval = node->max_child;
+                    return root;
+                } else { // two leaves
+                    root->lval = node->max_child;
+                    return root;
+                }
             } else if (val <= root->rval && val > root->lval) {
                 node = deleteNode(root->middle, val);
+                if (node->right == NULL) {
+                    Node_t* toDelete = root->left;
+                    node = mergeNode(node, root->left->left, root->left->right, node->left);
+                    freeNode(toDelete);
+                    root->left = node;
+                    node->parent = root;
+                    root->middle = NULL;
+                    root->rval = EMPTY;
+                    root->lval = node->max_child;
+                    return root;
+                } else { // two leaves
+                    root->rval = node->max_child;
+                    return root;
+                }
             } else {
                 node = deleteNode(root->right, val);
+                if (node->right == NULL) {
+                    Node_t* toDelete = root->middle;
+                    node = mergeNode(node, root->middle->left, root->middle->right, node->left);
+                    freeNode(toDelete);
+                    root->right = node;
+                    node->parent = root;
+                    root->middle = NULL;
+                    root->rval = EMPTY;
+                    root->max_child = node->max_child;
+                    return root;
+                } else { // two leaves
+                    root->max_child = node->max_child;
+                    return root;
+                }
             }
         }
     }

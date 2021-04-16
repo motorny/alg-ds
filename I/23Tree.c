@@ -46,6 +46,29 @@ Node_t* newNode(int val) {
     return node;
 }
 
+void freeNode(Node_t* node) {
+    if (node != NULL) {
+        node->lsib = NULL;
+        node->rsib = NULL;
+        node->left = NULL;
+        node->middle = NULL;
+        node->right = NULL;
+        node->lval = EMPTY;
+        node->rval = EMPTY;
+        node->max_child = EMPTY;
+        free(node);
+    }
+}
+
+void freeTree(Node_t* root) {
+    if (root != NULL) {
+        freeTree(root->left);
+        freeTree(root->middle);
+        freeTree(root->right);
+        freeNode(root);
+    }
+}
+
 Node_t* splitNode(Node_t* X, Node_t* node, Node_t* Y, Node_t* root, Node_t* a, Node_t* b, Node_t* c, Node_t* d) {
     node->lval = b->max_child;
     node->max_child = d->max_child;
@@ -113,13 +136,6 @@ Node_t* insertTerminate(Node_t* root, int val) {
                     a = root->left, b = node, c = root->right;
                 }
                 connectSiblings(lsib, node, rsib);
-//                root->left = a;
-//                root->middle = b;
-//                root->right = c;
-//                root->lval = a->max_child;
-//                root->rval = b->max_child;
-//                root->max_child = c->max_child;
-//                return root;
                 return mergeNode(root, a, b, c);
             }
         } else { // two values, three leaves
@@ -182,29 +198,6 @@ Node_t* insertNode(Node_t* root, int val) {
         freeNode(X);
         freeNode(Y);
         return root;
-    }
-}
-
-void freeNode(Node_t* node) {
-    if (node != NULL) {
-        node->lsib = NULL;
-        node->rsib = NULL;
-        node->left = NULL;
-        node->middle = NULL;
-        node->right = NULL;
-        node->lval = EMPTY;
-        node->rval = EMPTY;
-        node->max_child = EMPTY;
-        free(node);
-    }
-}
-
-void freeTree(Node_t* root) {
-    if (root != NULL) {
-        freeTree(root->left);
-        freeTree(root->middle);
-        freeTree(root->right);
-        freeNode(root);
     }
 }
 
@@ -291,4 +284,17 @@ Node_t* deleteNode(Node_t* root, int val) {
         }
     }
     return root;
+}
+
+void printTree(Node_t* root) {
+    if (root == NULL)
+        return;
+    while (!isTerminal(root))
+        root = root->left;
+    if (root != NULL) {
+        root = root->left;
+        do {
+            printf("%d ", root->lval);
+        } while ((root = root->rsib) != NULL);
+    }
 }

@@ -193,22 +193,10 @@ public:
         node *left_node = cur_node;
         while (left_node->left != nullptr) {
             left_node = left_node->left;
-            //            node *right_node = cur_node->right;
-//            if (cur_node != root && cur_node->parent == nullptr)
-//                free(cur_node);
-//            if (element < cur_node->key)
-//                cur_node = left_node;
-//            else if (element > cur_node->key)
-//                cur_node = right_node;
-//            else if (element == cur_node->key) {
-//                return (cur_node);
-//            }
-        }
-//        замена
+
         node *del_node = left_node;
         if (left_node != cur_node)
             copy_nodes(cur_node, left_node);
-        //chek children and rebalanсe
         if (root == NULL) {
             free(del_node);
             return;
@@ -256,9 +244,6 @@ public:
     }
 
     void delete_one_child(struct node *n) {
-        /*
-         * Условие: n имеет не более одного ненулевого потомка.
-         */
         struct node *child;
         if (n->left == nullptr)
             child = n->right;
@@ -266,8 +251,6 @@ public:
             child = n->left;
         }
 
-//сдесь ошибка выделения
-//        if (child != nullptr) {
         replace_node(n, child);
         if (n->color == BLACK) {
             if (child != nullptr && child->color == RED)
@@ -275,11 +258,7 @@ public:
             else if (child != nullptr)
                 delete_case1(child);
         }
-//        }
-//        n=NULL;
-//        if (n == root)
-//            free(root);
-//        else
+
         free(n);
     }
 

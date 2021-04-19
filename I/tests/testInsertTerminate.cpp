@@ -23,8 +23,36 @@ TEST_F(InsertTerminate, 1Value) {
     ASSERT_EQ(root->lval, val);
 }
 
+TEST_F(InsertTerminate, 1Value_Duplicate) {
+    int val = 1;
+    root = insertTerminate(root, val);
+
+    root = insertTerminate(root, val);
+
+    ASSERT_EQ(root->left->lval, val);
+    ASSERT_EQ(root->lval, val);
+    ASSERT_EQ(root->middle, nullptr);
+    ASSERT_EQ(root->right, nullptr);
+}
+
 TEST_F(InsertTerminate, 2ValuesSmallBig) {
     int fval = 1, sval = 3;
+    root = insertTerminate(root, fval);
+    root = insertTerminate(root, sval);
+
+    ASSERT_EQ(root->left->lval, fval);
+    ASSERT_EQ(root->lval, fval);
+    ASSERT_EQ(root->right->lval, sval);
+    ASSERT_EQ(root->max_child, sval);
+    ASSERT_EQ(root->left->rsib, root->right);
+    ASSERT_EQ(root->right->lsib, root->left);
+}
+
+TEST_F(InsertTerminate, 2ValuesSmallBig_Duplicate) {
+    int fval = 1, sval = 3;
+    root = insertTerminate(root, fval);
+    root = insertTerminate(root, sval);
+
     root = insertTerminate(root, fval);
     root = insertTerminate(root, sval);
 
@@ -49,8 +77,48 @@ TEST_F(InsertTerminate, 2ValuesBigSmall) {
     ASSERT_EQ(root->right->lsib, root->left);
 }
 
+TEST_F(InsertTerminate, 2ValuesBigSmall_Duplicate) {
+    int fval = 1, sval = 3;
+    root = insertTerminate(root, sval);
+    root = insertTerminate(root, fval);
+
+    root = insertTerminate(root, sval);
+    root = insertTerminate(root, fval);
+
+    ASSERT_EQ(root->left->lval, fval);
+    ASSERT_EQ(root->lval, fval);
+    ASSERT_EQ(root->right->lval, sval);
+    ASSERT_EQ(root->max_child, sval);
+    ASSERT_EQ(root->left->rsib, root->right);
+    ASSERT_EQ(root->right->lsib, root->left);
+}
+
 TEST_F(InsertTerminate, TurnInto2NodeLeft) {
     int lval = 0, mval = 1, rval = 3;
+    root = insertTerminate(root, mval);
+    root = insertTerminate(root, rval);
+    root = insertTerminate(root, lval);
+
+    ASSERT_EQ(root->lval, lval);
+    ASSERT_EQ(root->rval, mval);
+    ASSERT_EQ(root->left->lval, lval);
+    ASSERT_EQ(root->middle->lval, mval);
+    ASSERT_EQ(root->right->lval, rval);
+
+    ASSERT_EQ(root->left->rsib, root->middle);
+    ASSERT_EQ(root->middle->lsib, root->left);
+    ASSERT_EQ(root->middle->rsib, root->right);
+    ASSERT_EQ(root->right->lsib, root->middle);
+
+    ASSERT_EQ(root->max_child, root->right->lval);
+}
+
+TEST_F(InsertTerminate, TurnInto2NodeLeft_Duplicate) {
+    int lval = 0, mval = 1, rval = 3;
+    root = insertTerminate(root, mval);
+    root = insertTerminate(root, rval);
+    root = insertTerminate(root, lval);
+
     root = insertTerminate(root, mval);
     root = insertTerminate(root, rval);
     root = insertTerminate(root, lval);
@@ -89,6 +157,30 @@ TEST_F(InsertTerminate, TurnInto2NodeMiddle) {
     ASSERT_EQ(root->max_child, root->right->lval);
 }
 
+TEST_F(InsertTerminate, TurnInto2NodeMiddle_Duplicate) {
+    int lval = 1, mval = 2, rval = 3;
+    root = insertTerminate(root, lval);
+    root = insertTerminate(root, rval);
+    root = insertTerminate(root, mval);
+
+    root = insertTerminate(root, lval);
+    root = insertTerminate(root, rval);
+    root = insertTerminate(root, mval);
+
+    ASSERT_EQ(root->lval, lval);
+    ASSERT_EQ(root->rval, mval);
+    ASSERT_EQ(root->left->lval, lval);
+    ASSERT_EQ(root->middle->lval, mval);
+    ASSERT_EQ(root->right->lval, rval);
+
+    ASSERT_EQ(root->left->rsib, root->middle);
+    ASSERT_EQ(root->middle->lsib, root->left);
+    ASSERT_EQ(root->middle->rsib, root->right);
+    ASSERT_EQ(root->right->lsib, root->middle);
+
+    ASSERT_EQ(root->max_child, root->right->lval);
+}
+
 TEST_F(InsertTerminate, TurnInto2NodeRight) {
     int lval = 1, mval = 3, rval = 4;
     root = insertTerminate(root, lval);
@@ -109,6 +201,31 @@ TEST_F(InsertTerminate, TurnInto2NodeRight) {
     ASSERT_EQ(root->max_child, root->right->lval);
 }
 
+TEST_F(InsertTerminate, TurnInto2NodeRight_Duplicate) {
+    int lval = 1, mval = 3, rval = 4;
+    root = insertTerminate(root, lval);
+    root = insertTerminate(root, mval);
+    root = insertTerminate(root, rval);
+
+    root = insertTerminate(root, lval);
+    root = insertTerminate(root, mval);
+    root = insertTerminate(root, rval);
+
+    ASSERT_EQ(root->lval, lval);
+    ASSERT_EQ(root->rval, mval);
+    ASSERT_EQ(root->left->lval, lval);
+    ASSERT_EQ(root->middle->lval, mval);
+    ASSERT_EQ(root->right->lval, rval);
+
+    ASSERT_EQ(root->left->rsib, root->middle);
+    ASSERT_EQ(root->middle->lsib, root->left);
+    ASSERT_EQ(root->middle->rsib, root->right);
+    ASSERT_EQ(root->right->lsib, root->middle);
+
+    ASSERT_EQ(root->max_child, root->right->lval);
+}
+
+// duplicate tests for split terminal node makes no sense, since split node is not terminal
 TEST_F(InsertTerminate, Split2NodeLeft) {
     int f = 0, s = 1, t = 3, fo = 5;
     root = insertTerminate(root, t);

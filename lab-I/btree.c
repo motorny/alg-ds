@@ -118,7 +118,7 @@ int RemovingKey(BTREE* tree, int value) {
 
 	int minimum = (T - 1) / 2;
 
-	int num_of_keys = tree->num_of_keys; //check smth later
+	int num_of_keys = tree->num_of_keys; 
 	int* values = tree->values;
 	BTREE** children = tree->children;
 

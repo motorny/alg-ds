@@ -248,7 +248,6 @@ void Clear(BTREE* tree) {
 	if (tree->leaf == NOT_LEAF) {
 		for (int i = 0; i <= tree->num_of_keys; i++) {
 			Clear(tree->children[i]);
-			free(tree->children[i]);
 		}
 	}
 	free(tree);

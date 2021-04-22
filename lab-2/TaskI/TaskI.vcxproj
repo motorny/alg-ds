@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{bbaa8ce7-7777-4ef6-8f72-649244544b38}</ProjectGuid>
-    <RootNamespace>TaskH</RootNamespace>
+    <ProjectGuid>{d914ff91-049d-46ed-8ccb-636f188200be}</ProjectGuid>
+    <RootNamespace>TaskI</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -140,10 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.c" />
-    <ClCompile Include="rst.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="rst.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

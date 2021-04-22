@@ -16,138 +16,12 @@ typedef enum KeyStatus {
   InsertIt
 } KeyStatus;
 node* root = NULL;
-
-void Insert(int key) {
-  node* newnode;
-  int upKey;
-  KeyStatus value;
-  value = Ins(root, key, &upKey, &newnode);
-  if (value == InsertIt) {
-    node* uproot = root;
-    root = (node*)malloc(sizeof(node));
-    root->n = 1;
-    root->keys[0] = upKey;
-    root->p[0] = uproot;
-    root->p[1] = newnode;
-  }
-}
-KeyStatus Ins(node* ptr, int key, int* topkey, node** newnode) {
-  node* newptr;
-  node *lastptr;
-  int pos;
-  int i;
-  int n;
-  int splitpos;
-  int nkey;
-  int lastkey;
-  KeyStatus value;
-  if (ptr == NULL) {
-    *newnode = NULL;
-    *topkey = key;
-    return InsertIt;
-  }
-  n = ptr->n;
-  pos = SearchPos(key, ptr->keys, n);
-  if (pos < n && key == ptr->keys[pos]) {
-    return Duplicate;
-  }
-  value = Ins(ptr->p[pos], key, &nkey, &newptr);
-  if (value != InsertIt) {
-    return value;
-  }
-  if (n < S - 1) {
-    pos = SearchPos(nkey, ptr->keys, n);
-    for (i = n; i > pos; i--) {
-      ptr->keys[i] = ptr->keys[i - 1];
-      ptr->p[i + 1] = ptr->p[i];
-    }
-    ptr->keys[pos] = nkey;
-    ptr->p[pos + 1] = newptr;
-    ++ptr->n;
-    return Luck;
-  }
-  if (pos == S - 1) {
-    lastkey = nkey;
-    lastptr = newptr;
-  }
-  else {
-    lastkey = ptr->keys[S - 2];
-    lastptr = ptr->p[S - 1];
-    for (i = S - 2; i > pos; i--) {
-      ptr->keys[i] = ptr->keys[i - 1];
-      ptr->p[i + 1] = ptr->p[i];
-    }
-    ptr->keys[pos] = nkey;
-    ptr->p[pos + 1] = newptr;
-  }
-  splitpos = (S - 1) / 2;
-  (*topkey) = ptr->keys[splitpos];
-  (*newnode) = (node*)malloc(sizeof(node));
-  ptr->n = splitpos;
-  (*newnode)->n = S - 1 - splitpos;
-  for (i = 0; i < (*newnode)->n; i++) {
-    (*newnode)->p[i] = ptr->p[i + splitpos + 1];
-    if (i < (*newnode)->n - 1) {
-      (*newnode)->keys[i] = ptr->keys[i + splitpos + 1];
-    }
-    else {
-      (*newnode)->keys[i] = lastkey;
-    }
-  }
-  (*newnode)->p[(*newnode)->n] = lastptr;
-  return InsertIt;
-}
-void Show(node* ptr, int bl) {
-  if (ptr) {
-    int i;
-    for (i = 1; i <= bl; i++) {
-      printf(" ");
-    }
-    for (i = 0; i < ptr->n; i++) {
-      printf("%d ", ptr->keys[i]);
-    }
-    printf("\n");
-    for (i = 0; i <= ptr->n; i++) {
-      Show(ptr->p[i], bl + 10);
-    }
-  }
-}
-void Search(int key) {
-  int n;
-  int pos;
-  int i;
-  node* ptr = root;
-  while (ptr) {
-    n = ptr->n;
-    pos = SearchPos(key, ptr->keys, n);
-    if (pos < n && key == ptr->keys[pos]) {
-      printf("yes\n");
-      return;
-    }
-    ptr = ptr->p[pos];
-  }
-  printf("no\n");
-}
 int SearchPos(int key, int* key_arr, int n) {
   int pos = 0;
   while (pos < n && key > key_arr[pos]) {
     pos++;
   }
   return pos;
-}
-void DeleteNode(int key) {
-  node* uproot;
-  KeyStatus value;
-  value = Delete(root, key);
-  switch (value) {
-  case LessKeys:
-    uproot = root;
-    root = root->p[0];
-    free(uproot);
-    break;
-  default:
-    return;
-  }
 }
 KeyStatus Delete(node* ptr, int key) {
   int i;
@@ -172,7 +46,7 @@ KeyStatus Delete(node* ptr, int key) {
     if (pos == n || key < key_arr[pos]) {
       return SearchingError;
     }
-    for (i = pos + 1; i < n; i++){
+    for (i = pos + 1; i < n; i++) {
       key_arr[i - 1] = key_arr[i];
       p[i] = p[i + 1];
     }
@@ -249,6 +123,134 @@ KeyStatus Delete(node* ptr, int key) {
   }
   return --ptr->n >= (ptr == root ? 1 : min) ? Luck : LessKeys;
 }
+void DeleteNode(int key) {
+  node* uproot;
+  KeyStatus value;
+  value = Delete(root, key);
+  switch (value) {
+  case LessKeys:
+    uproot = root;
+    root = root->p[0];
+    free(uproot);
+    break;
+  default:
+    return;
+  }
+}
+KeyStatus Ins(node* ptr, int key, int* topkey, node** newnode) {
+  node* newptr;
+  node* lastptr;
+  int pos;
+  int i;
+  int n;
+  int splitpos;
+  int nkey;
+  int lastkey;
+  KeyStatus value;
+  if (ptr == NULL) {
+    *newnode = NULL;
+    *topkey = key;
+    return InsertIt;
+  }
+  n = ptr->n;
+  pos = SearchPos(key, ptr->keys, n);
+  if (pos < n && key == ptr->keys[pos]) {
+    return Duplicate;
+  }
+  value = Ins(ptr->p[pos], key, &nkey, &newptr);
+  if (value != InsertIt) {
+    return value;
+  }
+  if (n < S - 1) {
+    pos = SearchPos(nkey, ptr->keys, n);
+    for (i = n; i > pos; i--) {
+      ptr->keys[i] = ptr->keys[i - 1];
+      ptr->p[i + 1] = ptr->p[i];
+    }
+    ptr->keys[pos] = nkey;
+    ptr->p[pos + 1] = newptr;
+    ++ptr->n;
+    return Luck;
+  }
+  if (pos == S - 1) {
+    lastkey = nkey;
+    lastptr = newptr;
+  }
+  else {
+    lastkey = ptr->keys[S - 2];
+    lastptr = ptr->p[S - 1];
+    for (i = S - 2; i > pos; i--) {
+      ptr->keys[i] = ptr->keys[i - 1];
+      ptr->p[i + 1] = ptr->p[i];
+    }
+    ptr->keys[pos] = nkey;
+    ptr->p[pos + 1] = newptr;
+  }
+  splitpos = (S - 1) / 2;
+  (*topkey) = ptr->keys[splitpos];
+  (*newnode) = (node*)malloc(sizeof(node));
+  ptr->n = splitpos;
+  (*newnode)->n = S - 1 - splitpos;
+  for (i = 0; i < (*newnode)->n; i++) {
+    (*newnode)->p[i] = ptr->p[i + splitpos + 1];
+    if (i < (*newnode)->n - 1) {
+      (*newnode)->keys[i] = ptr->keys[i + splitpos + 1];
+    }
+    else {
+      (*newnode)->keys[i] = lastkey;
+    }
+  }
+  (*newnode)->p[(*newnode)->n] = lastptr;
+  return InsertIt;
+}
+void Insert(int key) {
+  node* newnode;
+  int upKey;
+  KeyStatus value;
+  value = Ins(root, key, &upKey, &newnode);
+  if (value == InsertIt) {
+    node* uproot = root;
+    root = (node*)malloc(sizeof(node));
+    root->n = 1;
+    root->keys[0] = upKey;
+    root->p[0] = uproot;
+    root->p[1] = newnode;
+  }
+}
+
+void Show(node* ptr, int bl) {
+  if (ptr) {
+    int i;
+    for (i = 1; i <= bl; i++) {
+      printf(" ");
+    }
+    for (i = 0; i < ptr->n; i++) {
+      printf("%d ", ptr->keys[i]);
+    }
+    printf("\n");
+    for (i = 0; i <= ptr->n; i++) {
+      Show(ptr->p[i], bl + 10);
+    }
+  }
+}
+void Search(int key) {
+  int n;
+  int pos;
+  int i;
+  node* ptr = root;
+  while (ptr) {
+    n = ptr->n;
+    pos = SearchPos(key, ptr->keys, n);
+    if (pos < n && key == ptr->keys[pos]) {
+      printf("yes\n");
+      return;
+    }
+    ptr = ptr->p[pos];
+  }
+  printf("no\n");
+}
+
+
 int main(void) {
   char selection;
   int key;

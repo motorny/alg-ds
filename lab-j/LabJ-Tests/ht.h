@@ -3,13 +3,13 @@
 
 typedef struct htCell_t htCell_t;
 struct htCell_t {
-  char* str;
-  char isFree;
+  char str[100];
+  char status;            // 0 not inited, 2 - free, 1 - not free
 };
 
-enum returnedType_t {
-  ht_false = -1,
-  ht_true = 1
+enum returns {
+  LABJ_TRUE = 1,
+  LABJ_FALSE = 0
 };
 
 int HtInit(htCell_t** ht, int htSize);

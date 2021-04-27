@@ -3,88 +3,101 @@
 #include "ht.h"
 
 int HtInit(htCell_t** ht, int htSize) {
-  if (htSize <= 0)
-    return ht_false;
-
   *ht = (htCell_t*)malloc(sizeof(htCell_t) * htSize);
-  
-  if (*ht == NULL)
-    return ht_false;
 
-  for (int i = 0; i < htSize; i++) {
-    (*ht)[i].isFree = 1;
-    (*ht)[i].str = NULL;
-  }
-  return ht_true;
+  if (*ht == NULL)
+    return LABJ_FALSE;
+
+  for (int i = 0; i < htSize; i++)
+    (*ht)[i].status = 0;
+  return LABJ_TRUE;
 }
 
-unsigned int HashFunc1(char* str) {
-  int res = 0, i = 0;
+unsigned int HashFunc1(char *str, int size) {
+  unsigned int res = 0;
 
-  while (str[i] != 0) {
-    res += str[i++];
-    res %= 4294967010;
+  for (int i = 0; str[i] != 0; i++) {
+    res += (unsigned int)str[i];
+    res %= size;
   }
 
   return res;
 }
 
-unsigned int HashFunc2(char* str) {
-  unsigned int hash = 5381;
-  int c, i = 0;
+unsigned int HashFunc2(char *str, int size) {
+  unsigned int res = 0;
 
-  while (str[i] != 0) {
-    c = str[i++];
-    hash = hash * 33 + c;
-    hash %= 130150524;
+  for (int i = 0; str[i] != 0; i++) {
+    res += (unsigned int)str[i] + res * 2;
+    res %= size;
   }
 
-  return hash;
+  return res;
+
+  return res == 0 ? 1 : res;
 }
 
-int HtInsert(htCell_t* ht, int htSize, char* str) {
-  unsigned int x = HashFunc1(str) % htSize, y = HashFunc2(str);
+int HtInsert(htCell_t* ht, int htSize, char *str) {
+  unsigned int x, y;
 
+  if (strlen(str) > 100)
+    return LABJ_FALSE;
+
+  x = HashFunc1(str, htSize), y = HashFunc2(str, htSize);
   for (int i = 0; i < htSize; i++) {
-    if (ht[x].isFree == 1) {
-      ht[x].str = str;
-      ht[x].isFree = 0;
-      return ht_true;
+    if (ht[x].status == 0 || ht[x].status == 2) {
+      strcpy(ht[x].str, str);
+      ht[x].status = 1;
+      return LABJ_TRUE;
     }
-    x = (x + y) % htSize;
+    else if (ht[x].status == 1 && strcmp(ht[x].str, str) == 0)
+      return LABJ_FALSE;
+    else
+      x = (x + y) % htSize;
   }
-  return ht_false;
+  return LABJ_FALSE;
 }
 
-int HtFind(htCell_t* ht, int htSize, char* str) {
-  unsigned int x = HashFunc1(str) % htSize, y = HashFunc2(str);
+int HtFind(htCell_t* ht, int htSize, char *str) {
+  unsigned int x, y;
 
+  if (strlen(str) > 100)
+    return LABJ_FALSE;
+
+  x = HashFunc1(str, htSize), y = HashFunc2(str, htSize);
   for (int i = 0; i < htSize; i++) {
-    if (ht[x].isFree == 0 && ht[x].str == str)
-      return x;
+    if (ht[x].status == 1 && strcmp(ht[x].str, str) == 0)
+      return LABJ_TRUE;
+    else if (ht[x].status == 0)
+      return LABJ_FALSE;
 
     x = (x + y) % htSize;
   }
-  return ht_false;
+  return LABJ_FALSE;
 }
 
-int HtDelete(htCell_t* ht, int htSize, char* str) {
-  unsigned int x = HashFunc1(str) % htSize, y = HashFunc2(str);
+int HtDelete(htCell_t* ht, int htSize, char *str) {
+  unsigned int x, y;
 
+  if (strlen(str) > 100)
+    return LABJ_FALSE;
+
+  x = HashFunc1(str, htSize), y = HashFunc2(str, htSize);
   for (int i = 0; i < htSize; i++) {
-    if (ht[x].isFree == 0 && ht[x].str == str) {
-      ht[x].isFree = 1;
-      ht[x].str = NULL;
-      return ht_true;
+    if (ht[x].status == 1 && strcmp(ht[x].str, str) == 0) {
+      ht[x].status = 2;
+      return LABJ_TRUE;
     }
+    else if (ht[x].status == 0)
+      return LABJ_FALSE;
 
     x = (x + y) % htSize;
   }
-  return ht_false;
+  return LABJ_FALSE;
 }
 
 int HtClear(htCell_t** ht, int htSize) {
   free(*ht);
   *ht = NULL;
-  return ht_true;
+  return LABJ_TRUE;
 }

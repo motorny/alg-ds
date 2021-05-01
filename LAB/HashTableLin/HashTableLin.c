@@ -33,7 +33,6 @@ struct _HashTable_t
   uint32_t mod;
   HTItem* data;
 };
-static uint32_t maxKol = 0;
 const uint32_t Crc32Table[256] = {
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
     0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -132,7 +131,6 @@ void HashTableFree(HashTable_t* table)
   }
   free(table->data);
   free(table);
-  printf("%u\n", maxKol);
 }
 
 static uint32_t hashTFunc(uint32_t n, uint32_t i, uint32_t k, uint32_t x)
@@ -198,7 +196,7 @@ int HashTableFind(HashTable_t* table, char* key, void** value_p)
       break;
     }
   }
-  if (delCount > 100)
+  if (delCount > table->mod)
   {
     HashTableRebuild(table);
   }
@@ -210,6 +208,13 @@ int HashTableAdd(HashTable_t* table, char* key, void* value)
   uint32_t i, a;
   uint32_t strHash = Crc32(key);
   char deleteFlag;
+  {
+    void* tmp;
+    if (1 == HashTableFind(table, key, &tmp))
+    {
+      return -1;
+    }
+  }
   for (i = 0; i < table->size; i++)
   {
     a = hashTFunc(table->size, i, table->mod, strHash);
@@ -229,7 +234,6 @@ int HashTableAdd(HashTable_t* table, char* key, void* value)
       table->data[a].deleteFlag = _DELETE_FLAG_ACTIVE;
       table->data[a].strHash = strHash;
       table->data[a].value = value;
-      maxKol = max(maxKol, i);
       return 1;
       break;
     default:

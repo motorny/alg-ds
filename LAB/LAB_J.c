@@ -1,16 +1,52 @@
 #include <stdint.h>
 
+typedef enum _OUT_CODE
+{
+  OC_OK = 0,
+  OC_YES = 1,
+  OC_NO = -1,
+  OC_ERROR = -2
+}OUT_CODE;
+
 typedef struct _HashTable_t HashTable_t;
 
 HashTable_t* HashTableGet(uint32_t size, uint32_t mod);
 
 void HashTableFree(HashTable_t* table);
 
-int HashTableFind(HashTable_t* table, uint32_t key, void** value_p);
+int HashTableFind(HashTable_t* table, char* key, void** value_p);
 
-int HashTableAdd(HashTable_t* table, uint32_t key, void* value);
+int HashTableAdd(HashTable_t* table, char* key, void* value);
 
-int HashTableRemove(HashTable_t* table, uint32_t key, void** value_p);
+int HashTableRemove(HashTable_t* table, char* key, void** value_p);
+
+
+void* WrapperGet();
+
+void WrapperFree(void* dataStructure);
+
+OUT_CODE WrapperFind(void** dataStructure_p, int key, int* val_p);
+
+OUT_CODE WrapperAdd(void** dataStructure_p, int key, int val);
+
+OUT_CODE WrapperRemove(void** dataStructure_p, int key, int* val_p);
+
+#include <stdio.h>
+
+
+typedef void* _dsGet();
+
+typedef void _dsFree(void* dataStructure);
+
+typedef OUT_CODE _dsFind(void** dataStructure_p, int key, int* val_p);
+
+typedef OUT_CODE _dsAdd(void** dataStructure_p, int key, int val);
+
+typedef OUT_CODE _dsRemove(void** dataStructure_p, int key, int* val_p);
+
+void SetDataStructure(_dsGet* dsGet, _dsFree* dsFree, _dsFind* dsFind, _dsAdd* dsAdd, _dsRemove* dsRemove);
+
+int StartConsole(void);
 
 #ifdef _DEBUG
 
@@ -35,7 +71,7 @@ int HashTableRemove(HashTable_t* table, uint32_t key, void** value_p);
 typedef struct _HTItem
 {
   uint32_t strHash;
-  uint32_t key;
+  char* key;
   void* value;
   char deleteFlag;
 }HTItem;
@@ -46,7 +82,6 @@ struct _HashTable_t
   uint32_t mod;
   HTItem* data;
 };
-
 const uint32_t Crc32Table[256] = {
     0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA,
     0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -139,7 +174,7 @@ void HashTableFree(HashTable_t* table)
   {
     if (table->data[i].deleteFlag == _DELETE_FLAG_ACTIVE)
     {
-      //free(table->data[i].key);
+      free(table->data[i].key);
       free(table->data[i].value);
     }
   }
@@ -180,12 +215,12 @@ static void HashTableRebuild(HashTable_t* table)
   free(oldData);
 }
 
-int HashTableFind(HashTable_t* table, uint32_t key, void** value_p)
+int HashTableFind(HashTable_t* table, char* key, void** value_p)
 {
   uint32_t i, a;
   int r = -1;
   uint32_t delCount = 0;
-  uint32_t strHash = key;
+  uint32_t strHash = Crc32(key);
   char deleteFlag;
   for (i = 0; i < table->size; i++)
   {
@@ -193,7 +228,7 @@ int HashTableFind(HashTable_t* table, uint32_t key, void** value_p)
     deleteFlag = table->data[a].deleteFlag;
     if (deleteFlag == _DELETE_FLAG_ACTIVE)
     {
-      if (table->data[a].strHash == strHash && key == table->data[a].key)
+      if (table->data[a].strHash == strHash && strcmp(key, table->data[a].key) == 0)
       {
         *value_p = table->data[a].value;
         r = 1;
@@ -209,22 +244,58 @@ int HashTableFind(HashTable_t* table, uint32_t key, void** value_p)
       r = -1;
       break;
     }
-    else
-    {
-      return -2;
-    }
   }
-  if (delCount > 100)
+  if (delCount > table->mod)
   {
     HashTableRebuild(table);
   }
   return r;
 }
 
-int HashTableAdd(HashTable_t* table, uint32_t key, void* value)
+int HashTableAdd(HashTable_t* table, char* key, void* value)
 {
   uint32_t i, a;
-  uint32_t strHash = key;
+  uint32_t strHash = Crc32(key);
+  char deleteFlag;
+  {
+    void* tmp;
+    if (1 == HashTableFind(table, key, &tmp))
+    {
+      return -1;
+    }
+  }
+  for (i = 0; i < table->size; i++)
+  {
+    a = hashTFunc(table->size, i, table->mod, strHash);
+    deleteFlag = table->data[a].deleteFlag;
+    switch (deleteFlag)
+    {
+    case _DELETE_FLAG_ACTIVE:
+      if (table->data[a].strHash == strHash && strcmp(key, table->data[a].key) == 0)
+      {
+        return -1;
+      }
+      break;
+    case _DELETE_FLAG_DELETED:
+    case _DELETE_FLAG_NOT_USED:
+      table->data[a].key = (char*)malloc(strlen(key) + 1);
+      memcpy(table->data[a].key, key, strlen(key) + 1);
+      table->data[a].deleteFlag = _DELETE_FLAG_ACTIVE;
+      table->data[a].strHash = strHash;
+      table->data[a].value = value;
+      return 1;
+      break;
+    default:
+      break;
+    }
+  }
+  return -2;
+}
+
+int HashTableRemove(HashTable_t* table, char* key, void** value_p)
+{
+  uint32_t i, a;
+  uint32_t strHash = Crc32(key);
   char deleteFlag;
   for (i = 0; i < table->size; i++)
   {
@@ -233,99 +304,27 @@ int HashTableAdd(HashTable_t* table, uint32_t key, void* value)
     switch (deleteFlag)
     {
     case _DELETE_FLAG_ACTIVE:
-      if (table->data[a].strHash == strHash && key == table->data[a].key)
+      if (table->data[a].strHash == strHash && strcmp(key, table->data[a].key) == 0)
       {
-        return -1;
+        table->data[a].deleteFlag = _DELETE_FLAG_DELETED;
+        free(table->data[a].key);
+        table->data[a].key = NULL;
+        *value_p = table->data[a].value;
+        table->data[a].value = NULL;
+        return 1;
       }
       break;
     case _DELETE_FLAG_DELETED:
+      break;
     case _DELETE_FLAG_NOT_USED:
-      table->data[a].key = key;
-      table->data[a].deleteFlag = _DELETE_FLAG_ACTIVE;
-      table->data[a].strHash = strHash;
-      table->data[a].value = value;
-      return 1;
+      return -1;
       break;
     default:
-      return -2;
       break;
     }
   }
-  return -2;
+  return -1;
 }
-
-int HashTableRemove(HashTable_t* table, uint32_t key, void** value_p)
-{
-  uint32_t i, a;
-  int r = -1;
-  uint32_t strHash = key;
-  char deleteFlag;
-  uint32_t delCount = 0;
-  for (i = 0; i < table->size; i++)
-  {
-    a = hashTFunc(table->size, i, table->mod, strHash);
-    deleteFlag = table->data[a].deleteFlag;
-    if (deleteFlag == _DELETE_FLAG_ACTIVE)
-    {
-      if (table->data[a].strHash == strHash && key == table->data[a].key)
-      {
-        table->data[a].deleteFlag = _DELETE_FLAG_DELETED;
-        table->data[a].key = 0;
-        *value_p = table->data[a].value;
-        table->data[a].value = NULL;
-        r = 1;
-        break;
-      }
-    }
-    else if (deleteFlag == _DELETE_FLAG_NOT_USED)
-    {
-      r = -1;
-      break;
-    }
-    else
-    {
-      delCount++;
-    }
-  }
-  if (delCount > 100)
-  {
-    HashTableRebuild(table);
-  }
-  return r;
-}
-
-
-typedef enum _OUT_CODE
-{
-  OC_OK = 0,
-  OC_YES = 1,
-  OC_NO = -1,
-  OC_ERROR = -2
-}OUT_CODE;
-
-typedef void* _dsGet();
-
-typedef void _dsFree(void* dataStructure);
-
-typedef OUT_CODE _dsFind(void** dataStructure_p, unsigned int key, int* val_p);
-
-typedef OUT_CODE _dsAdd(void** dataStructure_p, unsigned int key, int val);
-
-typedef OUT_CODE _dsRemove(void** dataStructure_p, unsigned int key, int* val_p);
-
-void SetDataStructure(_dsGet* dsGet, _dsFree* dsFree, _dsFind* dsFind, _dsAdd* dsAdd, _dsRemove* dsRemove);
-
-int StartConsole(void);
-
-void* WrapperGet();
-
-void WrapperFree(void* dataStructure);
-
-OUT_CODE WrapperFind(void** dataStructure_p, unsigned int key, int* val_p);
-
-OUT_CODE WrapperAdd(void** dataStructure_p, unsigned int key, int val);
-
-OUT_CODE WrapperRemove(void** dataStructure_p, unsigned int key, int* val_p);
 
 #include <stdlib.h>
 #include <string.h>
@@ -333,7 +332,7 @@ OUT_CODE WrapperRemove(void** dataStructure_p, unsigned int key, int* val_p);
 
 void* WrapperGet()
 {
-  return (void*)HashTableGet(1046527, 1);
+  return (void*)HashTableGet(1046527, 23);
 }
 
 void WrapperFree(void* dataStructure)
@@ -341,11 +340,13 @@ void WrapperFree(void* dataStructure)
   HashTableFree((HashTable_t*)dataStructure);
 }
 
-OUT_CODE WrapperFind(void** dataStructure_p, unsigned int key, int* val_p)
+OUT_CODE WrapperFind(void** dataStructure_p, int key, int* val_p)
 {
   int r;
   int* tmp;
-  r = HashTableFind((HashTable_t*)(*dataStructure_p), key, (void**)&tmp);
+  char buff[30];
+  sprintf(buff, "%i", key);
+  r = HashTableFind((HashTable_t*)(*dataStructure_p), buff, (void**)&tmp);
   switch (r)
   {
   case 1:
@@ -361,12 +362,14 @@ OUT_CODE WrapperFind(void** dataStructure_p, unsigned int key, int* val_p)
   }
 }
 
-OUT_CODE WrapperAdd(void** dataStructure_p, unsigned int key, int val)
+OUT_CODE WrapperAdd(void** dataStructure_p, int key, int val)
 {
   int r;
   int* tmp = (int*)malloc(sizeof(int));
+  char buff[30];
+  sprintf(buff, "%i", key);
   *tmp = val;
-  r = HashTableAdd((HashTable_t*)(*dataStructure_p), key, (void*)tmp);
+  r = HashTableAdd((HashTable_t*)(*dataStructure_p), buff, (void*)tmp);
   switch (r)
   {
   case 1:
@@ -382,11 +385,13 @@ OUT_CODE WrapperAdd(void** dataStructure_p, unsigned int key, int val)
   }
 }
 
-OUT_CODE WrapperRemove(void** dataStructure_p, unsigned int key, int* val_p)
+OUT_CODE WrapperRemove(void** dataStructure_p, int key, int* val_p)
 {
   int r;
   int* tmp;
-  r = HashTableRemove((HashTable_t*)(*dataStructure_p), key, (void**)&tmp);
+  char buff[30];
+  sprintf(buff, "%i", key);
+  r = HashTableRemove((HashTable_t*)(*dataStructure_p), buff, (void**)&tmp);
   switch (r)
   {
   case 1:
@@ -402,7 +407,6 @@ OUT_CODE WrapperRemove(void** dataStructure_p, unsigned int key, int* val_p)
     break;
   }
 }
-
 
 #include <stdio.h>
 #pragma warning(disable:4996)
@@ -441,9 +445,9 @@ typedef OUT_CODE CommandFunc_t(void** dataStructure_p, FILE* instream);
 
 static OUT_CODE cmdAdd(void** dataStructure_p, FILE* instream)
 {
-  unsigned int key;
+  int key;
   int output;
-  if (1 != fscanf(instream, "%u", &key))
+  if (1 != fscanf(instream, "%i", &key))
   {
     return OC_ERROR;
   }
@@ -463,10 +467,10 @@ static OUT_CODE cmdAdd(void** dataStructure_p, FILE* instream)
 
 static OUT_CODE cmdFind(void** dataStructure_p, FILE* instream)
 {
-  unsigned int key;
+  int key;
   int output;
   int tmp;
-  if (1 != fscanf(instream, "%u", &key))
+  if (1 != fscanf(instream, "%i", &key))
   {
     return OC_ERROR;
   }
@@ -487,10 +491,10 @@ static OUT_CODE cmdFind(void** dataStructure_p, FILE* instream)
 
 static OUT_CODE cmdRemove(void** dataStructure_p, FILE* instream)
 {
-  unsigned int key;
+  int key;
   int output;
   int tmp;
-  if (1 != fscanf(instream, "%u", &key))
+  if (1 != fscanf(instream, "%i", &key))
   {
     return OC_ERROR;
   }
@@ -584,6 +588,10 @@ int StartConsole(void)
   DataStructureFree(dataStructure);
   return 0;
 }
+
+#include <stdio.h>
+
+#pragma warning(disable:4996)
 
 int main(void)
 {

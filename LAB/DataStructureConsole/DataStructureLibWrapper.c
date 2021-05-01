@@ -6,7 +6,7 @@
 
 void* WrapperGet()
 {
-  return (void*)HashTableGet(1046527, 1);
+  return (void*)HashTableGet(1046527, 23);
 }
 
 void WrapperFree(void* dataStructure)

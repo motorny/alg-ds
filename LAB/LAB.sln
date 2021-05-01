@@ -5,6 +5,13 @@ VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataStructureConsole", "DataStructureConsole\DataStructureConsole.vcxproj", "{01F75A97-291E-4F41-A93D-73F930405AEA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HashTableLin", "HashTableLin\HashTableLin.vcxproj", "{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E71E1C84-E4E4-40D9-A4B1-1F077E54E940}"
+	ProjectSection(SolutionItems) = preProject
+		LAB_J.c = LAB_J.c
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +28,14 @@ Global
 		{01F75A97-291E-4F41-A93D-73F930405AEA}.Release|x64.Build.0 = Release|x64
 		{01F75A97-291E-4F41-A93D-73F930405AEA}.Release|x86.ActiveCfg = Release|Win32
 		{01F75A97-291E-4F41-A93D-73F930405AEA}.Release|x86.Build.0 = Release|Win32
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Debug|x64.ActiveCfg = Debug|x64
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Debug|x64.Build.0 = Debug|x64
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Debug|x86.ActiveCfg = Debug|Win32
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Debug|x86.Build.0 = Debug|Win32
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Release|x64.ActiveCfg = Release|x64
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Release|x64.Build.0 = Release|x64
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Release|x86.ActiveCfg = Release|Win32
+		{F86EF00A-9E7C-4ABB-AE07-92BFA4EF630D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

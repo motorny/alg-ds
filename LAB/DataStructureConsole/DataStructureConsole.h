@@ -6,7 +6,7 @@ typedef enum _OUT_CODE
   OC_OK = 0,
   OC_YES = 1,
   OC_NO = -1,
-  OC_ERROR
+  OC_ERROR = -2
 }OUT_CODE;
 
 typedef void* _dsGet();

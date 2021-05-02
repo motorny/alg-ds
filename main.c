@@ -6,7 +6,7 @@
 
 #include "hash.h"
 
-#define SIZE 10
+#define SIZE 10000
 
 int main(void) {
 
@@ -42,10 +42,6 @@ int main(void) {
     avoidError = getchar();
   }
 
-  for (int i = 0; i < SIZE; i++) {
-    if (hashTable[i].status == NOTFREE)
-      printf("%i: key = %s", i, hashTable[i].str);
-  }
   hashDestroy(hashTable, SIZE);
 
   return 0;

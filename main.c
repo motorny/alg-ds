@@ -8,6 +8,7 @@
 
 int main(void) {
 
+
   tree_t* root;
   root = createTree();
   char regimeWork;
@@ -39,7 +40,6 @@ int main(void) {
     avoidError = getchar();
   }
 
-  printTree(root, 1, 0);
   deleteTree(root);
 
   return 0;

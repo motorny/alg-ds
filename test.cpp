@@ -1,106 +1,81 @@
+#pragma warning (disable: 4996)
 #include "pch.h"
 
 extern "C" {
-#include"tree.h"
+#include"hash.h"
 }
 
+#define SIZE 10
 
-TEST(insertKey, successInsert) {
-  tree_t* tree = NULL;
+hashTable_t* createTable() {
 
-  insertKey(&tree, 10);
-  insertKey(&tree, 11);
-  insertKey(&tree, 12);
-  insertKey(&tree, 13);
-  insertKey(&tree, 14);
-  insertKey(&tree, 15);
-  insertKey(&tree, 16);
+  hashTable_t* hashTable = (hashTable_t*)malloc(sizeof(hashTable_t) * SIZE);
+  if (hashTable == NULL)
+    return NULL;
 
-  ASSERT_EQ(tree->keys[0], 10);
-  ASSERT_EQ(tree->keys[1], 11);
-  ASSERT_EQ(tree->keys[2], 12);
-  ASSERT_EQ(tree->keys[3], 13);
-  ASSERT_EQ(tree->keys[4], 14);
-  ASSERT_EQ(tree->keys[5], 15);
-  ASSERT_EQ(tree->keys[6], 16);
+  for (int i = 0; i < SIZE; i++)
+    hashTable[i].status = DELETED;
 
-  deleteTree(tree);
+  hashTable[0].str = (char*)malloc(sizeof(char) + 1);
+  strcpy(hashTable[0].str, "d");
+  hashTable[0].status = NOTFREE;
+  hashTable[1].str = (char*)malloc(sizeof(char) + 1);
+  strcpy(hashTable[1].str, "e");
+  hashTable[1].status = NOTFREE;
+  hashTable[7].str = (char*)malloc(sizeof(char) + 1);
+  strcpy(hashTable[7].str, "a");
+  hashTable[7].status = NOTFREE;
+  hashTable[8].str = (char*)malloc(sizeof(char) + 1);
+  strcpy(hashTable[8].str, "b");
+  hashTable[8].status = NOTFREE;
+  hashTable[9].str = (char*)malloc(sizeof(char) + 1);
+  strcpy(hashTable[9].str, "c");
+  hashTable[9].status = NOTFREE;
+
+  return hashTable;
+
 }
 
-TEST(insertKey, successSplit) {
-  tree_t* tree = NULL;
+TEST(hashInsert, successInsertOne) {
 
-  insertKey(&tree, 10);
-  insertKey(&tree, 11);
-  insertKey(&tree, 12);
-  insertKey(&tree, 13);
-  insertKey(&tree, 14);
-  insertKey(&tree, 15);
-  insertKey(&tree, 16);
-  insertKey(&tree, 17);//split tree here
+  hashTable_t* hashTable = createTable();
+  hashInsert(hashTable, "f", SIZE);
+  ASSERT_TRUE(strcmp(hashTable[2].str, "f") == 0);
+  ASSERT_EQ(hashTable[2].status, NOTFREE);//
 
-  ASSERT_EQ(tree->keys[0], 13);
-  ASSERT_EQ(tree->nodes[0]->keys[0], 10);
-  ASSERT_EQ(tree->nodes[0]->keys[1], 11);
-  ASSERT_EQ(tree->nodes[0]->keys[2], 12);
-  ASSERT_EQ(tree->nodes[1]->keys[0], 14);
-  ASSERT_EQ(tree->nodes[1]->keys[1], 15);
-  ASSERT_EQ(tree->nodes[1]->keys[2], 16);
+  hashDestroy(hashTable, SIZE);
 
-  deleteTree(tree);
 }
 
-TEST(findKey, foundKey) {
-  tree_t* tree = NULL;
+TEST(hashInsert, successInsertTwoWithCollision) {
 
-  insertKey(&tree, 10);
-  insertKey(&tree, 11);
-  insertKey(&tree, 12);
-  insertKey(&tree, 13);
-  insertKey(&tree, 14);
-  insertKey(&tree, 15);
-  insertKey(&tree, 16);
+  hashTable_t* hashTable = createTable();
+  hashInsert(hashTable, "f", SIZE);//ASCII 102 => hash = 2 
+  hashInsert(hashTable, "p", SIZE);//ASCII 112 => hash = 2
+  ASSERT_TRUE(strcmp(hashTable[2].str, "f") == 0);
+  ASSERT_TRUE(strcmp(hashTable[3].str, "p") == 0);
+  ASSERT_EQ(hashTable[2].status, NOTFREE);
+  ASSERT_EQ(hashTable[3].status, NOTFREE);
 
-  ASSERT_TRUE(findKey(tree, 13) != NULL);
+  hashDestroy(hashTable, SIZE);
 
-  deleteTree(tree);
 }
 
-TEST(findKey, notFoundKey) {
-  tree_t* tree = NULL;
+TEST(hashFind, successFind) {
 
-  insertKey(&tree, 10);
-  insertKey(&tree, 11);
-  insertKey(&tree, 12);
-  insertKey(&tree, 13);
-  insertKey(&tree, 14);
-  insertKey(&tree, 15);
-  insertKey(&tree, 16);
+  hashTable_t* hashTable = createTable();
+  ASSERT_TRUE(hashFind(hashTable, "a", SIZE) == FOUND);
 
-  ASSERT_TRUE(findKey(tree, 17) == NULL);
+  hashDestroy(hashTable, SIZE);
 
-  deleteTree(tree);
 }
 
-TEST(deleteKey, successDelete) {
-  tree_t* tree = NULL;
+TEST(hashDelete, sucessDelete) {
 
-  insertKey(&tree, 10);
-  insertKey(&tree, 11);
-  insertKey(&tree, 12);
-  insertKey(&tree, 13);
-  insertKey(&tree, 14);
-  insertKey(&tree, 15);
-  insertKey(&tree, 16);
+  hashTable_t* hashTable = createTable();
+  hashDelete(hashTable, "b", SIZE);
+  ASSERT_EQ(hashTable[8].status, FREE);
 
-  deleteKey(&tree, 13);
+  hashDestroy(hashTable, SIZE);
 
-  ASSERT_EQ(tree->keys[0], 10);
-  ASSERT_EQ(tree->keys[1], 11);
-  ASSERT_EQ(tree->keys[2], 12);
-  ASSERT_EQ(tree->keys[3], 14);
-  ASSERT_EQ(tree->keys[4], 15);
-  ASSERT_EQ(tree->keys[5], 16);
-
-  deleteTree(tree);
 }

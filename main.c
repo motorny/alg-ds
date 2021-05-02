@@ -1,15 +1,20 @@
 #pragma warning (disable: 4996)
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<ctype.h>
 
-#include "tree.h"
+#include "hash.h"
+
+#define SIZE 10
 
 int main(void) {
-  tree_t* root = NULL;
 
+  hashTable_t* hashTable;
+  hashTable = hashCreate(SIZE);
+  char keyStr[100];
   char regimeWork;
-  int key, avoidError;
+  int avoidError;
 
   while (1) {
     regimeWork = getchar();
@@ -17,16 +22,16 @@ int main(void) {
       break;
     while (regimeWork == '\0' || regimeWork == '\n' || isspace(regimeWork) != 0)
       avoidError = getchar();
-    avoidError = scanf("%i", &key);
+    avoidError = scanf("%s", &keyStr);
     switch (regimeWork) {
       case('a'):
-        insertKey(&root, key);
+        hashInsert(hashTable, keyStr, SIZE);
         break;
       case('r'):
-        deleteKey(&root, key);
+        hashDelete(hashTable, keyStr, SIZE);
         break;
       case('f'):
-        if (findKey(root, key) != NULL)
+        if (hashFind(hashTable, keyStr, SIZE) == FOUND)
           printf("yes\n");
         else
           printf("no\n");
@@ -36,7 +41,13 @@ int main(void) {
     }
     avoidError = getchar();
   }
-  deleteTree(root);
+
+  for (int i = 0; i < SIZE; i++) {
+    if (hashTable[i].status == NOTFREE)
+      printf("%i: key = %s", i, hashTable[i].str);
+  }
+  hashDestroy(hashTable, SIZE);
 
   return 0;
+
 }

@@ -1,13 +1,15 @@
 #pragma warning (disable: 4996)
 #include<stdio.h>
 #include<stdlib.h>
+#include<string.h>
 #include<ctype.h>
 
-#include "tree.h"
+#include"tree.h"
 
 int main(void) {
-  tree_t* root = NULL;
 
+  tree_t* root;
+  root = createTree();
   char regimeWork;
   int key, avoidError;
 
@@ -23,10 +25,10 @@ int main(void) {
         insertKey(&root, key);
         break;
       case('r'):
-        deleteKey(&root, key);
+        deleteKey(root, key);
         break;
       case('f'):
-        if (findKey(root, key) != NULL)
+        if (findKey(root, key) == FOUND)
           printf("yes\n");
         else
           printf("no\n");
@@ -36,7 +38,10 @@ int main(void) {
     }
     avoidError = getchar();
   }
+
+  printTree(root, 1, 0);
   deleteTree(root);
 
   return 0;
+
 }

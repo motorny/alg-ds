@@ -5,24 +5,27 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-#define NOTENOUGHNODES 0
 #define FOUND 1
 #define NOTFOUND -1
 #define ORDER 4
 #define LEAF 4
 #define NOTLEAF -4
 
-//B-tree
+//B+-tree
 typedef struct tree {
-  int keys[2 * ORDER - 1];
-  struct tree* nodes[2 * ORDER];
+  int keys[2 * ORDER];
+  struct tree* nodes[2 * ORDER + 1];
+  struct tree* parent;
+  struct tree* left, *right;
   int numOfNode;
   int isLeaf;
 } tree_t;
 
-tree_t* findKey(tree_t* tree, int key);
-void insertKey(tree_t** tree, int key);
-void deleteKey(tree_t** root, int key);
+tree_t* createTree(void);
+int findKey(tree_t* tree, int key);
+void insertKey(tree_t** root, int key);
+void deleteKey(tree_t* tree, int key);
 void deleteTree(tree_t* tree);
+void printTree(tree_t* tree, int index, int child);
 
 #endif

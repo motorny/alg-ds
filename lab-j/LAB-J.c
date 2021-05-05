@@ -14,7 +14,8 @@ typedef struct list{
 list* (hash[HASH_SIZE]);
 
 int hashFunction(char *str){
-    int length = sizeof(str)/sizeof(char);
+    if(str == NULL) return 0;
+    int length = strlen(str);
     int sum = 0;
     for (int i = 0; i < length; i++)
         sum += (int)str[i];
@@ -22,6 +23,7 @@ int hashFunction(char *str){
 }
 
 void addStr(char *str){
+    if(!str) return;
     int index = hashFunction(str);
     int is = 0;
     
@@ -80,6 +82,7 @@ void addStr(char *str){
 }
 
 void rmStr(char *str){
+    if(!str) return;
     int index = hashFunction(str);
     int is = 0;
 
@@ -125,6 +128,7 @@ void rmStr(char *str){
 }
 
 int findStr(char *str){
+    if(!str) return 0;
     int index = hashFunction(str);
     int is = 0;
     if(hash[index] != NULL){

@@ -1,292 +1,581 @@
-#include "stdio.h"
-#include "stdlib.h"
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define M 3
+// Default order
+#define ORDER 3
 
-typedef struct _node {
-    int  n; /* n < M */
-    int  keys[M - 1]; /*array of keys*/
-    struct _node* p[M]; /* (n+1 pointers) */
+typedef struct record {
+    int value;
+} record;
+
+// Node
+typedef struct node {
+    void** pointers;
+    int* keys;
+    struct node* parent;
+    bool is_leaf;
+    int num_keys;
+    struct node* next;
 } node;
-node* root = NULL;
 
-typedef enum KeyStatus {
-    Duplicate,
-    SearchFailure,
-    Success,
-    InsertIt,
-    LessKeys,
-} KeyStatus;
+int order = ORDER;
+node* queue = NULL;
+bool verbose_output = false;
 
-void insert(int key) {
-    node* newnode;
-    int upKey;
-    KeyStatus value;
-    value = ins(root, key, &upKey, &newnode);
-    if (value == Duplicate) {
-        // printf("Key already insert\n");
-    }
-    if (value == InsertIt) {
-        node* uproot = root;
-        root = (node*)malloc(sizeof(node));
-        root->n = 1;
-        root->keys[0] = upKey;
-        root->p[0] = uproot;
-        root->p[1] = newnode;
-    }
-}
+// Enqueue
+void enqueue(node* new_node);
 
-KeyStatus ins(node* ptr, int key, int* upKey, node** newnode) {
-    node* newPtr, * lastPtr;
-    int pos, i, n, splitPos;
-    int newKey, lastKey;
-    KeyStatus value;
-    if (ptr == NULL) {
-        *newnode = NULL;
-        *upKey = key;
-        return InsertIt;
+// Dequeue
+node* dequeue(void);
+int height(node* const root);
+int pathToLeaves(node* const root, node* child);
+void printLeaves(node* const root);
+void printTree(node* const root);
+void findAndPrint(node* const root, int key, bool verbose);
+void findAndPrintRange(node* const root, int range1, int range2, bool verbose);
+int findRange(node* const root, int key_start, int key_end, bool verbose,
+    int returned_keys[], void* returned_pointers[]);
+node* findLeaf(node* const root, int key, bool verbose);
+record* find(node* root, int key, bool verbose, node** leaf_out);
+int cut(int length);
+
+record* makeRecord(int value);
+node* makeNode(void);
+node* makeLeaf(void);
+int getLeftIndex(node* parent, node* left);
+node* insertIntoLeaf(node* leaf, int key, record* pointer);
+node* insertIntoLeafAfterSplitting(node* root, node* leaf, int key,
+    record* pointer);
+node* insertIntoNode(node* root, node* parent,
+    int left_index, int key, node* right);
+node* insertIntoNodeAfterSplitting(node* root, node* parent,
+    int left_index,
+    int key, node* right);
+node* insertIntoParent(node* root, node* left, int key, node* right);
+node* insertIntoNewRoot(node* left, int key, node* right);
+node* startNewTree(int key, record* pointer);
+node* insert(node* root, int key, int value);
+
+// Enqueue
+void enqueue(node* new_node) {
+    node* c;
+    if (queue == NULL) {
+        queue = new_node;
+        queue->next = NULL;
     }
-    n = ptr->n;
-    pos = searchPos(key, ptr->keys, n);
-    if (pos < n && key == ptr->keys[pos])
-        return Duplicate;
-    value = ins(ptr->p[pos], key, &newKey, &newPtr);
-    if (value != InsertIt)
-        return value;
-    /*If keys in node is less than M-1 where M is order of B tree*/
-    if (n < M - 1) {
-        pos = searchPos(newKey, ptr->keys, n);
-        /*Shifting the key and pointer right for inserting the new key*/
-        for (i = n; i > pos; i--) {
-            ptr->keys[i] = ptr->keys[i - 1];
-            ptr->p[i + 1] = ptr->p[i];
+    else {
+        c = queue;
+        while (c->next != NULL) {
+            c = c->next;
         }
-        /*Key is inserted at exact location*/
-        ptr->keys[pos] = newKey;
-        ptr->p[pos + 1] = newPtr;
-        ++ptr->n; /*incrementing the number of keys in node*/
-        return Success;
-    }
-     /*If keys in nodes are maximum and position of node to be inserted is last*/
-    if (pos == M - 1) {
-        lastKey = newKey;
-        lastPtr = newPtr;
-    }
-    else { /*If keys in node are maximum and position of node to be inserted is not last*/
-        lastKey = ptr->keys[M - 2];
-        lastPtr = ptr->p[M - 1];
-        for (i = M - 2; i > pos; i--) {
-            ptr->keys[i] = ptr->keys[i - 1];
-            ptr->p[i + 1] = ptr->p[i];
-        }
-        ptr->keys[pos] = newKey;
-        ptr->p[pos + 1] = newPtr;
-    }
-    splitPos = (M - 1) / 2;
-    (*upKey) = ptr->keys[splitPos];
-
-    (*newnode) = (node*)malloc(sizeof(node));/*Right node after split*/
-    ptr->n = splitPos; /*No. of keys for left splitted node*/
-    (*newnode)->n = M - 1 - splitPos;/*No. of keys for right splitted node*/
-    for (i = 0; i < (*newnode)->n; i++) {
-        (*newnode)->p[i] = ptr->p[i + splitPos + 1];
-        if (i < (*newnode)->n - 1)
-            (*newnode)->keys[i] = ptr->keys[i + splitPos + 1];
-        else
-            (*newnode)->keys[i] = lastKey;
-    }
-    (*newnode)->p[(*newnode)->n] = lastPtr;
-    return InsertIt;
-}
-
-void display(node* ptr, int blanks) {
-    if (ptr) {
-        int i;
-        for (i = 1; i <= blanks; i++)
-            printf(" ");
-        for (i = 0; i < ptr->n; i++)
-            printf("%d ", ptr->keys[i]);
-        printf("\n");
-        for (i = 0; i <= ptr->n; i++)
-            display(ptr->p[i], blanks + 10);
+        c->next = new_node;
+        new_node->next = NULL;
     }
 }
 
-void search(int key) {
-    int pos, i, n;
-    node* ptr = root;
-    while (ptr) {
-        n = ptr->n;
-        pos = searchPos(key, ptr->keys, n);
-        if (pos < n && key == ptr->keys[pos]) {
-            printf("yes\n");
-            return;
-        }
-        ptr = ptr->p[pos];
-    }
-    printf("no\n");
+// Dequeue
+node* dequeue(void) {
+    node* n = queue;
+    queue = queue->next;
+    n->next = NULL;
+    return n;
 }
 
-int searchPos(int key, int* key_arr, int n) {
-    int pos = 0;
-    while (pos < n && key > key_arr[pos])
-        pos++;
-    return pos;
-}
-
-void DelNode(int key) {
-    node* uproot;
-    KeyStatus value;
-    value = del(root, key);
-    switch (value) {
-    case SearchFailure:
-        //printf("Key %d is not found\n", key);
-        break;
-    case LessKeys:
-        uproot = root;
-        root = root->p[0];
-        free(uproot);
-        break;
-    default:
+// Print the leaves
+void printLeaves(node* const root) {
+    if (root == NULL) {
+        printf("Empty tree.\n");
         return;
     }
+    int i;
+    node* c = root;
+    while (!c->is_leaf)
+        c = c->pointers[0];
+    while (true) {
+        for (i = 0; i < c->num_keys; i++) {
+            if (verbose_output)
+                printf("%p ", c->pointers[i]);
+            printf("%d ", c->keys[i]);
+        }
+        if (verbose_output)
+            printf("%p ", c->pointers[order - 1]);
+        if (c->pointers[order - 1] != NULL) {
+            printf(" | ");
+            c = c->pointers[order - 1];
+        }
+        else
+            break;
+    }
+    printf("\n");
 }
 
-KeyStatus del(node* ptr, int key) {
-    int pos, i, pivot, n, min;
-    int* key_arr;
-    KeyStatus value;
-    node** p, * lptr, * rptr;
-
-    if (ptr == NULL)
-        return SearchFailure;
-    /*Assigns values of node*/
-    n = ptr->n;
-    key_arr = ptr->keys;
-    p = ptr->p;
-    min = (M - 1) / 2;/*Minimum number of keys*/
-                            
-    pos = searchPos(key, key_arr, n);
-    // p is a leaf
-    if (p[0] == NULL) {
-        if (pos == n || key < key_arr[pos])
-            return SearchFailure;
-        /*Shift keys and pointers left*/
-        for (i = pos + 1; i < n; i++)
-        {
-            key_arr[i - 1] = key_arr[i];
-            p[i] = p[i + 1];
-        }
-        return --ptr->n >= (ptr == root ? 1 : min) ? Success : LessKeys;
+// Calculate height
+int height(node* const root) {
+    int h = 0;
+    node* c = root;
+    while (!c->is_leaf) {
+        c = c->pointers[0];
+        h++;
     }
+    return h;
+}
 
-    //if found key but p is not a leaf
-    if (pos < n && key == key_arr[pos]) {
-        node* qp = p[pos], * qp1;
-        int nkey;
-        while (1) {
-            nkey = qp->n;
-            qp1 = qp->p[nkey];
-            if (qp1 == NULL)
-                break;
-            qp = qp1;
-        }
-        key_arr[pos] = qp->keys[nkey - 1];
-        qp->keys[nkey - 1] = key;
+// Get path to root
+int pathToLeaves(node* const root, node* child) {
+    int length = 0;
+    node* c = child;
+    while (c != root) {
+        c = c->parent;
+        length++;
     }
-    value = del(p[pos], key);
-    if (value != LessKeys)
-        return value;
+    return length;
+}
 
-    if (pos > 0 && p[pos - 1]->n > min) {
-        pivot = pos - 1; /*pivot for left and right node*/
-        lptr = p[pivot];
-        rptr = p[pos];
-        /*Assigns values for right node*/
-        rptr->p[rptr->n + 1] = rptr->p[rptr->n];
-        for (i = rptr->n; i > 0; i--) {
-            rptr->keys[i] = rptr->keys[i - 1];
-            rptr->p[i] = rptr->p[i - 1];
-        }
-        rptr->n++;
-        rptr->keys[0] = key_arr[pivot];
-        rptr->p[0] = lptr->p[lptr->n];
-        key_arr[pivot] = lptr->keys[--lptr->n];
-        return Success;
+// Print the tree
+void printTree(node* const root) {
+    node* n = NULL;
+    int i = 0;
+    int rank = 0;
+    int new_rank = 0;
+
+    if (root == NULL) {
+        printf("Empty tree.\n");
+        return;
     }
-
-    if (pos < n && p[pos + 1]->n > min) {
-        pivot = pos;
-        lptr = p[pivot];
-        rptr = p[pivot + 1];
-        /*Assigns values for left node*/
-        lptr->keys[lptr->n] = key_arr[pivot];
-        lptr->p[lptr->n + 1] = rptr->p[0];
-        key_arr[pivot] = rptr->keys[0];
-        lptr->n++;
-        rptr->n--;
-        for (i = 0; i < rptr->n; i++) {
-            rptr->keys[i] = rptr->keys[i + 1];
-            rptr->p[i] = rptr->p[i + 1];
+    queue = NULL;
+    enqueue(root);
+    while (queue != NULL) {
+        n = dequeue();
+        if (n->parent != NULL && n == n->parent->pointers[0]) {
+            new_rank = pathToLeaves(root, n);
+            if (new_rank != rank) {
+                rank = new_rank;
+                printf("\n");
+            }
         }
-        rptr->p[rptr->n] = rptr->p[rptr->n + 1];
-        return Success;
+        if (verbose_output)
+            printf("(%p)", n);
+        for (i = 0; i < n->num_keys; i++) {
+            if (verbose_output)
+                printf("%p ", n->pointers[i]);
+            printf("%d ", n->keys[i]);
+        }
+        if (!n->is_leaf)
+            for (i = 0; i <= n->num_keys; i++)
+                enqueue(n->pointers[i]);
+        if (verbose_output) {
+            if (n->is_leaf)
+                printf("%p ", n->pointers[order - 1]);
+            else
+                printf("%p ", n->pointers[n->num_keys]);
+        }
+        printf("| ");
     }
+    printf("\n");
+}
 
-    if (pos == n)
-        pivot = pos - 1;
+// Find the node and print it
+void findAndPrint(node* const root, int key, bool verbose) {
+    node* leaf = NULL;
+    record* r = find(root, key, verbose, NULL);
+    if (r == NULL)
+        printf("Record not found under key %d.\n", key);
     else
-        pivot = pos;
-
-    lptr = p[pivot];
-    rptr = p[pivot + 1];
-    /*merge right node with left node*/
-    lptr->keys[lptr->n] = key_arr[pivot];
-    lptr->p[lptr->n + 1] = rptr->p[0];
-    for (i = 0; i < rptr->n; i++) {
-        lptr->keys[lptr->n + 1 + i] = rptr->keys[i];
-        lptr->p[lptr->n + 2 + i] = rptr->p[i + 1];
-    }
-    lptr->n = lptr->n + rptr->n + 1;
-    free(rptr); /*Remove right node*/
-    for (i = pos + 1; i < n; i++) {
-        key_arr[i - 1] = key_arr[i];
-        p[i] = p[i + 1];
-    }
-    return --ptr->n >= (ptr == root ? 1 : min) ? Success : LessKeys;
+        printf("Record at %p -- key %d, value %d.\n",
+            r, key, r->value);
 }
 
+// Find and print the range
+void findAndPrintRange(node* const root, int key_start, int key_end,
+    bool verbose) {
+    int i;
+    const array_size = key_end - key_start + 1;
+    int *returned_keys = (int*)malloc(array_size * sizeof(int));
+    void** returned_pointers = malloc(array_size * sizeof(int*));
+    int num_found = findRange(root, key_start, key_end, verbose,
+        returned_keys, returned_pointers);
+    if (!num_found)
+        printf("None found.\n");
+    else {
+        for (i = 0; i < num_found; i++)
+            printf("Key: %d   Location: %p  Value: %d\n",
+                returned_keys[i],
+                returned_pointers[i],
+                ((record*)
+                    returned_pointers[i])
+                ->value);
+    }
+}
+
+// Find the range
+int findRange(node* const root, int key_start, int key_end, bool verbose,
+    int returned_keys[], void* returned_pointers[]) {
+    int i, num_found;
+    num_found = 0;
+    node* n = findLeaf(root, key_start, verbose);
+    if (n == NULL)
+        return 0;
+    for (i = 0; i < n->num_keys && n->keys[i] < key_start; i++)
+        ;
+    if (i == n->num_keys)
+        return 0;
+    while (n != NULL) {
+        for (; i < n->num_keys && n->keys[i] <= key_end; i++) {
+            returned_keys[num_found] = n->keys[i];
+            returned_pointers[num_found] = n->pointers[i];
+            num_found++;
+        }
+        n = n->pointers[order - 1];
+        i = 0;
+    }
+    return num_found;
+}
+
+// Find the leaf
+node* findLeaf(node* const root, int key, bool verbose) {
+    if (root == NULL) {
+        if (verbose)
+            printf("Empty tree.\n");
+        return root;
+    }
+    int i = 0;
+    node* c = root;
+    while (!c->is_leaf) {
+        if (verbose) {
+            printf("[");
+            for (i = 0; i < c->num_keys - 1; i++)
+                printf("%d ", c->keys[i]);
+            printf("%d] ", c->keys[i]);
+        }
+        i = 0;
+        while (i < c->num_keys) {
+            if (key >= c->keys[i])
+                i++;
+            else
+                break;
+        }
+        if (verbose)
+            printf("%d ->\n", i);
+        c = (node*)c->pointers[i];
+    }
+    if (verbose) {
+        printf("Leaf [");
+        for (i = 0; i < c->num_keys - 1; i++)
+            printf("%d ", c->keys[i]);
+        printf("%d] ->\n", c->keys[i]);
+    }
+    return c;
+}
+
+record* find(node* root, int key, bool verbose, node** leaf_out) {
+    if (root == NULL) {
+        if (leaf_out != NULL) {
+            *leaf_out = NULL;
+        }
+        return NULL;
+    }
+
+    int i = 0;
+    node* leaf = NULL;
+
+    leaf = findLeaf(root, key, verbose);
+
+    for (i = 0; i < leaf->num_keys; i++)
+        if (leaf->keys[i] == key)
+            break;
+    if (leaf_out != NULL) {
+        *leaf_out = leaf;
+    }
+    if (i == leaf->num_keys)
+        return NULL;
+    else
+        return (record*)leaf->pointers[i];
+}
+
+int cut(int length) {
+    if (length % 2 == 0)
+        return length / 2;
+    else
+        return length / 2 + 1;
+}
+
+record* makeRecord(int value) {
+    record* new_record = (record*)malloc(sizeof(record));
+    if (new_record == NULL) {
+        perror("Record creation.");
+        exit(EXIT_FAILURE);
+    }
+    else {
+        new_record->value = value;
+    }
+    return new_record;
+}
+
+node* makeNode(void) {
+    node* new_node;
+    new_node = malloc(sizeof(node));
+    if (new_node == NULL) {
+        perror("Node creation.");
+        exit(EXIT_FAILURE);
+    }
+    new_node->keys = malloc((order - 1) * sizeof(int));
+    if (new_node->keys == NULL) {
+        perror("New node keys array.");
+        exit(EXIT_FAILURE);
+    }
+    new_node->pointers = malloc(order * sizeof(void*));
+    if (new_node->pointers == NULL) {
+        perror("New node pointers array.");
+        exit(EXIT_FAILURE);
+    }
+    new_node->is_leaf = false;
+    new_node->num_keys = 0;
+    new_node->parent = NULL;
+    new_node->next = NULL;
+    return new_node;
+}
+
+node* makeLeaf(void) {
+    node* leaf = makeNode();
+    leaf->is_leaf = true;
+    return leaf;
+}
+
+int getLeftIndex(node* parent, node* left) {
+    int left_index = 0;
+    while (left_index <= parent->num_keys &&
+        parent->pointers[left_index] != left)
+        left_index++;
+    return left_index;
+}
+
+node* insertIntoLeaf(node* leaf, int key, record* pointer) {
+    int i, insertion_point;
+
+    insertion_point = 0;
+    while (insertion_point < leaf->num_keys && leaf->keys[insertion_point] < key)
+        insertion_point++;
+
+    for (i = leaf->num_keys; i > insertion_point; i--) {
+        leaf->keys[i] = leaf->keys[i - 1];
+        leaf->pointers[i] = leaf->pointers[i - 1];
+    }
+    leaf->keys[insertion_point] = key;
+    leaf->pointers[insertion_point] = pointer;
+    leaf->num_keys++;
+    return leaf;
+}
+
+node* insertIntoLeafAfterSplitting(node* root, node* leaf, int key, record* pointer) {
+    node* new_leaf;
+    int* temp_keys;
+    void** temp_pointers;
+    int insertion_index, split, new_key, i, j;
+
+    new_leaf = makeLeaf();
+
+    temp_keys = malloc(order * sizeof(int));
+    if (temp_keys == NULL) {
+        perror("Temporary keys array.");
+        exit(EXIT_FAILURE);
+    }
+
+    temp_pointers = malloc(order * sizeof(void*));
+    if (temp_pointers == NULL) {
+        perror("Temporary pointers array.");
+        exit(EXIT_FAILURE);
+    }
+
+    insertion_index = 0;
+    while (insertion_index < order - 1 && leaf->keys[insertion_index] < key)
+        insertion_index++;
+
+    for (i = 0, j = 0; i < leaf->num_keys; i++, j++) {
+        if (j == insertion_index)
+            j++;
+        temp_keys[j] = leaf->keys[i];
+        temp_pointers[j] = leaf->pointers[i];
+    }
+
+    temp_keys[insertion_index] = key;
+    temp_pointers[insertion_index] = pointer;
+
+    leaf->num_keys = 0;
+
+    split = cut(order - 1);
+
+    for (i = 0; i < split; i++) {
+        leaf->pointers[i] = temp_pointers[i];
+        leaf->keys[i] = temp_keys[i];
+        leaf->num_keys++;
+    }
+
+    for (i = split, j = 0; i < order; i++, j++) {
+        new_leaf->pointers[j] = temp_pointers[i];
+        new_leaf->keys[j] = temp_keys[i];
+        new_leaf->num_keys++;
+    }
+
+    free(temp_pointers);
+    free(temp_keys);
+
+    new_leaf->pointers[order - 1] = leaf->pointers[order - 1];
+    leaf->pointers[order - 1] = new_leaf;
+
+    for (i = leaf->num_keys; i < order - 1; i++)
+        leaf->pointers[i] = NULL;
+    for (i = new_leaf->num_keys; i < order - 1; i++)
+        new_leaf->pointers[i] = NULL;
+
+    new_leaf->parent = leaf->parent;
+    new_key = new_leaf->keys[0];
+
+    return insertIntoParent(root, leaf, new_key, new_leaf);
+}
+
+node* insertIntoNode(node* root, node* n,
+    int left_index, int key, node* right) {
+    int i;
+
+    for (i = n->num_keys; i > left_index; i--) {
+        n->pointers[i + 1] = n->pointers[i];
+        n->keys[i] = n->keys[i - 1];
+    }
+    n->pointers[left_index + 1] = right;
+    n->keys[left_index] = key;
+    n->num_keys++;
+    return root;
+}
+
+node* insertIntoNodeAfterSplitting(node* root, node* old_node, int left_index,
+    int key, node* right) {
+    int i, j, split, k_prime;
+    node* new_node, * child;
+    int* temp_keys;
+    node** temp_pointers;
+
+    temp_pointers = malloc((order + 1) * sizeof(node*));
+    if (temp_pointers == NULL) {
+        exit(EXIT_FAILURE);
+    }
+    temp_keys = malloc(order * sizeof(int));
+    if (temp_keys == NULL) {
+        exit(EXIT_FAILURE);
+    }
+
+    for (i = 0, j = 0; i < old_node->num_keys + 1; i++, j++) {
+        if (j == left_index + 1)
+            j++;
+        temp_pointers[j] = old_node->pointers[i];
+    }
+
+    for (i = 0, j = 0; i < old_node->num_keys; i++, j++) {
+        if (j == left_index)
+            j++;
+        temp_keys[j] = old_node->keys[i];
+    }
+
+    temp_pointers[left_index + 1] = right;
+    temp_keys[left_index] = key;
+
+    split = cut(order);
+    new_node = makeNode();
+    old_node->num_keys = 0;
+    for (i = 0; i < split - 1; i++) {
+        old_node->pointers[i] = temp_pointers[i];
+        old_node->keys[i] = temp_keys[i];
+        old_node->num_keys++;
+    }
+    old_node->pointers[i] = temp_pointers[i];
+    k_prime = temp_keys[split - 1];
+    for (++i, j = 0; i < order; i++, j++) {
+        new_node->pointers[j] = temp_pointers[i];
+        new_node->keys[j] = temp_keys[i];
+        new_node->num_keys++;
+    }
+    new_node->pointers[j] = temp_pointers[i];
+    free(temp_pointers);
+    free(temp_keys);
+    new_node->parent = old_node->parent;
+    for (i = 0; i <= new_node->num_keys; i++) {
+        child = new_node->pointers[i];
+        child->parent = new_node;
+    }
+
+    return insertIntoParent(root, old_node, k_prime, new_node);
+}
+
+node* insertIntoParent(node* root, node* left, int key, node* right) {
+    int left_index;
+    node* parent;
+
+    parent = left->parent;
+
+    if (parent == NULL)
+        return insertIntoNewRoot(left, key, right);
+
+    left_index = getLeftIndex(parent, left);
+
+    if (parent->num_keys < order - 1)
+        return insertIntoNode(root, parent, left_index, key, right);
+
+    return insertIntoNodeAfterSplitting(root, parent, left_index, key, right);
+}
+
+node* insertIntoNewRoot(node* left, int key, node* right) {
+    node* root = makeNode();
+    root->keys[0] = key;
+    root->pointers[0] = left;
+    root->pointers[1] = right;
+    root->num_keys++;
+    root->parent = NULL;
+    left->parent = root;
+    right->parent = root;
+    return root;
+}
+
+node* startNewTree(int key, record* pointer) {
+    node* root = makeLeaf();
+    root->keys[0] = key;
+    root->pointers[0] = pointer;
+    root->pointers[order - 1] = NULL;
+    root->parent = NULL;
+    root->num_keys++;
+    return root;
+}
+
+node* insert(node* root, int key, int value) {
+    record* record_pointer = NULL;
+    node* leaf = NULL;
+
+    record_pointer = find(root, key, false, NULL);
+    if (record_pointer != NULL) {
+        record_pointer->value = value;
+        return root;
+    }
+
+    record_pointer = makeRecord(value);
+
+    if (root == NULL)
+        return startNewTree(key, record_pointer);
+
+    leaf = findLeaf(root, key, false);
+
+    if (leaf->num_keys < order - 1) {
+        leaf = insertIntoLeaf(leaf, key, record_pointer);
+        return root;
+    }
+
+    return insertIntoLeafAfterSplitting(root, leaf, key, record_pointer);
+}
 
 int main() {
-    int key;
-    char choice;
-    while (!feof(stdin)) {
-       
-        scanf("%c", &choice); 
+    node* root;
+    char instruction;
 
-        switch (choice) {
-        case 'a':
-         
-            scanf("%d", &key); 
-            insert(key);
-            break;
-        case 'r':
-            
-            scanf("%d", &key); 
-            DelNode(key);
-            break;
-        case 'f':
-            
-            scanf("%d", &key); 
-            search(key);
-            break;
-        
-        case 'v':
+    root = NULL;
 
-            display(root, 0); //display tree for debugging
-            break;
-        }
-    }
-    return 0;
+   
 }
-

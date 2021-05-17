@@ -101,7 +101,6 @@ int main() {
     char key[100];
     char command;
     char symbol;
-    int avoidError;
 
     while (1) {
         command = getchar();

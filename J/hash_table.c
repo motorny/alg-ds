@@ -1,5 +1,6 @@
 #include <malloc.h>
 #include <string.h>
+#include <stdint.h>
 #include "hash_table.h"
 
 ht_t* createHash(ht_t* table, int capacity) {
@@ -25,19 +26,27 @@ void freeHash(ht_t* table) {
     free(table);
 }
 
-uint hash(const char* key) {
-    unsigned int sum = 0;
+#define A 54059 /* a prime */
+#define B 76963 /* another prime */
+#define C 86969 /* yet another prime */
+#define FIRSTH 37 /* also prime */
 
-    for (const char* ptr = key; *ptr; ptr++)
-        sum += (*ptr - 'a');
-    return sum;
+static uint_fast16_t hash(const char* s) {
+    uint_fast16_t h = FIRSTH;
+    uint8_t size = 0;
+    for (const char* ptr = s; *ptr; ptr++, size++) {
+        if (size > 20)
+            return h;
+        h = (h * A) ^ (*ptr * B);
+    }
+    return h; // or return h % C;
 }
 
 ht_entry_t* findHash(const ht_t* table, const char* str) {
     if (!table)
         return NULL;
 
-    uint index = hash(str) % table->capacity, _try = 0;
+    uint_fast16_t index = hash(str) % table->capacity, _try = 0;
 
     while (table->entries[index].status != FREE) {
         if (table->entries[index].status == BUSY && strcmp(table->entries[index].key, str) == 0)
@@ -50,31 +59,33 @@ ht_entry_t* findHash(const ht_t* table, const char* str) {
 
 
 ht_entry_t* __insertHash(ht_entry_t* entries, const char* str, const int capacity, int* size) {
-    uint index = hash(str) % capacity, _try = 0;
+    uint_fast16_t index = hash(str) % capacity, _try = 0;
 
-    while (entries[index].status == BUSY && strcmp(entries[index].key, str) != 0)
+    while (entries[index].status == BUSY) {
+        if (strcmp(entries[index].key, str) == 0)
+            return entries;
         _try++, index = (index + _try * _try) % capacity;
-
-    if (entries[index].status != BUSY) {
-        entries[index].key = strdup(str);
-        entries[index].status = BUSY;
-        if (size != NULL)
-            (*size)++;
     }
+
+    entries[index].key = strdup(str);
+    entries[index].status = BUSY;
+    if (size != NULL)
+        (*size)++;
+
     return entries;
 }
 
 expand_status_t expandHash(ht_t* table) {
-    int new_capacity = table->capacity * 2;
-    ht_entry_t* new_entries = (ht_entry_t*) calloc(new_capacity, sizeof(ht_entry_t));
+    int new_capacity = table->capacity > 0 ? table->capacity * 2 : 4;
+    ht_entry_t* new_entries = (ht_entry_t*) calloc(new_capacity, sizeof *(table->entries));
     if (!new_entries)
         return FAIL;
-    ht_entry_t en_try;
+    ht_entry_t entry;
     for (int i = 0; i < table->capacity; i++) {
-        en_try = table->entries[i];
-        if (en_try.status == BUSY) {
-            __insertHash(new_entries, en_try.key, table->capacity, NULL);
-            free(en_try.key);
+        entry = table->entries[i];
+        if (entry.status == BUSY) {
+            __insertHash(new_entries, entry.key, new_capacity, NULL);
+            free(entry.key);
         }
     }
     free(table->entries);
@@ -82,7 +93,6 @@ expand_status_t expandHash(ht_t* table) {
     table->capacity = new_capacity;
     return SUCCESS;
 }
-
 
 ht_t* insertHash(ht_t* table, const char* str) {
     if (!table)
@@ -97,7 +107,7 @@ ht_t* deleteHash(ht_t* table, const char* str) {
     if (!table)
         return NULL;
 
-    uint index = hash(str) % table->capacity, _try = 0;
+    uint_fast16_t index = hash(str) % table->capacity, _try = 0;
 
     while (table->entries[index].status != FREE) {
         if (table->entries[index].status == BUSY && strcmp(table->entries[index].key, str) == 0) {
@@ -107,7 +117,8 @@ ht_t* deleteHash(ht_t* table, const char* str) {
             table->size--;
             return table;
         }
-        _try++, index = (index + _try * _try) % table->capacity;
+        _try++;
+        index = (index + _try * _try) % table->capacity;
     }
     return table;
 }

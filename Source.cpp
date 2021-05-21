@@ -40,8 +40,7 @@ unsigned HashFunc2(char* str, int size) {
   unsigned result = 0;
 
   for (int i = 0; str[i] != 0; i++) {
-    result += (unsigned)str[i] + result * 2;
-    result %= size;
+    result += ((unsigned)str[i] + 17)%size;
   }
 
   return result;

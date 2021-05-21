@@ -39,7 +39,7 @@ static uint_fast16_t hash(const char* s) {
             return h;
         h = (h * A) ^ (*ptr * B);
     }
-    return h; // or return h % C;
+    return h;
 }
 
 ht_entry_t* findHash(const ht_t* table, const char* str) {
@@ -75,11 +75,12 @@ ht_entry_t* __insertHash(ht_entry_t* entries, const char* str, const int capacit
     return entries;
 }
 
-expand_status_t expandHash(ht_t* table) {
-    int new_capacity = table->capacity > 0 ? table->capacity * 2 : 4;
+resize_status_t resizeHash(ht_t* table, double multiplier) {
+    int new_capacity = table->capacity > 0 ? (int) (table->capacity * multiplier) : 4;
     ht_entry_t* new_entries = (ht_entry_t*) calloc(new_capacity, sizeof *(table->entries));
-    if (!new_entries)
+    if (!new_entries || new_capacity <= 0)
         return FAIL;
+
     ht_entry_t entry;
     for (int i = 0; i < table->capacity; i++) {
         entry = table->entries[i];
@@ -97,7 +98,7 @@ expand_status_t expandHash(ht_t* table) {
 ht_t* insertHash(ht_t* table, const char* str) {
     if (!table)
         return NULL;
-    if (table->capacity * OCCUPANCY <= (table->size + 1) && expandHash(table) == FAIL)
+    if (table->capacity * OCCUPANCY <= (table->size + 1) && resizeHash(table, EXPAND) == FAIL)
         return table;
     __insertHash(table->entries, str, table->capacity, &table->size);
     return table;
@@ -106,6 +107,9 @@ ht_t* insertHash(ht_t* table, const char* str) {
 ht_t* deleteHash(ht_t* table, const char* str) {
     if (!table)
         return NULL;
+
+    if (table->capacity * (1 - OCCUPANCY) > table->size && resizeHash(table, SHRINK) == FAIL)
+        return table;
 
     uint_fast16_t index = hash(str) % table->capacity, _try = 0;
 

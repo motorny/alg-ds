@@ -1,7 +1,9 @@
 #pragma once
 
-#define OCCUPANCY 0.75
+#define OCCUPANCY 0.66
 #define INIT_SIZE 4
+#define EXPAND 2
+#define SHRINK 0.5
 
 typedef enum status {
     FREE,
@@ -9,10 +11,10 @@ typedef enum status {
     BUSY
 } status_t;
 
-typedef enum expand_status {
+typedef enum resize_status {
     SUCCESS,
     FAIL
-} expand_status_t;
+} resize_status_t;
 
 typedef struct ht_entry {
     char* key;
@@ -24,8 +26,6 @@ typedef struct ht {
     int capacity;
     ht_entry_t* entries;
 } ht_t;
-
-typedef unsigned int uint;
 
 ht_t* createHash(ht_t* table, int capacity);
 

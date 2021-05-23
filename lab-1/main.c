@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include "2-3_tree.h"
+#include "hashTable.h"
 #pragma warning(disable:4996)
 
 enum mode_t {
@@ -11,14 +10,14 @@ enum mode_t {
     ERROR = -1
 };
 
-int ReadAction(FILE* fp, int* keys) {
+int ReadAction(FILE* fp, data_t keys) {
     char c, n;
     int check;
-    check = fscanf(fp, "%c", &c);
+     check = fscanf(fp, "%c", &c);
     if (check == -1)
         return ERROR;
 
-    fscanf(fp, " %d", keys);
+    fscanf(fp, "%s", keys);
     fscanf(fp, "%c", &n); //it's for \n
 
     switch (c) {
@@ -36,36 +35,40 @@ int ReadAction(FILE* fp, int* keys) {
 }
 
 int main(void) {
-    int mode = 0, num = 0;
-    tree_t* tree = NULL;
+    int mode = 0;
+    data_t num[100];
 
-    mode = ReadAction(stdin, &num);
+    hash_t* table = CreateTable(TABLE_SIZE);
+    if (table == NULL)
+        return -1;
+
+    mode = ReadAction(stdin, num);
     if (mode == ERROR)
         return -1;
+
 
     do {
         switch (mode) {
         case ADD:
-            tree = Add(tree, num);
+            Add(table, num);
             break;
         case DELETE:
-           Del(&tree, num);
+            Del(table, num);
             break;
         case FIND:
-            if (Find(tree, num) != NULL)
+            if (Find(table, num) >= 0)
                 printf("yes\n");
             else
                 printf("no\n");
             break;
-        case PRINT:
-            PrintTree(tree);
-            break;
         default:
             break;
         }
-        mode = ReadAction(stdin, &num);
+        mode = ReadAction(stdin, num);
 
     } while (mode != ERROR);
+
+    Destroy(table);
 
     return 0;
 }

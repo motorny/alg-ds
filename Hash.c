@@ -2,21 +2,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-//#include "hasht.h"
+#include "hasht.h"
 #define STR_SIZE 100
 #pragma warning (disable:4996)
-
-typedef enum {
-	NOT_INTENTED = 0,
-	NOT_FREE,
-	FREE
-}codes;
-
-typedef struct Htable {
-	char str[100];
-	unsigned size;
-	codes status;
-}Htable;
 
 int Init(Htable** ht, int htSize) {
 	*ht = (Htable*)malloc(sizeof(Htable) * htSize);

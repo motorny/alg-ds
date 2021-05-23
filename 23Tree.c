@@ -1,7 +1,7 @@
 #pragma warning (disable:4996)
 #include <stdio.h>
 #include <stdlib.h>
-//#include "23Tree.h"
+#include "23Tree.h"
 
 typedef struct Tree23 {
 
@@ -350,39 +350,3 @@ void Print(Tree23* tree) {
 		}
 	}
 }
-
-
-int main(void) {
-
-	Tree23* tree = NULL;
-	int letter, number;
-
-	letter = getchar();
-	while (letter != EOF) {
-
-		scanf("%d", &number);
-		switch (letter) {
-		case 'a':
-			tree = InsertNumber(tree, number);
-			break;
-		case 'r':
-			tree = DeleteNumber(tree, number);
-			break;
-		case 'f':
-			printf(FindNumber(tree, number) == NULL ? "no\n" : "yes\n");
-			break;
-		default:
-			break;
-		}
-
-		letter = getchar();
-		if (letter == '\n')
-			letter = getchar();
-	}
-	Print(tree);
-	DestroyTree(tree);
-	return 0;
-}
-
-
-
